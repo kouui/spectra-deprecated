@@ -10,7 +10,7 @@ if __name__ == "__main__":
     #-------------------------------------------------------------------------
     # C III Be like
     #-------------------------------------------------------------------------
-    file = "../atom/Si_III/Si_III.Level"
+    file = "../data/atom/Si_III/Si_III.Level"
 
     atom = AtomCls.Atom(file)
     gro = Grotrian.Grotrian(_atom=atom, _conf_prefix="1s2.2s2.2p6.")

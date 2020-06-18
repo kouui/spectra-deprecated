@@ -9,9 +9,9 @@ if __name__ == "__main__":
     from src.Atomic import LTELib, ColExcite, SEsolver
     from src.RadiativeTransfer import Thin
 
-    file     = "../atom/C_III/C_III.Level"
-    file_Aji = "../atom/C_III/Einstein_A/Nist.Aji"
-    file_CEe = "../atom/C_III/Collisional_Excitation/Berrington_et_al_1985.Electron"
+    file     = "../data/atom/C_III/C_III.Level"
+    file_Aji = "../data/atom/C_III/Einstein_A/Nist.Aji"
+    file_CEe = "../data/atom/C_III/Collisional_Excitation/Berrington_et_al_1985.Electron"
     atom = AtomCls.Atom(file, _file_Aji=file_Aji, _file_CEe=file_CEe)
     Te = 2E+04
     ne = 1E+10
