@@ -2,6 +2,7 @@
 # Collisional Ionization Rate
 # CI [s^-1 K^-1/2 cm^3] : RH/Atoms_example/CaII.atom
 # Collision Rate : n_e * C_ik = n_e * CI * exp(-dE/kT) * sqrt(T) / f2
+nCont   5
 Temperature     3.00e+03    5.00e+03    7.00e+03    1.50e+04	5.00e+04	1.00e+05
 END
 #--------------------------------------------------------------------------------------------------

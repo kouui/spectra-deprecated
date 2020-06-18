@@ -21,14 +21,15 @@
 #       - Hydrogenic    : 0     -->     \nu^{-3} dependency
 #       - data          : 1     -->     reads data from experimental result
 #-----------------------------------------------------------------------------
-nCont : 5
-# configuration_i             term_i      J_i
-# configuration_j             term_j      J_j
-# nLambda   Wavelength-Dependence   alpha0[cm^2]
+nCont   5
+nMesh   20
+End
+#-----------------------------------------------------------------------------
+# configuration_i         term_i      J_i       configuration_j             term_j      J_j nLambda   Wavelength-Dependence   alpha0[cm^2]
 #
-1s2.2s2.2p6.3s2.3p6.4s      2S          1/2
-1s2.2s2.2p6.3s2.3p6         1S          0
-21  data   2.0363E-19
+# wavelength [nm]    cross section [cm^2]
+#
+1s2.2s2.2p6.3s2.3p6.4s      2S          1/2     1s2.2s2.2p6.3s2.3p6         1S          0   15  data   2.0363E-19
 #
 104.4   2.0363E-19
 100.0   2.0974E-19
@@ -46,9 +47,7 @@ nCont : 5
  40.0   1.2248E-19
  35.0   1.0486E-19
 #
-1s2.2s2.2p6.3s2.3p6.3d      2D          3/2
-1s2.2s2.2p6.3s2.3p6         1S          0
-21  data    6.1484E-18
+1s2.2s2.2p6.3s2.3p6.3d      2D          3/2     1s2.2s2.2p6.3s2.3p6         1S          0   20  data    6.1484E-18
 #
 121.7   6.1484E-18
 120.0   6.0860E-18
@@ -71,9 +70,7 @@ nCont : 5
  35.0   1.5169E-18
  30.0   1.1734E-18
 #
-1s2.2s2.2p6.3s2.3p6.3d      2D          5/2
-1s2.2s2.2p6.3s2.3p6         1S          0
-21  data    6.1484E-18
+1s2.2s2.2p6.3s2.3p6.3d      2D          5/2     1s2.2s2.2p6.3s2.3p6         1S          0   20  data    6.1484E-18
 #
 121.8   6.1484E-18
 120.0   6.0860E-18
@@ -96,9 +93,7 @@ nCont : 5
  35.0   1.5169E-18
  30.0   1.1734E-18
 #
-1s2.2s2.2p6.3s2.3p6.4p      2P          1/2
-1s2.2s2.2p6.3s2.3p6         1S          0
-21  data    2.3823E-18
+1s2.2s2.2p6.3s2.3p6.4p      2P          1/2     1s2.2s2.2p6.3s2.3p6         1S          0   18  data    2.3823E-18
 #
 141.7   2.3823E-18
 140.0   2.2664E-18
@@ -119,9 +114,7 @@ nCont : 5
  65.0   1.3249E-19
  60.0   1.0130E-19
 #
-1s2.2s2.2p6.3s2.3p6.4p      2P          3/2
-1s2.2s2.2p6.3s2.3p6         1S          0
-21  data    2.3823E-18
+1s2.2s2.2p6.3s2.3p6.4p      2P          3/2     1s2.2s2.2p6.3s2.3p6         1S          0   18  data    2.3823E-18
 #
 142.1   2.3823E-18
 140.0   2.2664E-18

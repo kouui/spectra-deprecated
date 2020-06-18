@@ -8,6 +8,7 @@ import numpy as np
 import numba as nb
 
 from .. import Constants as Cst
+from ..Math import BasicM
 
 
 ################################################################################
@@ -15,7 +16,7 @@ from .. import Constants as Cst
 #    - Voigt
 #    - Gaussian
 ################################################################################
-
+@nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)
 def Voigt(a,x):
     r"""
     Calculate Doppler width normalized voigt function using polynomial fitting formula.
@@ -124,8 +125,119 @@ def Gaussian(x):
     return res
 
 ################################################################################
+# constructing mesh distribution
+################################################################################
+def makeLineMesh_Half(nLambda, qcore, qwing, q):
+    r"""
+    Construct half line mesh. Following RH's `getlambda.c`.
+    called by it's wrapper function `makeLineMesh_Full`
+
+    Parameters
+    ----------
+
+    nLambda : np.uint8 or any other integer type
+        Number of points in full line mesh. Must be an odd number.
+
+    qcore : np.double
+        a parameter to control mesh density.
+        there are always half of all points inside [-qcore,qcore].
+
+    qwing : np.double
+        a parameter to control how far away your mesh points reach.
+
+    q : array-like, dtype of np.double
+        a array to store output half line mesh distribution.
+
+    Notes
+    -------
+    with q[0] = 0 and q[-1] = qwing, nLambda//2 points belonging to -qcore< q < +qcore. So,
+
+    - change qwing, you change how far your Doppler width mesh reach
+    - change qcore, you change how dense in line core.
+    """
+    assert BasicM.is_odd(nLambda), "nLambda should be an odd number."
+    nLhalf = nLambda//2 + 1
+
+    if qwing <= 2*qcore:
+        beta = 1.0
+    else:
+        beta = 0.5 * qwing / qcore
+
+    y = beta + (beta*beta + (beta-1.)*nLhalf + 2. - 3.*beta)**(0.5)
+    b = 2.0*np.log(y) / (nLhalf - 1)
+    a = qwing / (nLhalf - 2. + y*y)
+
+    for i in range(0, nLhalf):
+        q[i] = a * (i + (np.exp(b*i)-1.))
+
+def makeLineMesh_Full(nLambda, qcore, qwing):
+    r"""
+    Construct Full line mesh.
+    Calls inner function `makeLineMesh_Half` to construct half part
+    and then make the use of symmetry.
+
+    Parameters
+    ----------
+
+    nLambda : np.uint8 or any other integer type
+        Number of points in full line mesh. Must be an odd number.
+
+    qcore : np.double
+        a parameter to control mesh density.
+        there are always half of all points inside [-qcore,qcore].
+
+    qwing : np.double
+        a parameter to control how far away your mesh points reach.
+
+    Returns
+    --------
+    x : array-like, dtype of np.double
+        Full line mesh distribution.
+
+    Notes
+    -------
+    with q[0] = 0 and q[-1] = qwing, nLambda//2 points belonging to -qcore< q < +qcore. So,
+
+    - change qwing, you change how far your Doppler width mesh reach
+    - change qcore, you change how dense in line core.
+    """
+
+    x = np.empty(nLambda, dtype=np.double)
+    nLmid = nLambda // 2
+    makeLineMesh_Half(nLambda, qcore, qwing, x[nLmid:])
+    x[:nLmid] = -x[nLmid+1:][::-1]
+
+    return x
+
+def makeContinuumMesh(nLambda):
+    r"""
+    Given number of mesh points,
+    compute a mesh distribution sampling most aroung wavelength edge.
+
+    Parameters
+    ----------
+
+    nLambda : np.uint8 or any other integer type
+        Number of points in Continuum mesh.
+
+    Returns
+    --------
+
+    Mesh : array-like, dtype of np.double
+        Output mesh distribution.
+
+    """
+    mesh = np.empty(nLambda, dtype=np.double)
+    for j in range(1, nLambda+1):
+        qj_ = (nLambda+1.-j) / nLambda
+        mesh[j-1] = qj_**(0.5)
+
+    return mesh
+
+
+################################################################################
 # whether to compile them using numba's LLVM
 ################################################################################
 
-if Cst.isJIT == True:
-    Voigt = nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)( Voigt )
+#if Cst.isJIT == True:
+#    Voigt = nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)( Voigt )
