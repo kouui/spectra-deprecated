@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.ColExcite.interpolate_CE_fac &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.Atomic.ColExcite.Cij_to_Cji" href="src.Atomic.ColExcite.Cij_to_Cji.html" />
+    <link rel="prev" title="ColExcite API" href="../ColExcite_API.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.ColExcite.interpolate_CE_fac</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="../ColExcite_API.html">ColExcite API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.ColExcite.Cij_to_Cji.html">src.Atomic.ColExcite.Cij_to_Cji</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-colexcite-interpolate-ce-fac">
+<h1>src.Atomic.ColExcite.interpolate_CE_fac<a class="headerlink" href="#src-atomic-colexcite-interpolate-ce-fac" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.ColExcite.interpolate_CE_fac">
+<code class="descclassname">src.Atomic.ColExcite.</code><code class="descname">interpolate_CE_fac</code><span class="sig-paren">(</span><em>_table</em>, <em>_Te</em>, <em>_Te_table</em>, <em>_f1</em>, <em>_f2</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/ColExcite.html#interpolate_CE_fac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.ColExcite.interpolate_CE_fac" title="Permalink to this definition">¶</a></dt>
+<dd><p>given temperature, interpolate collisional excitation coefficient
+( in most case is Effective collisional strength)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_table</strong> (<em>np.double</em><em>, </em><em>array</em><em>, </em><em>(</em><em>nLine</em><em>, </em><em>nTemperature</em><em>)</em>) – a table of CE coefficient as a function of temperature for interpolation</p></li>
+<li><p><strong>_Te</strong> (<em>scalar</em>) – termperature, [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
+<li><p><strong>_Te_table</strong> (<em>np.double</em><em>, </em><em>array</em><em>, </em><em>(</em><em>nTemperature</em><em>,</em><em>)</em>) – corresponding termperature points in _table, [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
+<li><p><strong>_f1</strong> (<em>int</em>) – a factor needed to compute CE rate coefficient</p></li>
+<li><p><strong>_f2</strong> (<em>int</em>) – a factor needed to compute CE rate coefficient</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>_CE_fac</strong> – the CE coefficient we need to compute CE rate coefficient</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.double, np.array, (nLine,)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>From <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>John T. Mariska, “The Solar Transition Region”,
+Cambridge University Press, pp. 22, 1992</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="../ColExcite_API.html">ColExcite API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.ColExcite.Cij_to_Cji.html">src.Atomic.ColExcite.Cij_to_Cji</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

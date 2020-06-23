@@ -159,7 +159,7 @@ class AtmosphereC1d(AtmosphereCartesian):
             Mesh = self.__defaultSlabSpatialMesh__(isHalf)
         else:
             assert Mesh.ndim==1, "keyword argument Mesh must be a one dimensional numpy.ndarray."
-            assert Mesh[0]==0 and Mesh[-1]==1, "Mesh runs from 0 to 1 ."
+            #assert Mesh[0]==0 and Mesh[-1]==1, "Mesh runs from 0 to 1 ."
 
         data = np.recarray(Mesh.shape, dtype=self.dType); self.data = data
         data.Mesh[:] = Mesh[:]
@@ -203,6 +203,8 @@ class AtmosphereC1d(AtmosphereCartesian):
             return Mesh
         else :
             return Mesh[:46]
+
+        self.setUniform()
 
     def setUniform(self, Te=1E4, Vt=5.E5, Ne=1E10, Pg=5E-1, Vd=0.E5):
         r"""

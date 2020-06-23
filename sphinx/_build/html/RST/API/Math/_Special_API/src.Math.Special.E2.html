@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Math.Special.E2 &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Visual API" href="../../Visual_API.html" />
+    <link rel="prev" title="src.Math.Special.E1" href="src.Math.Special.E1.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Math.Special.E2</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Math.Special.E1.html">src.Math.Special.E1</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../../Visual_API.html">Visual API</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-math-special-e2">
+<h1>src.Math.Special.E2<a class="headerlink" href="#src-math-special-e2" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Math.Special.E2">
+<code class="descclassname">src.Math.Special.</code><code class="descname">E2</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Math/Special.html#E2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Math.Special.E2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate Exponential integral <span class="math notranslate nohighlight">\(E_2(x)\)</span> from <span class="math notranslate nohighlight">\(E_1(x)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.double</em><em> or </em><em>array-like</em>) – independent variable x</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>E2</strong> – 2nd order Exponential integral of x</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.double or array-like</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Using relation <a class="footnote-reference brackets" href="#id2" id="id1">1</a> Equation(11.127):</p>
+<div class="math notranslate nohighlight">
+\[E_{n+1}(x) = [e^{-x} - xE_{n}(x)] / n\]</div>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Ivan Hubeny, Dimitri Mihalas, “Theory of Stellar Atmosphere:
+An Introduction to Astrophysical Non-equilibrium
+Quantitative Spectroscopic Analysis”,
+Princeton University Press, pp. 365, 2015.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Math.Special.E1.html">src.Math.Special.E1</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../../Visual_API.html">Visual API</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

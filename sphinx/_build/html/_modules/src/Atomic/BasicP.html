@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.BasicP &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.BasicP</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.Atomic.BasicP</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################################</span>
+<span class="c1"># this file defines functions for</span>
+<span class="c1">#     calculations related to naive/basic physics process</span>
+<span class="c1">################################################################################</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Constants</span> <span class="k">as</span> <span class="n">Cst</span>
+
+
+<span class="c1">################################################################################</span>
+<span class="c1"># wavelength [cm] &lt;--&gt; frequency [hz]</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="wave_to_freq"><a class="viewcode-back" href="../../../RST/API/Atomic/_BasicP_API/src.Atomic.BasicP.wave_to_freq.html#src.Atomic.BasicP.wave_to_freq">[docs]</a><span class="k">def</span> <span class="nf">wave_to_freq</span><span class="p">(</span><span class="n">wave</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    convert Wavelength to Frequency.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    wave : np.double or array-like</span>
+<span class="sd">        Wavelength, [:math:`cm`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    freq : np.double or array-like</span>
+<span class="sd">        Frequency, [:math:`Hz`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    .. math:: \nu = \frac{c}{\lambda}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="n">wave</span>
+    <span class="k">return</span> <span class="n">freq</span></div>
+
+<div class="viewcode-block" id="freq_to_wave"><a class="viewcode-back" href="../../../RST/API/Atomic/_BasicP_API/src.Atomic.BasicP.freq_to_wave.html#src.Atomic.BasicP.freq_to_wave">[docs]</a><span class="k">def</span> <span class="nf">freq_to_wave</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    convert Frequency to Wavelength.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    freq : np.double or array-like</span>
+<span class="sd">        Frequency, [:math:`Hz`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    wave : np.double or array-like</span>
+<span class="sd">        Wavelength, [:math:`cm`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    .. math:: \lambda = \frac{c}{\nu}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wave</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="n">freq</span>
+    <span class="k">return</span> <span class="n">wave</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Doppler shift and Doppler width</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="Dvlocity_to_Dshift"><a class="viewcode-back" href="../../../RST/API/Atomic/_BasicP_API/src.Atomic.BasicP.Dvlocity_to_Dshift.html#src.Atomic.BasicP.Dvlocity_to_Dshift">[docs]</a><span class="k">def</span> <span class="nf">Dvlocity_to_Dshift</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    given Doppler velocity and the line central wavelength/frequency,</span>
+<span class="sd">    compute Doppler shift in wavelength/frequency.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    p0 : np.double or array-like</span>
+<span class="sd">        Frequency in any frequency unit or Wavelength in any length unit</span>
+<span class="sd">    v : np.double or array-like</span>
+<span class="sd">        line of sight velocity, [:math:`cm/s`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dp : np.double or array-like</span>
+<span class="sd">        Frequency or Wavelength, same unit with input `p0`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    in wavelength,</span>
+
+<span class="sd">    .. math:: d\lambda = \lambda_0 \frac{v}{c}</span>
+
+<span class="sd">    in frequency,</span>
+
+<span class="sd">    .. math:: d\nu = \nu_0 \frac{v}{c}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dp</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">*</span> <span class="n">v</span> <span class="o">/</span> <span class="n">Cst</span><span class="o">.</span><span class="n">c_</span>
+    <span class="k">return</span> <span class="n">dp</span></div>
+
+<div class="viewcode-block" id="get_Doppler_width"><a class="viewcode-back" href="../../../RST/API/Atomic/_BasicP_API/src.Atomic.BasicP.get_Doppler_width.html#src.Atomic.BasicP.get_Doppler_width">[docs]</a><span class="k">def</span> <span class="nf">get_Doppler_width</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">Te</span><span class="p">,</span> <span class="n">Vt</span><span class="p">,</span> <span class="n">am</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given central wavelength/frequency, relative atomic mass of a line,</span>
+<span class="sd">    and the temperature, turbulent velocity, compute the corresponding</span>
+<span class="sd">    Doppler Width.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    p0 : np.double or array-like</span>
+<span class="sd">        Frequency in any frequency unit or Wavelength in any length unit</span>
+<span class="sd">    Te : np.double or array-like</span>
+<span class="sd">        Temperature, [:math:`K`]</span>
+<span class="sd">    Vt : np.double or array-like</span>
+<span class="sd">        Turbulent velocity, [:math:`cm/s`]</span>
+<span class="sd">    am : np.double or array-like</span>
+<span class="sd">        atomic mass relative to hydrogen atom. [-]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dp : np.double or array-like</span>
+<span class="sd">        Frequency/Wavelength Doppler width, same unit with input argument `p0`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    According to [1]_.</span>
+
+<span class="sd">    .. math:: \eta_{0} = (2kT/m + Vt^2)^{1/2}</span>
+
+<span class="sd">    in wavelength,</span>
+
+<span class="sd">    .. math:: d\lambda = \lambda_0 \frac{\eta_{0}}{c}</span>
+
+<span class="sd">    in frequency,</span>
+
+<span class="sd">    .. math:: d\nu = \nu_0 \frac{\eta_{0}}{c}</span>
+
+<span class="sd">    References</span>
+<span class="sd">    -----------</span>
+
+<span class="sd">    .. [1] Robert J. Rutten, &quot;Radiative Transfer in Stellar Atmosphere&quot;, pp. 82, 2003.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">eta0_</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">Te</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">mH_</span><span class="o">*</span><span class="n">am</span><span class="p">)</span> <span class="o">+</span> <span class="n">Vt</span><span class="o">*</span><span class="n">Vt</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">dp</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">*</span> <span class="n">eta0_</span> <span class="o">/</span> <span class="n">Cst</span><span class="o">.</span><span class="n">c_</span>
+    <span class="k">return</span> <span class="n">dp</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

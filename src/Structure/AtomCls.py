@@ -6,6 +6,7 @@ from ..RadiativeTransfer import Profile
 
 class Atom:
 
+
     def __init__(self, _filepath, _file_Aji=None, _file_CEe=None, _file_CEp=None):
         r"""
         initial method of class Atom.

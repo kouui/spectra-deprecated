@@ -22,7 +22,7 @@ J2erg_ = 1.E+7                          #: unit conversion from J to erg, [:math
 m2cm_ = 1.E+2                           #: unit conversion from m to cm, [:math:`cm/m`]
 micro2AA_ = 1.E4                        #: unit conversion from micro to angstrom, [:math:`A / \mu m`]
 K2eV_ = 8.6173324 * 1.E-5               #: compute electron temperature in unit eV, [:math:`eV / K`]
-eV2AA_div_ = 1.23984176 * 1E+4          #: unit conversion from eV to angstrom ('div': ex. eV2AA_div_ / 2[eV] = 6199.2088[AA]), [:math:`eV \cdot A`]
+eV2AA_div_ = 1.23984176 * 1E+4          #: unit conversion from eV to angstrom, [:math:`eV \cdot A`]
 
 ################################################################################
 # physcis constants
@@ -36,7 +36,7 @@ mH_ = 1.660     * 1.E-24                #: mass of hydrogen atom, [:math:`g`]
 me_ = 9.1093836 * 1.E-28                #: mass of electron, [:math:`g`]
 E_Rydberg_ = 2.1798741 * 1.E-11         #: Rydberg constant of hydrogen atom, [:math:`erg`]
 a0_ = 5.2917720859 * 1.E-9              #: Bohr radius, [:math:`cm`]
-alp_ = 1/137.036                        #: fine structure constant, [:math:``]
+alp_ = 1/137.036                        #: fine structure constant, [:math:`-`]
 AU_ = 1.49597871 * 1.E+13               #: astronomical unit, distance from the sun to our earth, [:math:`cm`]
 R_sun_ = 6.957 * 1.E+10                 #: Solar radius, [:math:`cm`]
 
@@ -55,18 +55,21 @@ saha_ = 2 * (2*pi_*me_*k_/h_/h_)**(1.5)
 ################################################################################
 
 L_s2i = { "S" : 0, "P" : 1, "D" : 2, "F" : 3, "G" : 4, "H" : 5, "I" : 6 }
-L_i2s = { 0 : "S", 1 : "P", 2 : "D", 3 : "F", 4 : "G", 5 : "H", 6 : "I" }
 """a hash dictionary mapping symbolic quantum number L to its integer value
+"""
+L_i2s = { 0 : "S", 1 : "P", 2 : "D", 3 : "F", 4 : "G", 5 : "H", 6 : "I" }
+"""a hash dictionary mapping integer value to its symbolic quantum number L
 """
 
 ################################################################################
 # constants for code configuration
 ################################################################################
-isJIT = True
+isJIT = False
 """whether to turn on the JIT compilation in all *.py files,
 since sphinx does no understand numba thus can not generate documentation for numba jitted functions.
 
 set to
     True  : before simulation; before pushing to github
+
     False : before generating documentation using sphinx
 """

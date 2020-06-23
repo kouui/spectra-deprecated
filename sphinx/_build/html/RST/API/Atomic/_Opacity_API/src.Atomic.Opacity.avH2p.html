@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.Opacity.avH2p &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.Atomic.Opacity.H2p_CrossSection" href="src.Atomic.Opacity.H2p_CrossSection.html" />
+    <link rel="prev" title="src.Atomic.Opacity.HIRayleigh_CrossSection" href="src.Atomic.Opacity.HIRayleigh_CrossSection.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.Opacity.avH2p</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.Opacity.HIRayleigh_CrossSection.html">src.Atomic.Opacity.HIRayleigh_CrossSection</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.Opacity.H2p_CrossSection.html">src.Atomic.Opacity.H2p_CrossSection</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-opacity-avh2p">
+<h1>src.Atomic.Opacity.avH2p<a class="headerlink" href="#src-atomic-opacity-avh2p" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.Opacity.avH2p">
+<code class="descclassname">src.Atomic.Opacity.</code><code class="descname">avH2p</code><span class="sig-paren">(</span><em>T</em>, <em>wl</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/Opacity.html#avH2p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.Opacity.avH2p" title="Permalink to this definition">¶</a></dt>
+<dd><p>H2+ opacity per 1 HI atom and per 1 H+, scaled by e26,</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (temperature, [<span class="math notranslate nohighlight">\(K\)</span>]) – </p></li>
+<li><p><strong>wl</strong> (wave length, [<span class="math notranslate nohighlight">\(\AA\)</span>]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>kh2</strong> – kh2 = nhi * np * avh2p * 1.e-26, [<span class="math notranslate nohighlight">\(cm^{-1}\)</span>]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>absorption coeff,</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>from <a class="footnote-reference brackets" href="#id3" id="id1">1</a>, <a class="footnote-reference brackets" href="#id4" id="id2">2</a>.</p>
+<ul class="simple">
+<li><p>stimulated emission is corrected.</p></li>
+</ul>
+<p>Modification history:
+- k.ichimoto 18 jun. 1987,  6 Jan. 1992
+- k.ichimoto  19 Feb.1994
+- 2019.9.11  K.Ichimoto  from IDL avh2p.pro</p>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Gingerich SAO special report 167,21,1964.</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Carbon &amp; Gingerich (1969) “theory and observation of normal stellar atmosphere”  MIT press</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.Opacity.HIRayleigh_CrossSection.html">src.Atomic.Opacity.HIRayleigh_CrossSection</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.Opacity.H2p_CrossSection.html">src.Atomic.Opacity.H2p_CrossSection</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

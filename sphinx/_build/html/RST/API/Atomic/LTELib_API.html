@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>LTELib API &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="src.Atomic.LTELib.Boltzmann_distribution" href="_LTELib_API/src.Atomic.LTELib.Boltzmann_distribution.html" />
+    <link rel="prev" title="src.Atomic.Gaunt.g2" href="_Gaunt_API/src.Atomic.Gaunt.g2.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>LTELib API</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="_Gaunt_API/src.Atomic.Gaunt.g2.html">src.Atomic.Gaunt.g2</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="_LTELib_API/src.Atomic.LTELib.Boltzmann_distribution.html">src.Atomic.LTELib.Boltzmann_distribution</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="ltelib-api">
+<h1>LTELib API<a class="headerlink" href="#ltelib-api" title="Permalink to this headline">¶</a></h1>
+<p>description here.</p>
+<span class="target" id="module-src.Atomic.LTELib"></span><table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.Boltzmann_distribution.html#src.Atomic.LTELib.Boltzmann_distribution" title="src.Atomic.LTELib.Boltzmann_distribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Boltzmann_distribution</span></code></a>(_gi, _gj, _Eji, _Te)</p></td>
+<td><p>calculate the population ratio between upper level j and lower level i under LTE.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.Saha_distribution.html#src.Atomic.LTELib.Saha_distribution" title="src.Atomic.LTELib.Saha_distribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Saha_distribution</span></code></a>(_gi, _gk, _chi, _ne, _Te)</p></td>
+<td><p>calculate the population ratio between the ground states of two subsequent ionization stage under LTE.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.get_LTE_ratio.html#src.Atomic.LTELib.get_LTE_ratio" title="src.Atomic.LTELib.get_LTE_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_LTE_ratio</span></code></a>(_erg, _g, _stage, _Te, _Ne)</p></td>
+<td><p>Compute LTE population ratio relative to 1st level.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz.html#src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz" title="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EinsteinA_to_EinsteinBs_hz</span></code></a>(Aji, f0, gi, gj)</p></td>
+<td><p>given Einstein A coefficient Aij, calculate Einstein B coefficients Bij and Bji.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm.html#src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm" title="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EinsteinA_to_EinsteinBs_cm</span></code></a>(Aji, w0, gi, gj)</p></td>
+<td><p>given Einstein A coefficient Aij, calculate Einstein B coefficients Bij and Bji.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.Planck_hz.html#src.Atomic.LTELib.Planck_hz" title="src.Atomic.LTELib.Planck_hz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Planck_hz</span></code></a>(F, T)</p></td>
+<td><p>given frequency and temperature, calculate the frequency based planck function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.Planck_cm.html#src.Atomic.LTELib.Planck_cm" title="src.Atomic.LTELib.Planck_cm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Planck_cm</span></code></a>(W, T)</p></td>
+<td><p>given wavelength and temperature, calculate the wavelength based planck function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_LTELib_API/src.Atomic.LTELib.Ufunc.html#src.Atomic.LTELib.Ufunc" title="src.Atomic.LTELib.Ufunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Ufunc</span></code></a>(elm, T)</p></td>
+<td><p>partition function of neutral hydrogen</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="_Gaunt_API/src.Atomic.Gaunt.g2.html">src.Atomic.Gaunt.g2</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="_LTELib_API/src.Atomic.LTELib.Boltzmann_distribution.html">src.Atomic.LTELib.Boltzmann_distribution</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Structure.AtmosphereCls.AtmosphereC1d &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.Structure.AtmosphereCls.AtmosphereCartesian" href="src.Structure.AtmosphereCls.AtmosphereCartesian.html" />
+    <link rel="prev" title="AtmosphereCls API" href="../AtmosphereCls_API.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Structure.AtmosphereCls.AtmosphereC1d</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="../AtmosphereCls_API.html">AtmosphereCls API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Structure.AtmosphereCls.AtmosphereCartesian.html">src.Structure.AtmosphereCls.AtmosphereCartesian</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-structure-atmospherecls-atmospherec1d">
+<h1>src.Structure.AtmosphereCls.AtmosphereC1d<a class="headerlink" href="#src-structure-atmospherecls-atmospherec1d" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="src.Structure.AtmosphereCls.AtmosphereC1d">
+<em class="property">class </em><code class="descclassname">src.Structure.AtmosphereCls.</code><code class="descname">AtmosphereC1d</code><span class="sig-paren">(</span><em>thickness</em>, <em>isHalf=False</em>, <em>Mesh=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Structure/AtmosphereCls.html#AtmosphereC1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Structure.AtmosphereCls.AtmosphereC1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>one dimensional Cartesion Atmosphere,
+inheritting parent class <cite>AtmosphereCartesian</cite></p>
+<dl class="attribute">
+<dt id="src.Structure.AtmosphereCls.AtmosphereC1d.Scale">
+<code class="descname">Scale</code><a class="headerlink" href="#src.Structure.AtmosphereCls.AtmosphereC1d.Scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>a tuple of size 1, specifying the grometry scale along line of sight</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>tuple of float or int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="src.Structure.AtmosphereCls.AtmosphereC1d.data">
+<code class="descname">data</code><a class="headerlink" href="#src.Structure.AtmosphereCls.AtmosphereC1d.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>a structured array to store physical parameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>numpy.recarray, dtype of dTpye</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="src.Structure.AtmosphereCls.AtmosphereC1d.dType">
+<code class="descname">dType</code><a class="headerlink" href="#src.Structure.AtmosphereCls.AtmosphereC1d.dType" title="Permalink to this definition">¶</a></dt>
+<dd><p>a data type object decleared in parent class <cite>AtmosphereCartesian</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>numpy.dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.Structure.AtmosphereCls.AtmosphereC1d.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>thickness</em>, <em>isHalf=False</em>, <em>Mesh=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Structure/AtmosphereCls.html#AtmosphereC1d.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Structure.AtmosphereCls.AtmosphereC1d.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thickness</strong> (<em>np.double</em>) – thickness of your model, [<span class="math notranslate nohighlight">\(cm\)</span>]</p></li>
+<li><p><strong>Mesh</strong> (<em>array-like</em><em>, </em><em>dtype of np.double</em><em>, </em><em>optional</em>) – <p>default : None</p>
+<ul>
+<li><p>None : construct a  91 points slab Mesh or half slab Mesh automatically</p></li>
+<li><p>array-like : user-defined mesh grid, with scale from Mesh[0] = 0 to Mesh[1] = 1</p></li>
+</ul>
+</p></li>
+<li><p><strong>isHalf</strong> (<em>boolean</em><em>, </em><em>optional</em>) – <p>default : True</p>
+<ul>
+<li><p>False : full slab mesh grid, frequent at lower/upper surface, sparse at the middle, 91 grid points.</p></li>
+<li><p>True : upper half of the full slab mesh, 46 grid points.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#src.Structure.AtmosphereCls.AtmosphereC1d.__init__" title="src.Structure.AtmosphereCls.AtmosphereC1d.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(thickness[, isHalf, Mesh])</p></td>
+<td><p>initialization method.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">readBackgroundIntensity</span></code>(path)</p></td>
+<td><p>read background intensity from path to <cite>self.BackRad</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUniform</span></code>([Te, Vt, Ne, Pg, Vd])</p></td>
+<td><p>set all parameters uniform across the space</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndim</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="../AtmosphereCls_API.html">AtmosphereCls API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Structure.AtmosphereCls.AtmosphereCartesian.html">src.Structure.AtmosphereCls.AtmosphereCartesian</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

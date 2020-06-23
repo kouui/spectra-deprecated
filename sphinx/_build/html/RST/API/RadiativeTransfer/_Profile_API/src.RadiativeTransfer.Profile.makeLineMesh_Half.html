@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.RadiativeTransfer.Profile.makeLineMesh_Half &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.RadiativeTransfer.Profile.makeLineMesh_Full" href="src.RadiativeTransfer.Profile.makeLineMesh_Full.html" />
+    <link rel="prev" title="src.RadiativeTransfer.Profile.Gaussian" href="src.RadiativeTransfer.Profile.Gaussian.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.RadiativeTransfer.Profile.makeLineMesh_Half</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.RadiativeTransfer.Profile.Gaussian.html">src.RadiativeTransfer.Profile.Gaussian</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.RadiativeTransfer.Profile.makeLineMesh_Full.html">src.RadiativeTransfer.Profile.makeLineMesh_Full</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-radiativetransfer-profile-makelinemesh-half">
+<h1>src.RadiativeTransfer.Profile.makeLineMesh_Half<a class="headerlink" href="#src-radiativetransfer-profile-makelinemesh-half" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.RadiativeTransfer.Profile.makeLineMesh_Half">
+<code class="descclassname">src.RadiativeTransfer.Profile.</code><code class="descname">makeLineMesh_Half</code><span class="sig-paren">(</span><em>nLambda</em>, <em>qcore</em>, <em>qwing</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/RadiativeTransfer/Profile.html#makeLineMesh_Half"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.RadiativeTransfer.Profile.makeLineMesh_Half" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct half line mesh. Following RH’s <cite>getlambda.c</cite>.
+called by it’s wrapper function <cite>makeLineMesh_Full</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nLambda</strong> (<em>np.uint8</em><em> or </em><em>any other integer type</em>) – Number of points in full line mesh. Must be an odd number.</p></li>
+<li><p><strong>qcore</strong> (<em>np.double</em>) – a parameter to control mesh density.
+there are always half of all points inside [-qcore,qcore].</p></li>
+<li><p><strong>qwing</strong> (<em>np.double</em>) – a parameter to control how far away your mesh points reach.</p></li>
+<li><p><strong>q</strong> (<em>array-like</em><em>, </em><em>dtype of np.double</em>) – a array to store output half line mesh distribution.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>with q[0] = 0 and q[-1] = qwing, nLambda//2 points belonging to -qcore&lt; q &lt; +qcore. So,</p>
+<ul class="simple">
+<li><p>change qwing, you change how far your Doppler width mesh reach</p></li>
+<li><p>change qcore, you change how dense in line core.</p></li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.RadiativeTransfer.Profile.Gaussian.html">src.RadiativeTransfer.Profile.Gaussian</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.RadiativeTransfer.Profile.makeLineMesh_Full.html">src.RadiativeTransfer.Profile.makeLineMesh_Full</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

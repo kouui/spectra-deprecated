@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Visual.Grotrian &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Visual.Grotrian</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.Visual.Grotrian</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Constants</span> <span class="k">as</span> <span class="n">Cst</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">def</span> <span class="nf">_prepare_dict</span><span class="p">(</span><span class="n">_atom</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    separate singlet and multiplet</span>
+
+<span class="sd">        - singlet   : { (conf_clean,term) : { J : (E[eV], L, conf_origin) } }</span>
+<span class="sd">        - multiplet : { (conf_clean,term) : { J : (E[eV], L, conf_origin) } }</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _atom : AtomCls.Atom</span>
+<span class="sd">        object of the atomic model</span>
+
+<span class="sd">    _conf_prefix : str</span>
+<span class="sd">        common configuration string of the inner shell</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    _singlet : { (conf_clean,term) : { J : (E[eV], L, conf_origin) } }</span>
+
+<span class="sd">    _multiplet : { (conf_clean,term) : { J : (E[eV], L, conf_origin) } }</span>
+
+<span class="sd">    _Lset : { &quot;singlet&quot; : {int,}, &quot;multiplet&quot; : {int,} }</span>
+<span class="sd">        set of Quantum number L in integer for singlet and multiplet, respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_L_prefix</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_conf_prefix</span><span class="p">)</span>
+
+    <span class="c1">#-------------------------------------------------------------------------</span>
+    <span class="c1"># create and count list of (conf, term)</span>
+    <span class="c1">#-------------------------------------------------------------------------</span>
+    <span class="n">_conf_term</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">],</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;term&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">_count</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span> <span class="n">_conf_term</span> <span class="p">)</span>
+    <span class="c1">#-------------------------------------------------------------------------</span>
+
+    <span class="c1">#-------------------------------------------------------------------------</span>
+    <span class="c1"># separate singlet and multiplet</span>
+    <span class="c1">#-------------------------------------------------------------------------</span>
+    <span class="n">_L_prefix</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">_conf_prefix</span><span class="p">)</span>
+
+    <span class="n">_singlet</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_multiplet</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">_Lset</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;singlet&quot;</span> <span class="p">:</span> <span class="nb">set</span><span class="p">(),</span> <span class="s2">&quot;multiplet&quot;</span> <span class="p">:</span> <span class="nb">set</span><span class="p">()}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_atom</span><span class="o">.</span><span class="n">nLevel</span><span class="p">):</span>
+
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="c1"># - remove inner shell electron configuration</span>
+        <span class="c1"># - remove all &#39;.&#39; in conf</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="n">_conf</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_conf_clean</span> <span class="o">=</span> <span class="n">_conf</span><span class="p">[</span><span class="n">_L_prefix</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="n">_term</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;term&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_J</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;J&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_L</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">L_s2i</span><span class="p">[</span> <span class="n">_term</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">_count</span><span class="p">[</span> <span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="n">_term</span><span class="p">)</span> <span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_d</span> <span class="o">=</span> <span class="n">_singlet</span>
+            <span class="n">_Lset</span><span class="p">[</span><span class="s2">&quot;singlet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_L</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_d</span> <span class="o">=</span> <span class="n">_multiplet</span>
+            <span class="n">_Lset</span><span class="p">[</span><span class="s2">&quot;multiplet&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_L</span><span class="p">)</span>
+
+        <span class="n">_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">_conf_clean</span> <span class="p">,</span><span class="n">_term</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">_d</span><span class="p">[</span><span class="n">_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">_d</span><span class="p">[</span><span class="n">_key</span><span class="p">][</span><span class="n">_J</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level</span><span class="o">.</span><span class="n">erg</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">/</span> <span class="n">Cst</span><span class="o">.</span><span class="n">eV2erg_</span><span class="p">,</span> <span class="n">_L</span><span class="p">,</span> <span class="n">_conf</span> <span class="p">)</span>
+    <span class="c1">#-------------------------------------------------------------------------</span>
+    <span class="k">return</span> <span class="n">_singlet</span><span class="p">,</span> <span class="n">_multiplet</span><span class="p">,</span> <span class="n">_Lset</span>
+
+<span class="k">def</span> <span class="nf">line_with_text</span><span class="p">(</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_lp</span><span class="p">,</span> <span class="n">_rp</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="n">_tsize</span><span class="p">,</span> <span class="n">_r</span><span class="p">,</span> <span class="n">_tangle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _ax : matlotlib.pyplot.Axe</span>
+<span class="sd">        the axe to plot a line</span>
+
+<span class="sd">    _lp : tuple of float/int, (x,y)</span>
+<span class="sd">        left point of the line</span>
+
+<span class="sd">    _rp : tuple of float/int, (x,y)</span>
+<span class="sd">        right point of the line</span>
+
+<span class="sd">    _text : str</span>
+<span class="sd">        string of the text</span>
+
+<span class="sd">    _tsize : int</span>
+<span class="sd">        texture size</span>
+
+<span class="sd">    _r : float, in the range of [0 : 1]</span>
+<span class="sd">        relative position along the line starting from left point</span>
+
+<span class="sd">    _tangle : int or float</span>
+<span class="sd">        angle to rotate the text, default : 0</span>
+
+<span class="sd">    _lcolor : str</span>
+<span class="sd">        color of the line, default : &quot;black&quot;</span>
+
+<span class="sd">    _lwidth : float</span>
+<span class="sd">        line width, default : 0.7</span>
+
+<span class="sd">    _lstyle : str</span>
+<span class="sd">        line style, default : &#39;-&#39;</span>
+
+<span class="sd">    _tcolor : str</span>
+<span class="sd">        color of the text, default : &quot;black&quot;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    _line_obj : matplotlib.lines.Line2D</span>
+<span class="sd">        object of the line we plot</span>
+
+<span class="sd">    _text_obj : matplotlib.text.Text</span>
+<span class="sd">        object of the text we plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># {&#39;color&#39;: &#39;black&#39;, &#39;fontsize&#39;: 6, &#39;ha&#39;: &#39;center&#39;, &#39;va&#39;: &#39;center&#39;,</span>
+    <span class="c1">#    &#39;bbox&#39;: dict(boxstyle=&quot;round&quot;, fc=&quot;white&quot;, ec=&quot;white&quot;, pad=0.2)}</span>
+    <span class="n">_line_obj</span><span class="p">,</span> <span class="o">=</span> <span class="n">_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">_rp</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">_lstyle</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_lcolor</span><span class="p">)</span>
+    <span class="n">_tx</span> <span class="o">=</span> <span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">_r</span>
+    <span class="n">_ty</span> <span class="o">=</span> <span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">_r</span>
+    <span class="n">_text_obj</span> <span class="o">=</span> <span class="n">_ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span> <span class="n">_tx</span><span class="p">,</span> <span class="n">_ty</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">_tcolor</span><span class="p">,</span> <span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="n">_tsize</span><span class="p">,</span>
+                        <span class="s1">&#39;ha&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="s1">&#39;va&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span><span class="s1">&#39;rotation&#39;</span><span class="p">:</span><span class="n">_tangle</span><span class="p">,</span>
+                        <span class="s1">&#39;bbox&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)}</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_line_obj</span><span class="p">,</span> <span class="n">_text_obj</span>
+
+<div class="viewcode-block" id="Grotrian"><a class="viewcode-back" href="../../../RST/API/Visual/_Grotrian_API/src.Visual.Grotrian.Grotrian.html#src.Visual.Grotrian.Grotrian">[docs]</a><span class="k">class</span> <span class="nc">Grotrian</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Grotrian.__init__"><a class="viewcode-back" href="../../../RST/API/Visual/_Grotrian_API/src.Visual.Grotrian.Grotrian.html#src.Visual.Grotrian.Grotrian.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_atom</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+
+<span class="sd">        _atom : AtomCls.Atom</span>
+<span class="sd">            object of the atomic model</span>
+
+<span class="sd">        _conf_prefix : str</span>
+<span class="sd">            common configuration string of the inner shell</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">_atom</span>
+
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="c1"># prepare structures for plotting</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="n">singlet</span><span class="p">,</span> <span class="n">multiplet</span><span class="p">,</span> <span class="n">Lset</span> <span class="o">=</span> <span class="n">_prepare_dict</span><span class="p">(</span><span class="n">_atom</span><span class="o">=</span><span class="n">_atom</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="o">=</span><span class="n">_conf_prefix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">singlet</span> <span class="o">=</span> <span class="n">singlet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiplet</span> <span class="o">=</span> <span class="n">multiplet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lset</span> <span class="o">=</span> <span class="n">Lset</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="c1"># a dictionary to store level position of levels in the plot.</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span> <span class="o">=</span> <span class="p">{}</span></div>
+        <span class="c1">#---------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">make_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">_dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">_f</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        _figsize : tuple of int</span>
+<span class="sd">            size of the figure, default : (6,8)</span>
+
+<span class="sd">        _dpi : int</span>
+<span class="sd">            &quot;dot per inch&quot; (resolution) of the figure, default : 120</span>
+
+<span class="sd">        _f : int</span>
+<span class="sd">            enlarge factor to show fine structure explicitly, default : 200</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Lset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lset</span>
+        <span class="n">singlet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">singlet</span>
+        <span class="n">multiplet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplet</span>
+        <span class="n">pos_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span>
+
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="c1"># config</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="n">_hw</span> <span class="o">=</span> <span class="mf">0.5</span>                       <span class="c1"># half width of a level in the plot</span>
+        <span class="n">_b</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Lset</span><span class="p">[</span><span class="s2">&quot;singlet&quot;</span><span class="p">])</span>       <span class="c1"># bias in the x axis of multiplet</span>
+        <span class="n">_fontsize</span> <span class="o">=</span> <span class="mi">14</span>                  <span class="c1"># fontsize of labels</span>
+        <span class="n">_textsize</span> <span class="o">=</span> <span class="mi">10</span>                  <span class="c1"># fontsize of text of term</span>
+        <span class="n">_Jsize</span> <span class="o">=</span> <span class="mi">7</span>                      <span class="c1"># fontsize of text of J</span>
+        <span class="n">_st</span> <span class="o">=</span> <span class="mf">0.1</span>                       <span class="c1"># horizontal spacing between term and text</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">_figsize</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">_dpi</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">fig</span>
+
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="c1"># singlet</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="k">for</span> <span class="n">k0</span><span class="p">,</span> <span class="n">v0</span> <span class="ow">in</span> <span class="n">singlet</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">k1</span><span class="p">,</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">v0</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1">#plot level</span>
+                <span class="n">xs_level</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_hw</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">_hw</span>
+                <span class="n">ys_level</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs_level</span><span class="p">,</span> <span class="n">ys_level</span><span class="p">,</span> <span class="s2">&quot;-k&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># store level posiiton, (conf_origin, term, J)</span>
+                <span class="n">pos_level</span><span class="p">[</span> <span class="p">(</span><span class="n">v1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k1</span><span class="p">)</span> <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">pos_level</span><span class="p">[</span> <span class="p">(</span><span class="n">v1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k1</span><span class="p">)</span> <span class="p">][</span><span class="s2">&quot;xs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xs_level</span>
+                <span class="n">pos_level</span><span class="p">[</span> <span class="p">(</span><span class="n">v1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k1</span><span class="p">)</span> <span class="p">][</span><span class="s2">&quot;ys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ys_level</span>
+                <span class="c1"># plot text</span>
+                <span class="n">x_text</span> <span class="o">=</span> <span class="n">xs_level</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">_st</span>
+                <span class="n">y_text</span> <span class="o">=</span> <span class="n">ys_level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x_text</span><span class="p">,</span> <span class="n">y_text</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_textsize</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+
+        <span class="c1"># a vertical line separates singlet panel and multiplet panel</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">_b</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="c1"># plotting multiplet</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="n">_hw</span> <span class="o">=</span> <span class="mf">0.6</span>                    <span class="c1"># multiplet need wider</span>
+        <span class="n">_sf</span> <span class="o">=</span> <span class="mf">0.1</span>                    <span class="c1"># space for connecting fine structure</span>
+        <span class="k">for</span> <span class="n">k0</span><span class="p">,</span> <span class="n">v0</span> <span class="ow">in</span> <span class="n">multiplet</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># compute mean term energy</span>
+            <span class="n">y_count</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="n">y_mean</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">k1</span><span class="p">,</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">v0</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">y_mean</span> <span class="o">+=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">y_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">y_mean</span> <span class="o">/=</span> <span class="n">y_count</span>
+
+            <span class="k">for</span> <span class="n">k1</span><span class="p">,</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">v0</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># plot level</span>
+                <span class="n">y_pos</span> <span class="o">=</span> <span class="n">y_mean</span> <span class="o">+</span> <span class="n">_f</span> <span class="o">*</span> <span class="p">(</span><span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">y_mean</span><span class="p">)</span>            <span class="c1"># enlarge space</span>
+                <span class="n">ys_level</span> <span class="o">=</span> <span class="n">y_pos</span><span class="p">,</span> <span class="n">y_pos</span>
+                <span class="n">xs_level</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">_hw</span><span class="o">+</span><span class="n">_b</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">_hw</span><span class="o">+</span><span class="n">_b</span><span class="o">-</span><span class="n">_sf</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs_level</span><span class="p">,</span> <span class="n">ys_level</span><span class="p">,</span> <span class="s2">&quot;-k&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># store level posiiton, (conf_origin, term, J)</span>
+                <span class="n">pos_level</span><span class="p">[</span> <span class="p">(</span><span class="n">v1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k1</span><span class="p">)</span> <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">pos_level</span><span class="p">[</span> <span class="p">(</span><span class="n">v1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k1</span><span class="p">)</span> <span class="p">][</span><span class="s2">&quot;xs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xs_level</span>
+                <span class="n">pos_level</span><span class="p">[</span> <span class="p">(</span><span class="n">v1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">k1</span><span class="p">)</span> <span class="p">][</span><span class="s2">&quot;ys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ys_level</span>
+                <span class="c1"># connect fine structure</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">xs_level</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">xs_level</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">_sf</span><span class="p">],</span> <span class="p">[</span><span class="n">y_pos</span><span class="p">,</span><span class="n">y_mean</span><span class="p">],</span> <span class="s2">&quot;--k&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="c1"># plot text of J</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">xs_level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">_st</span><span class="p">,</span> <span class="n">y_pos</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_Jsize</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+            <span class="c1"># plot text of term</span>
+            <span class="n">x_pos_text</span> <span class="o">=</span> <span class="n">xs_level</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">_sf</span> <span class="o">+</span> <span class="n">_st</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x_pos_text</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_textsize</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+
+        <span class="c1">#---------------------------------------------------------------------</span>
+        <span class="c1"># config of the plot</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+
+        <span class="c1">#--- tick of singlet</span>
+        <span class="n">xtick1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Lset</span><span class="p">[</span><span class="s2">&quot;singlet&quot;</span><span class="p">])</span>
+        <span class="n">xticklabel1</span> <span class="o">=</span> <span class="p">[</span><span class="n">Cst</span><span class="o">.</span><span class="n">L_i2s</span><span class="p">[</span><span class="n">xt</span><span class="p">]</span> <span class="k">for</span> <span class="n">xt</span> <span class="ow">in</span> <span class="n">xtick1</span><span class="p">]</span>
+        <span class="c1">#--- tick of multiplet</span>
+        <span class="n">xtick2</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="o">+</span><span class="n">_b</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">Lset</span><span class="p">[</span><span class="s2">&quot;multiplet&quot;</span><span class="p">])</span> <span class="p">]</span>
+        <span class="n">xticklabel2</span> <span class="o">=</span> <span class="p">[</span><span class="n">Cst</span><span class="o">.</span><span class="n">L_i2s</span><span class="p">[</span><span class="n">xt</span><span class="o">-</span><span class="n">_b</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">xt</span> <span class="ow">in</span> <span class="n">xtick2</span><span class="p">]</span>
+        <span class="c1">#--- customize xticks and xticklabels</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span> <span class="n">xtick1</span> <span class="o">+</span> <span class="n">xtick2</span><span class="p">,</span> <span class="n">xticklabel1</span> <span class="o">+</span> <span class="n">xticklabel2</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_fontsize</span> <span class="p">)</span>
+
+        <span class="c1">#--- x,y label; title</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_fontsize</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;E [eV]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_fontsize</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">Title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_fontsize</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1">#--- change x limit</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">xtick2</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#---------------------------------------------------------------------</span>
+
+        <span class="n">ylim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+        <span class="n">xlim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+        <span class="c1"># ylim_max - ylim_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yr</span> <span class="o">=</span> <span class="n">ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ylim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># xlim_max - xlim_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xr</span> <span class="o">=</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">save_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_filename</span><span class="p">,</span> <span class="n">_dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        _filename : str</span>
+<span class="sd">            filename (including path) to save your figure</span>
+
+<span class="sd">        _dpi : int</span>
+<span class="sd">            &quot;dot per inch&quot; (resolution) to save figure, default : 120s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">_filename</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">_dpi</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">show_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">connect_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_cfj1</span><span class="p">,</span> <span class="n">_cfj2</span><span class="p">,</span> <span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="n">_tsize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">_r</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        _cfj1 : tuple of str, (conf,term,J)</span>
+<span class="sd">            to specify level 1</span>
+
+<span class="sd">        _cfj2 : tuple of str, (conf,term,J)</span>
+<span class="sd">            to specify level 2</span>
+
+<span class="sd">        _r1 : float, in the range of [0 : 1]</span>
+<span class="sd">            relative position along the line of level 1 starting from left point</span>
+
+<span class="sd">        _r2 : float, in the range of [0 : 1]</span>
+<span class="sd">            relative position along the line of level 2 starting from left point</span>
+
+<span class="sd">        _c : str</span>
+<span class="sd">            color of the line you&#39;re going to draw</span>
+
+<span class="sd">        _text : str</span>
+<span class="sd">            content of text</span>
+
+<span class="sd">        _tsize : int</span>
+<span class="sd">            fontsize of text, default : 7</span>
+
+<span class="sd">        _r : float, in the range of [0 : 1]</span>
+<span class="sd">            relative position along the line starting from left point, default : 0.4</span>
+
+<span class="sd">        _lcolor : str</span>
+<span class="sd">            color of the line, default : &quot;black&quot;</span>
+
+<span class="sd">        _lwidth : float</span>
+<span class="sd">            line width, default : 0.7</span>
+
+<span class="sd">        _lstyle : str</span>
+<span class="sd">            line style, default : &#39;-&#39;</span>
+
+<span class="sd">        _tcolor : str</span>
+<span class="sd">            color of the text, default : &quot;black&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pos_lvl1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="p">[</span><span class="n">_cfj1</span><span class="p">]</span>
+        <span class="n">pos_lvl2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="p">[</span><span class="n">_cfj2</span><span class="p">]</span>
+
+        <span class="c1"># initialize left/right point of the line</span>
+        <span class="n">_lp</span> <span class="o">=</span> <span class="n">pos_lvl1</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pos_lvl1</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos_lvl1</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">_r1</span> <span class="p">,</span> <span class="n">pos_lvl1</span><span class="p">[</span><span class="s2">&quot;ys&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_rp</span> <span class="o">=</span> <span class="n">pos_lvl2</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pos_lvl2</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos_lvl2</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">_r2</span> <span class="p">,</span> <span class="n">pos_lvl2</span><span class="p">[</span><span class="s2">&quot;ys&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># if the initialization is not correct, swap them</span>
+        <span class="k">if</span> <span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span>
+            <span class="n">_lp</span><span class="p">,</span> <span class="n">_rp</span> <span class="o">=</span> <span class="n">_rp</span><span class="p">,</span> <span class="n">_lp</span>
+
+        <span class="c1"># compute the angle to rotate text</span>
+        <span class="n">_w</span><span class="p">,</span> <span class="n">_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span>
+        <span class="n">_dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">xr</span> <span class="o">*</span> <span class="n">_w</span>
+        <span class="n">_dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">yr</span> <span class="o">*</span> <span class="n">_h</span>
+        <span class="n">_tangle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span> <span class="n">_dy</span><span class="p">,</span> <span class="n">_dx</span> <span class="p">)</span>
+        <span class="n">_tangle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span> <span class="n">_tangle</span> <span class="p">)</span>
+        <span class="c1"># plot line and text</span>
+        <span class="n">_ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="n">_line_obj</span><span class="p">,</span> <span class="n">_text_obj</span> <span class="o">=</span> <span class="n">line_with_text</span><span class="p">(</span><span class="n">_ax</span><span class="o">=</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_lp</span><span class="o">=</span><span class="n">_lp</span><span class="p">,</span> <span class="n">_rp</span><span class="o">=</span><span class="n">_rp</span><span class="p">,</span> <span class="n">_text</span><span class="o">=</span><span class="n">_text</span><span class="p">,</span> <span class="n">_tsize</span><span class="o">=</span><span class="n">_tsize</span><span class="p">,</span> <span class="n">_r</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                            <span class="n">_tangle</span><span class="o">=</span><span class="n">_tangle</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="n">_lcolor</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="n">_lstyle</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="n">_tcolor</span><span class="p">)</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

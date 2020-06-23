@@ -1,0 +1,635 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.Opacity &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.Opacity</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.Atomic.Opacity</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################################</span>
+<span class="c1"># this file defines functions for</span>
+<span class="c1">#     calculations of opacities of various atomic process</span>
+<span class="c1">#</span>
+<span class="c1">################################################################################</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Constants</span> <span class="k">as</span> <span class="n">Cst</span>
+
+<span class="c1">#import pdb</span>
+
+
+<span class="c1">################################################################################</span>
+<span class="k">def</span> <span class="nf">n_elements</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">na</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">return</span> <span class="n">na</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Thomson scattering (wavelength independent)</span>
+<span class="c1">################################################################################</span>
+
+<div class="viewcode-block" id="Thomson_scattering"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.Thomson_scattering.html#src.Atomic.Opacity.Thomson_scattering">[docs]</a><span class="k">def</span> <span class="nf">Thomson_scattering</span><span class="p">(</span><span class="n">n_e</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Thomson scattering of free electrons (non-relativistic).</span>
+<span class="sd">    Returns absorption coefficient instead of absorption cross section.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    n_e : np.double or array-like</span>
+<span class="sd">        electron density, [:math:`cm^{-3}`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    kappa : np.double or array-like</span>
+<span class="sd">        absorption coefficient, [:math:`cm^{-1}`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_.</span>
+
+<span class="sd">    .. math:: \kappa = \sigma_{T} n_{e}</span>
+
+<span class="sd">    where :math:`\sigma_{T}` is the absorption cross section for Thomson scattering</span>
+<span class="sd">    .. math:: \sigma_{T} = \frac{8 \pi e^{4}}{3 m_{e}^{2} c^{4}} = 6.6524 \times 10^{-25} \quad cm^{2}</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
+<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
+<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
+<span class="sd">        Princeton University Press, pp. 149, 2015.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kappa</span> <span class="o">=</span> <span class="mf">6.6524E-25</span> <span class="o">*</span> <span class="n">n_e</span>
+    <span class="k">return</span> <span class="n">kappa</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># HI atom bound-free cross section for n=k level</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="HIbf_CrossSec1"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.HIbf_CrossSec1.html#src.Atomic.Opacity.HIbf_CrossSec1">[docs]</a><span class="k">def</span> <span class="nf">HIbf_CrossSec1</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">wl</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return bound-free cross section of a HI atom in n=k in unit of e-18 cm**2</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    k  : principle quantum number of HI atom</span>
+<span class="sd">    wl : wavelength, [:math:`\AA`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_, [2]_.</span>
+<span class="sd">    - non-LTE ok</span>
+<span class="sd">    - stimulated emission is not corrected</span>
+<span class="sd">    - absorption coeff.:</span>
+
+<span class="sd">            kbf = nk*shibf*(1.-exp(-hv/kt))*1.e-18 (/cm)</span>
+
+<span class="sd">    Modification history:</span>
+<span class="sd">    - k.ichimoto 15 jun.1987,	6 Jan.1992</span>
+<span class="sd">    - k.ichimoto 19 Feb.1994</span>
+<span class="sd">    - 2019.9.15   k.ichimoto from IDL ahic.pro</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30,1.</span>
+<span class="sd">    .. [2] polynomial fitting for b-f gaunt factor is taken from Carbon &amp; Gingerich (1969) &quot;theory and observation of normal stellar atmosphere&quot;  mit press</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="n">HIbf_cs_const</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span> <span class="p">:</span> <span class="p">(</span><span class="mf">0.9916</span><span class="p">,</span> <span class="mf">9.068e-3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2524</span><span class="p">),</span>
+        <span class="mi">2</span> <span class="p">:</span> <span class="p">(</span><span class="mf">1.105</span><span class="p">,</span> <span class="o">-</span><span class="mf">7.922e-2</span><span class="p">,</span> <span class="mf">4.536e-3</span><span class="p">),</span>
+        <span class="mi">3</span> <span class="p">:</span> <span class="p">(</span><span class="mf">1.101</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.290e-2</span><span class="p">,</span> <span class="mf">1.152e-3</span><span class="p">),</span>
+        <span class="mi">4</span> <span class="p">:</span> <span class="p">(</span><span class="mf">1.101</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.923e-2</span><span class="p">,</span> <span class="mf">5.110e-4</span><span class="p">),</span>
+        <span class="mi">5</span> <span class="p">:</span> <span class="p">(</span><span class="mf">1.102</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01304</span><span class="p">,</span>  <span class="mf">2.638e-4</span><span class="p">),</span>
+        <span class="mi">6</span> <span class="p">:</span> <span class="p">(</span><span class="mf">1.0986</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00902</span><span class="p">,</span>  <span class="mf">1.367e-4</span><span class="p">),</span>
+        <span class="mi">7</span> <span class="p">:</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="n">wlk</span> <span class="o">=</span> <span class="mf">911.76</span> <span class="o">*</span> <span class="n">k</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">ak</span> <span class="o">=</span> <span class="mf">7.93</span> <span class="o">*</span> <span class="n">k</span>
+    <span class="n">wl3</span> <span class="o">=</span> <span class="n">wl</span><span class="o">/</span><span class="mf">1000.</span>
+    <span class="n">gbf</span> <span class="o">=</span> <span class="n">HIbf_cs_const</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">HIbf_cs_const</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">HIbf_cs_const</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">wl3</span><span class="p">)</span><span class="o">*</span><span class="n">wl3</span>
+    <span class="n">nwl</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+    <span class="n">shibf1</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nwl</span><span class="p">)</span>
+
+    <span class="n">ii</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">wl</span> <span class="o">&lt;</span> <span class="n">wlk</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">ii</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">shibf1</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">ak</span><span class="o">*</span><span class="p">(</span><span class="n">wl</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">/</span><span class="n">wlk</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span><span class="n">gbf</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">shibf1</span><span class="o">=</span><span class="n">shibf1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">shibf1</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># HI bound-free CrossSection in LTE per 1 HI atom in unit of e-26 cm^2</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="HIbf_CrossSection"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.HIbf_CrossSection.html#src.Atomic.Opacity.HIbf_CrossSection">[docs]</a><span class="k">def</span> <span class="nf">HIbf_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return bound-free cross section of a HI atom in LTE in unit of e-26 cm^2</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    T  : Temperature [:math:`K`]</span>
+<span class="sd">    wl : wavelength [:math:`\AA`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_.</span>
+
+<span class="sd">    HI bound-free opacity in LTE is</span>
+
+<span class="sd">          k(T,wl) = n_HI * HIbf_CrossSection(T,wl) * 1e-26 (/cm)</span>
+
+<span class="sd">    - n_HI: hydrogen number density in cm^(-3)</span>
+<span class="sd">    - stimulated emission is corrected</span>
+<span class="sd">    - partition function of HI is assumed to be 2.0, which is valid for T &lt; 2.e4 K</span>
+
+<span class="sd">    Modification history:</span>
+<span class="sd">    - 2019.9.15  K.Ichimoto  from IDL ahic.pro</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30, 1.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">#    wl = np.asarray(wl)</span>
+<span class="c1">#    T = np.asarray(T)</span>
+
+    <span class="n">nwl</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+    <span class="n">nt</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">wl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nwl</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">nt</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;both T &amp; wl are array! (HIbf_Opacity)&quot;</span><span class="p">)</span>
+<span class="c1">#        pdb.set_trace()</span>
+
+    <span class="n">l0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">wl</span><span class="o">/</span><span class="mf">911.76</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">xl</span> <span class="o">=</span> <span class="mf">157779.</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="mf">1.</span><span class="o">/</span><span class="n">l0</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">T</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.438787e8</span><span class="o">/</span><span class="n">wl</span><span class="o">/</span><span class="n">T</span><span class="p">))</span><span class="o">/</span><span class="n">u</span>
+
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">abf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nwl</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">):</span>
+            <span class="n">ii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">l0</span> <span class="o">==</span> <span class="n">k</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ii</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="nb">min</span><span class="p">([</span><span class="n">k</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">abf</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">=</span><span class="n">abf</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span><span class="o">+</span><span class="p">(</span><span class="n">l</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">xl</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span><span class="o">*</span><span class="n">HIbf_CrossSec1</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">wl</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span><span class="o">*</span><span class="mf">2.e8</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">abf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">min</span><span class="p">([</span><span class="n">l0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">abf</span><span class="o">=</span><span class="n">abf</span><span class="o">+</span><span class="p">(</span><span class="n">l</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">xl</span><span class="p">)</span><span class="o">*</span><span class="n">HIbf_CrossSec1</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">wl</span><span class="p">)</span><span class="o">*</span><span class="mf">2.e8</span>
+
+    <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">l0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wl exceeds the limit in &#39;ahic&#39; !&quot;</span><span class="p">)</span>
+
+    <span class="n">abf</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">abf</span>
+
+    <span class="k">return</span> <span class="n">abf</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># HI free-free CrossSection in LTE per 1 HI atom in unit of e-26 cm^2</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="HIff_CrossSection"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.HIff_CrossSection.html#src.Atomic.Opacity.HIff_CrossSection">[docs]</a><span class="k">def</span> <span class="nf">HIff_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return free-free cross section of a HI atom in LTE in unit of e-26 cm^2</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    T  : Temperature, [:math:`K`]</span>
+<span class="sd">    wl : wavelength, [:math:`\AA`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_, [2]_.</span>
+<span class="sd">    HI free-free opacity in LTE is</span>
+
+<span class="sd">          kff = n_HI * HIff_CrossSection(T,wl) * 1e-26 (/cm)</span>
+
+<span class="sd">    - n_HI: hydrogen number density in cm^(-3)</span>
+<span class="sd">    - stimulated emission is corrected</span>
+<span class="sd">    - partition function of HI is assumed to be 2.0, which is valid for T &lt; 2.e4 K</span>
+
+<span class="sd">    Modification history:</span>
+<span class="sd">    - 2019.9.15  K.Ichimoto  from IDL ahic.pro</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30, 1.</span>
+<span class="sd">    .. [2] porinomial fitting for f-f gaunt factor is taken from Carbon &amp; Gingerich (1969) &quot;theory and observation of</span>
+<span class="sd">           normal stellar atmosphere&quot;  MIT press</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="n">nwl</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+    <span class="n">nt</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">wl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nwl</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">nt</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;both T &amp; wl are array! (HIff_Opacity)&quot;</span><span class="p">)</span>
+<span class="c1">#    assert (nwl &gt; 1) and (nt &gt; 1), &quot;both T &amp; wl are array!&quot;</span>
+
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ;+/*******************************************************************/</span>
+<span class="sd">    function ahiff,t,wl</span>
+<span class="sd">    ;/*******************************************************************/</span>
+<span class="sd">    ;  HI free-free absorption coefficient per 1 proton and unit pe (dyne/cm**2)</span>
+<span class="sd">        in unit of e-26</span>
+<span class="sd">    ;  stimulated emission is not corrected</span>
+<span class="sd">    ;  absorption coeff.:   kff = np*pe*ahiff*(1.-exp(-hv/kt))*1.e-26 (/cm)</span>
+<span class="sd">    ;  ref.:  varnazza et al. (1976) ap.j.suppl. vol.30,1.</span>
+<span class="sd">    ;         porinomial fitting for f-f gaunt factor is taken from</span>
+<span class="sd">    ;         Carbon &amp; Gingerich (1969) &quot;theory and observation of</span>
+<span class="sd">    ;           normal stellar atmosphere&quot;  MIT press</span>
+<span class="sd">    ;                           k.ichimoto 15 jun.1987,	6 Jan.1992</span>
+<span class="sd">    ;                           k.ichimoto 19 Feb.1994</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mf">1.0828</span> <span class="o">+</span> <span class="mf">3.865e-6</span> <span class="o">*</span> <span class="n">T</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">7.564e-7</span> <span class="o">+</span> <span class="p">(</span><span class="mf">4.920e-10</span> <span class="o">-</span> <span class="mf">2.482e-15</span> <span class="o">*</span><span class="n">T</span><span class="p">)</span><span class="o">*</span><span class="n">T</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mf">5.326e-12</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">3.904e-15</span> <span class="o">+</span> <span class="mf">1.8790e-20</span> <span class="o">*</span><span class="n">T</span><span class="p">)</span><span class="o">*</span><span class="n">T</span>
+    <span class="n">gff</span> <span class="o">=</span> <span class="n">a</span><span class="o">+</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="o">*</span><span class="n">wl</span><span class="p">)</span><span class="o">*</span><span class="n">wl</span>
+    <span class="n">ahiff</span> <span class="o">=</span> <span class="mf">9.9264e-6</span><span class="o">*</span> <span class="n">T</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">wl</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span><span class="n">gff</span>
+
+    <span class="n">xi</span> <span class="o">=</span> <span class="mf">157779.</span><span class="o">/</span><span class="n">T</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+    <span class="n">a0</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.438787e8</span><span class="o">/</span><span class="n">wl</span><span class="o">/</span><span class="n">T</span><span class="p">))</span><span class="o">/</span><span class="n">u</span>
+    <span class="n">aff</span> <span class="o">=</span> <span class="mf">0.66699</span><span class="o">*</span><span class="n">T</span><span class="o">**</span><span class="mf">2.5</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">xi</span><span class="p">)</span><span class="o">*</span><span class="n">ahiff</span>
+
+    <span class="n">aff</span> <span class="o">=</span> <span class="n">a0</span><span class="o">*</span><span class="n">aff</span>
+
+    <span class="k">return</span> <span class="n">aff</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># H-minus (negative hidrogen) CrossSection per HI atom in unit of e-26 cm^2 (*lte*)</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="Hminus_CrossSection"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.Hminus_CrossSection.html#src.Atomic.Opacity.Hminus_CrossSection">[docs]</a><span class="k">def</span> <span class="nf">Hminus_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">,</span><span class="n">n_e</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return free-free &amp; bound-free cross section of a H-(negative hidrogen) in LTE in unit of e-26 cm^2</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    T  : Temperature, [:math:`K`]</span>
+<span class="sd">    wl : wavelength, [:math:`\AA`]</span>
+<span class="sd">    n_e: electron number density, [:math:`cm^{-3}`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_, [2]_.</span>
+
+<span class="sd">    H- opacity in LTE is</span>
+
+<span class="sd">          khm = n_HI * Hminus_CrossSection(T,wl,n_e) * 1.e-26 (/cm)</span>
+
+<span class="sd">    - n_HI: hydrogen number density in cm^(-3)</span>
+<span class="sd">    - stimulated emission is corrected</span>
+<span class="sd">    - partition function of HI is assumed to be 2.0, which is valid for T &lt; 2.e4 K</span>
+
+<span class="sd">    Modification history:</span>
+<span class="sd">    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992</span>
+<span class="sd">    - k.ichimoto  19 Feb.1994</span>
+<span class="sd">    - 2019.9.15  K.Ichimoto  from IDL ahic.pro</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30, 1.</span>
+<span class="sd">    .. [2] porinomial fitting for f-f gaunt factor is taken from Carbon &amp; Gingerich (1969) &quot;theory and observation of</span>
+<span class="sd">           normal stellar atmosphere&quot;  MIT press</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="n">nwl</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+    <span class="n">nt</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">wl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nwl</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">nt</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;both T &amp; wl are array! (HIff_Opacity)&quot;</span><span class="p">)</span>
+
+
+    <span class="n">th</span> <span class="o">=</span> <span class="mf">5039.778</span><span class="o">/</span><span class="n">T</span>
+    <span class="n">wl3</span> <span class="o">=</span> <span class="n">wl</span><span class="o">/</span><span class="mf">1000.</span>
+<span class="c1">#;/*  ---   bound-free   ---  */</span>
+    <span class="n">sigm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nwl</span><span class="p">)</span>
+    <span class="n">ii0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">wl3</span> <span class="o">&gt;</span> <span class="mf">16.419</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="p">;</span> <span class="n">count</span> <span class="o">=</span> <span class="n">ii0</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sigm</span><span class="p">[</span><span class="n">ii0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">ii1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span> <span class="p">(</span><span class="n">wl3</span> <span class="o">&lt;</span> <span class="mf">16.419</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wl3</span> <span class="o">&gt;</span> <span class="mf">14.2</span><span class="p">)</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="p">;</span> <span class="n">count</span> <span class="o">=</span> <span class="n">ii1</span><span class="o">.</span><span class="n">size</span>
+<span class="c1">#    ii1 = np.where( 14.2 &lt; wl3 &lt; 16.419 )[0] ; count = ii1.size</span>
+    <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">xl</span> <span class="o">=</span> <span class="mf">16.419</span> <span class="o">-</span> <span class="n">wl3</span><span class="p">[</span><span class="n">ii1</span><span class="p">]</span>
+        <span class="n">sigm</span><span class="p">[</span><span class="n">ii1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.269818</span><span class="o">+</span><span class="p">(</span><span class="mf">0.220190</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mf">0.0411288</span><span class="o">+</span><span class="mf">0.00273236</span><span class="p">)</span><span class="o">*</span><span class="n">xl</span><span class="p">)</span><span class="o">*</span><span class="n">xl</span><span class="p">)</span><span class="o">*</span><span class="n">xl</span>
+    <span class="n">ii2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">wl3</span> <span class="o">&lt;=</span> <span class="mf">14.2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="p">;</span> <span class="n">count</span> <span class="o">=</span> <span class="n">ii2</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sigm</span><span class="p">[</span><span class="n">ii2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.00680133</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.178708</span><span class="o">+</span><span class="p">(</span><span class="mf">0.16479</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.0204842</span> <span class="o">+</span> <span class="mf">5.95244e-4</span> <span class="o">*</span> <span class="n">wl3</span><span class="p">[</span><span class="n">ii2</span><span class="p">])</span> <span class="o">*</span> <span class="n">wl3</span><span class="p">[</span><span class="n">ii2</span><span class="p">])</span> <span class="o">*</span><span class="n">wl3</span><span class="p">[</span><span class="n">ii2</span><span class="p">])</span><span class="o">*</span><span class="n">wl3</span><span class="p">[</span><span class="n">ii2</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">sigm</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sigm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">sigm</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">kbf</span> <span class="o">=</span> <span class="mf">0.41590</span> <span class="o">*</span> <span class="n">th</span><span class="o">**</span><span class="mf">2.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.738</span><span class="o">*</span><span class="n">th</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">28.5486</span><span class="o">*</span><span class="n">th</span><span class="o">/</span><span class="n">wl3</span><span class="p">))</span> <span class="o">*</span> <span class="n">sigm</span>
+
+<span class="c1">#;/*  ---   free-free   ---  */</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mf">0.005366</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mf">0.011493</span><span class="o">+</span><span class="mf">0.027039</span><span class="o">*</span><span class="n">th</span><span class="p">)</span><span class="o">*</span><span class="n">th</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.2062</span><span class="o">+</span><span class="p">(</span><span class="mf">11.924</span><span class="o">-</span><span class="mf">5.939</span><span class="o">*</span><span class="n">th</span><span class="p">)</span><span class="o">*</span><span class="n">th</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.40192</span><span class="o">+</span><span class="p">(</span><span class="mf">7.0355</span><span class="o">-</span><span class="mf">0.34592</span><span class="o">*</span><span class="n">th</span><span class="p">)</span><span class="o">*</span><span class="n">th</span>
+    <span class="n">kff</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="o">*</span><span class="n">wl3</span><span class="p">)</span><span class="o">*</span><span class="n">wl3</span><span class="o">/</span><span class="mf">1000.</span>
+
+    <span class="n">ahm</span> <span class="o">=</span> <span class="n">kbf</span> <span class="o">+</span> <span class="n">kff</span>
+    <span class="n">pe</span> <span class="o">=</span> <span class="mf">1.38066e-16</span> <span class="o">*</span> <span class="n">n_e</span> <span class="o">*</span> <span class="n">T</span>
+    <span class="n">hmo</span> <span class="o">=</span> <span class="n">ahm</span><span class="o">*</span><span class="n">pe</span>
+    <span class="k">return</span> <span class="n">hmo</span></div>
+
+
+<span class="c1">################################################################################</span>
+<span class="c1"># HI Rayleigh scattering CrossSection per 1 HI atom in unit of e-26 cm^2</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="HIRayleigh_CrossSection"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.HIRayleigh_CrossSection.html#src.Atomic.Opacity.HIRayleigh_CrossSection">[docs]</a><span class="k">def</span> <span class="nf">HIRayleigh_CrossSection</span><span class="p">(</span><span class="n">wl</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return Rayleigh scattering cross section of a HI atom in unit of e-26 cm^2</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wl : wavelength, [:math:`A`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_, [2]_.</span>
+
+<span class="sd">    HI Rayleigh opacity in LTE is</span>
+
+<span class="sd">         khray = n_HI * HIRayleigh_CrossSection(wl) * 1.e-26 (/cm)</span>
+
+<span class="sd">    - n_HI: hydrogen number density in cm^(-3)</span>
+<span class="sd">    - stimulated emission is corrected</span>
+<span class="sd">    - partition function of HI is assumed to be 2.0, which is valid for T &lt; 2.e4 K</span>
+
+<span class="sd">    modification history:</span>
+<span class="sd">    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992</span>
+<span class="sd">    - k.ichimoto  19 Feb.1994</span>
+<span class="sd">    - 2019.9.10  K.Ichimoto  from IDL avray.pro</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Gingerich SAO special report 167,21,1964.</span>
+<span class="sd">    .. [2] porinomial fitting for f-f gaunt factor is taken from Carbon &amp; Gingerich (1969) &quot;theory and observation of</span>
+<span class="sd">           normal stellar atmosphere&quot;  MIT press</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="c1">#w2 = (wl&gt;1026.)**2</span>
+    <span class="n">w2</span> <span class="o">=</span> <span class="p">(</span><span class="n">wl</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mf">1026.</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">avray1</span> <span class="o">=</span> <span class="mf">5.799e13</span><span class="o">/</span><span class="n">w2</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">1.422e20</span><span class="o">/</span><span class="n">w2</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mf">2.784</span><span class="o">/</span><span class="n">w2</span><span class="o">**</span><span class="mi">4</span>
+    <span class="k">if</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">avray1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+          <span class="n">avray1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">avray1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">avray1</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># H2+ CrossSection per 1 HI atom and per 1 H+ in unit of e-26 cm^5?</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="avH2p"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.avH2p.html#src.Atomic.Opacity.avH2p">[docs]</a><span class="k">def</span> <span class="nf">avH2p</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">):</span>
+<span class="c1">#  k.i.   2019.9.11</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    H2+ opacity per 1 HI atom and per 1 H+, scaled by e26,</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    T  : temperature, [:math:`K`]</span>
+<span class="sd">    wl : wave length, [:math:`\AA`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    kh2 : absorption coeff,</span>
+<span class="sd">        kh2 = nhi * np * avh2p * 1.e-26, [:math:`cm^{-1}`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_, [2]_.</span>
+
+<span class="sd">    - stimulated emission is corrected.</span>
+
+<span class="sd">    Modification history:</span>
+<span class="sd">    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992</span>
+<span class="sd">    - k.ichimoto  19 Feb.1994</span>
+<span class="sd">    - 2019.9.11  K.Ichimoto  from IDL avh2p.pro</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Gingerich SAO special report 167,21,1964.</span>
+<span class="sd">    .. [2] Carbon &amp; Gingerich (1969) &quot;theory and observation of normal stellar atmosphere&quot;  MIT press</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nwl</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+    <span class="n">nT</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">wl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nT</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1">#;/* -----  data from Carbon &amp; Gingerich (1969)  ----- */</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+          <span class="p">[</span> <span class="mf">3.0</span><span class="p">,</span>    <span class="mf">2.852</span><span class="p">,</span>  <span class="mf">2.58</span><span class="p">,</span>   <span class="mf">2.294</span><span class="p">,</span>  <span class="mf">2.023</span><span class="p">,</span>  <span class="mf">1.774</span><span class="p">,</span>
+            <span class="mf">1.547</span><span class="p">,</span>  <span class="mf">1.344</span><span class="p">,</span>  <span class="mf">1.165</span><span class="p">,</span>  <span class="mf">1.007</span><span class="p">,</span>  <span class="mf">0.8702</span><span class="p">,</span> <span class="mf">0.7516</span><span class="p">,</span>
+            <span class="mf">0.6493</span><span class="p">,</span> <span class="mf">0.5610</span><span class="p">,</span> <span class="mf">0.4848</span><span class="p">,</span> <span class="mf">0.4198</span><span class="p">,</span> <span class="mf">0.3620</span><span class="p">,</span> <span class="mf">0.3128</span><span class="p">,</span>
+            <span class="mf">0.2702</span><span class="p">,</span> <span class="mf">0.2332</span><span class="p">,</span> <span class="mf">0.2011</span><span class="p">,</span> <span class="mf">0.1732</span><span class="p">,</span> <span class="mf">0.1491</span><span class="p">,</span> <span class="mf">0.1281</span><span class="p">,</span>
+            <span class="mf">0.1100</span><span class="p">,</span> <span class="mf">0.09426</span><span class="p">,</span><span class="mf">0.0809</span><span class="p">,</span> <span class="mf">0.06906</span><span class="p">,</span><span class="mf">0.05874</span><span class="p">,</span><span class="mf">0.04994</span><span class="p">,</span>
+            <span class="mf">0.04265</span><span class="p">,</span><span class="mf">0.03635</span><span class="p">,</span><span class="mf">0.0308</span><span class="p">,</span> <span class="mf">0.026</span><span class="p">,</span>  <span class="mf">0.02195</span><span class="p">,</span><span class="mf">0.01864</span><span class="p">,</span>
+            <span class="mf">0.01581</span><span class="p">,</span><span class="mf">0.01332</span><span class="p">,</span><span class="mf">0.01118</span><span class="p">,</span><span class="mf">0.00938</span><span class="p">,</span><span class="mf">0.00793</span><span class="p">,</span><span class="mf">0.00669</span><span class="p">,</span>
+            <span class="mf">0.00561</span><span class="p">,</span><span class="mf">0.00469</span><span class="p">,</span><span class="mf">0.00392</span><span class="p">,</span><span class="mf">0.0033</span> <span class="p">])</span>
+    <span class="n">up</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+          <span class="p">[</span>  <span class="mf">85.</span><span class="p">,</span>       <span class="mf">9.99465</span><span class="p">,</span>   <span class="mf">4.97842</span><span class="p">,</span>   <span class="mf">3.28472</span><span class="p">,</span>   <span class="mf">2.41452</span><span class="p">,</span>
+             <span class="mf">1.87038</span><span class="p">,</span>   <span class="mf">1.48945</span><span class="p">,</span>   <span class="mf">1.20442</span><span class="p">,</span>   <span class="mf">0.98279</span><span class="p">,</span>   <span class="mf">0.80665</span><span class="p">,</span>
+             <span class="mf">0.66493</span><span class="p">,</span>   <span class="mf">0.54997</span><span class="p">,</span>   <span class="mf">0.45618</span><span class="p">,</span>   <span class="mf">0.37932</span><span class="p">,</span>   <span class="mf">0.31606</span><span class="p">,</span>
+             <span class="mf">0.26382</span><span class="p">,</span>   <span class="mf">0.22057</span><span class="p">,</span>   <span class="mf">0.18446</span><span class="p">,</span>   <span class="mf">0.15473</span><span class="p">,</span>   <span class="mf">0.12977</span><span class="p">,</span>
+             <span class="mf">1.08890e-1</span><span class="p">,</span><span class="mf">9.14000e-2</span><span class="p">,</span><span class="mf">7.67600e-2</span><span class="p">,</span><span class="mf">6.44500e-2</span><span class="p">,</span><span class="mf">5.41200e-2</span><span class="p">,</span>
+             <span class="mf">4.54000e-2</span><span class="p">,</span><span class="mf">3.81000e-2</span><span class="p">,</span><span class="mf">3.19500e-2</span><span class="p">,</span><span class="mf">2.67600e-2</span><span class="p">,</span><span class="mf">2.23700e-2</span><span class="p">,</span>
+             <span class="mf">1.86900e-2</span><span class="p">,</span><span class="mf">1.56100e-2</span><span class="p">,</span><span class="mf">1.30200e-2</span><span class="p">,</span><span class="mf">1.08300e-2</span><span class="p">,</span><span class="mf">8.99000e-3</span><span class="p">,</span>
+             <span class="mf">7.45000e-3</span><span class="p">,</span><span class="mf">6.15000e-3</span><span class="p">,</span><span class="mf">5.08000e-3</span><span class="p">,</span><span class="mf">4.16000e-3</span><span class="p">,</span><span class="mf">3.42000e-3</span><span class="p">,</span>
+             <span class="mf">2.77000e-3</span><span class="p">,</span><span class="mf">2.21000e-3</span><span class="p">,</span><span class="mf">1.78000e-3</span><span class="p">,</span><span class="mf">1.45000e-3</span><span class="p">,</span><span class="mf">1.24000e-3</span><span class="p">,</span>
+             <span class="mf">1.14000e-3</span> <span class="p">])</span>
+    <span class="n">us</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+          <span class="p">[</span> <span class="o">-</span><span class="mf">85.</span><span class="p">,</span>      <span class="o">-</span><span class="mf">7.1426</span><span class="p">,</span>   <span class="o">-</span><span class="mf">2.3984</span><span class="p">,</span>   <span class="o">-</span><span class="mf">0.99032</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.39105</span><span class="p">,</span>
+             <span class="o">-</span><span class="mf">0.09644</span><span class="p">,</span>  <span class="mf">0.05794</span><span class="p">,</span>   <span class="mf">0.13996</span><span class="p">,</span>   <span class="mf">0.18186</span><span class="p">,</span>   <span class="mf">0.20052</span><span class="p">,</span>
+             <span class="mf">0.20525</span><span class="p">,</span>   <span class="mf">0.20167</span><span class="p">,</span>   <span class="mf">0.19309</span><span class="p">,</span>   <span class="mf">0.18167</span><span class="p">,</span>   <span class="mf">0.16871</span><span class="p">,</span>
+             <span class="mf">0.15511</span><span class="p">,</span>   <span class="mf">0.14147</span><span class="p">,</span>   <span class="mf">0.12815</span><span class="p">,</span>   <span class="mf">0.11542</span><span class="p">,</span>   <span class="mf">0.10340</span><span class="p">,</span>
+             <span class="mf">0.09216</span><span class="p">,</span>   <span class="mf">8.18000e-2</span><span class="p">,</span><span class="mf">7.22900e-2</span><span class="p">,</span><span class="mf">6.36700e-2</span><span class="p">,</span><span class="mf">5.58400e-2</span><span class="p">,</span>
+             <span class="mf">4.88400e-2</span><span class="p">,</span><span class="mf">4.25700e-2</span><span class="p">,</span><span class="mf">3.69900e-2</span><span class="p">,</span><span class="mf">3.20700e-2</span><span class="p">,</span><span class="mf">2.77500e-2</span><span class="p">,</span>
+             <span class="mf">2.39400e-2</span><span class="p">,</span><span class="mf">2.06100e-2</span><span class="p">,</span><span class="mf">1.77200e-2</span><span class="p">,</span><span class="mf">1.52200e-2</span><span class="p">,</span><span class="mf">1.30500e-2</span><span class="p">,</span>
+             <span class="mf">1.11900e-2</span><span class="p">,</span><span class="mf">9.58000e-3</span><span class="p">,</span><span class="mf">8.21000e-3</span><span class="p">,</span><span class="mf">7.01000e-3</span><span class="p">,</span><span class="mf">6.00000e-3</span><span class="p">,</span>
+             <span class="mf">5.11000e-3</span><span class="p">,</span><span class="mf">4.35000e-3</span><span class="p">,</span><span class="mf">3.72000e-3</span><span class="p">,</span><span class="mf">3.22000e-3</span><span class="p">,</span><span class="mf">2.86000e-3</span><span class="p">,</span>
+             <span class="mf">2.63000e-3</span> <span class="p">])</span>
+    <span class="n">fr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+           <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>      <span class="mf">4.30272e-18</span><span class="p">,</span><span class="mf">1.51111e-17</span><span class="p">,</span><span class="mf">4.02893e-17</span><span class="p">,</span><span class="mf">8.89643e-17</span><span class="p">,</span>
+          <span class="mf">1.70250e-16</span><span class="p">,</span><span class="mf">2.94529e-16</span><span class="p">,</span><span class="mf">4.77443e-16</span><span class="p">,</span><span class="mf">7.25449e-16</span><span class="p">,</span><span class="mf">1.06238e-15</span><span class="p">,</span>
+          <span class="mf">1.50501e-15</span><span class="p">,</span><span class="mf">2.08046e-15</span><span class="p">,</span><span class="mf">2.82259e-15</span><span class="p">,</span><span class="mf">3.76256e-15</span><span class="p">,</span><span class="mf">4.93692e-15</span><span class="p">,</span>
+          <span class="mf">6.38227e-15</span><span class="p">,</span><span class="mf">8.17038e-15</span><span class="p">,</span><span class="mf">1.02794e-14</span><span class="p">,</span><span class="mf">1.28018e-14</span><span class="p">,</span><span class="mf">1.57371e-14</span><span class="p">,</span>
+          <span class="mf">1.91217e-14</span><span class="p">,</span><span class="mf">2.30875e-14</span><span class="p">,</span><span class="mf">2.75329e-14</span><span class="p">,</span><span class="mf">3.27526e-14</span><span class="p">,</span><span class="mf">3.85481e-14</span><span class="p">,</span>
+          <span class="mf">4.52968e-14</span><span class="p">,</span><span class="mf">5.18592e-14</span><span class="p">,</span><span class="mf">5.99825e-14</span><span class="p">,</span><span class="mf">6.92092e-14</span><span class="p">,</span><span class="mf">7.94023e-14</span><span class="p">,</span>
+          <span class="mf">9.01000e-14</span><span class="p">,</span><span class="mf">1.01710e-13</span><span class="p">,</span><span class="mf">1.14868e-13</span><span class="p">,</span><span class="mf">1.29969e-13</span><span class="p">,</span><span class="mf">1.46437e-13</span><span class="p">,</span>
+          <span class="mf">1.63042e-13</span><span class="p">,</span><span class="mf">1.81440e-13</span><span class="p">,</span><span class="mf">2.02169e-13</span><span class="p">,</span><span class="mf">2.25126e-13</span><span class="p">,</span><span class="mf">2.49637e-13</span><span class="p">,</span>
+          <span class="mf">2.73970e-13</span><span class="p">,</span><span class="mf">3.00895e-13</span><span class="p">,</span><span class="mf">3.30827e-13</span><span class="p">,</span><span class="mf">3.64140e-13</span><span class="p">,</span><span class="mf">3.99503e-13</span><span class="p">,</span>
+          <span class="mf">4.34206e-13</span> <span class="p">])</span>
+
+    <span class="n">ev</span> <span class="o">=</span> <span class="mf">911.3047</span><span class="o">/</span><span class="n">wl</span>
+    <span class="n">Tk</span> <span class="o">=</span> <span class="mf">6.3348e-6</span> <span class="o">*</span> <span class="n">T</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nwl</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nwl</span><span class="p">):</span>
+        <span class="c1">#n[i]=min(where(e le ev[i],count))</span>
+        <span class="n">ii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">e</span> <span class="o">&lt;=</span> <span class="n">ev</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="p">;</span> <span class="n">count</span> <span class="o">=</span> <span class="n">ii</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="mi">45</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">ev</span><span class="o">-</span><span class="n">e</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">e</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+    <span class="n">usq</span> <span class="o">=</span> <span class="n">us</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">us</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">us</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">*</span><span class="n">d</span>
+    <span class="n">upq</span> <span class="o">=</span> <span class="n">up</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">up</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">up</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">*</span><span class="n">d</span>
+    <span class="n">frq</span> <span class="o">=</span> <span class="n">fr</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">fr</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">fr</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="o">*</span><span class="n">d</span>
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">usq</span><span class="o">=</span><span class="n">usq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">upq</span><span class="o">=</span><span class="n">upq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">frq</span><span class="o">=</span><span class="n">frq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">avh2p1</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">frq</span> <span class="o">*</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">usq</span><span class="o">/</span><span class="n">Tk</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">upq</span><span class="o">/</span><span class="n">Tk</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">avh2p1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">avh2p1</span><span class="o">=</span><span class="n">avh2p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">avh2p1</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># H2+ CrossSection per 1 HI atom n unit of e-26 cm^2 in LTE</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="H2p_CrossSection"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.H2p_CrossSection.html#src.Atomic.Opacity.H2p_CrossSection">[docs]</a><span class="k">def</span> <span class="nf">H2p_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">,</span><span class="n">n_e</span><span class="p">,</span><span class="n">n_H</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return H2+ CrossSection per 1 HI atom n unit of e-26 cm^2 in LTE</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    T  : Temperature [:math:`K`]</span>
+<span class="sd">    wl : wavelength [:math:`\AA`]</span>
+<span class="sd">    n_e: electron number density [:math:`cm^{-3}`]</span>
+<span class="sd">    n_H: hydrogen number density [:math:`cm^{-3}``]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    H2+ opacity in LTE is</span>
+
+<span class="sd">         kH2p = n_HI * H2p_CrossSection(T,wl,n_e,n_H) * 1.e-26 (/cm)</span>
+
+<span class="sd">    use `avH2p(T,wl)`</span>
+
+<span class="sd">    Modification history:</span>
+<span class="sd">    - 2019.9.15  K.Ichimoto</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pe</span> <span class="o">=</span> <span class="mf">1.38066e-16</span> <span class="o">*</span> <span class="n">n_e</span><span class="o">*</span><span class="n">T</span>
+
+    <span class="c1">#;/*  -----   solving LTE Saha&#39;s eq. for hydrogen   -----	*/</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">2.07e-16</span> <span class="o">*</span> <span class="n">T</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="mf">10.</span><span class="o">**</span><span class="p">(</span><span class="mf">5040.</span><span class="o">*</span><span class="mf">13.6</span><span class="o">/</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_e</span>
+    <span class="n">np</span>  <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">n_H</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">*</span><span class="n">avH2p</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">)</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># LTE continuum opacity in cm-1</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="xclte"><a class="viewcode-back" href="../../../RST/API/Atomic/_Opacity_API/src.Atomic.Opacity.xclte.html#src.Atomic.Opacity.xclte">[docs]</a><span class="k">def</span> <span class="nf">xclte</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">n_H</span><span class="p">,</span><span class="n">n_e</span><span class="p">,</span><span class="n">wl</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    LTE continuum opacity in cm-1, incruding HI, H-, H2, rayleigh scat.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    T  : Temperature, [:math:`K`]</span>
+<span class="sd">    n_H: H atom number density, [:math:`cm^{-3}`]</span>
+<span class="sd">    n_e: electron number density, [:math:`cm^{-3}`]</span>
+<span class="sd">    wl : wavelength, [:math:`\AA`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    HI Rayleigh opacity in LTE is [1]_.</span>
+
+<span class="sd">         khray = n_HI * HIRayleigh_CrossSection(wl) * 1.e-26 (/cm)</span>
+
+<span class="sd">    - n_HI: hydrogen number density in cm^(-3)</span>
+<span class="sd">    - stimulated emission is corrected</span>
+<span class="sd">    - partition function of HI is assumed to be 2.0, which is valid for T &lt; 2.e4 K</span>
+
+<span class="sd">    Modification history:</span>
+<span class="sd">    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992</span>
+<span class="sd">    - k.ichimoto  19 Feb.1994</span>
+<span class="sd">    - 2019.9.15  K.Ichimoto  from IDL avray.pro</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Gingerich SAO special report 167,21,1964. porinomial fitting for f-f gaunt factor is taken from Carbon &amp; Gingerich (1969) &quot;theory and observation of normal stellar atmosphere&quot;  MIT press</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nwl</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span>
+    <span class="n">nT</span>  <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">nnH</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">n_H</span><span class="p">)</span>
+    <span class="n">nne</span> <span class="o">=</span> <span class="n">n_elements</span><span class="p">(</span><span class="n">n_e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nwl</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">wl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">wl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nT</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nnH</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">n_H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">n_H</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">nne</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">n_e</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">n_e</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1">#;/*  -----   solving LTE Saha&#39;s eq. for hydrogen   -----	*/</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="mf">2.07e-16</span> <span class="o">*</span> <span class="n">T</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="mf">10.</span><span class="o">**</span><span class="p">(</span><span class="mf">5040.</span><span class="o">*</span><span class="mf">13.6</span><span class="o">/</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_e</span>
+    <span class="n">nHI</span> <span class="o">=</span>  <span class="n">q</span> <span class="o">/</span><span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">n_H</span>
+
+    <span class="n">xclte</span> <span class="o">=</span> <span class="n">nHI</span> <span class="o">*</span> <span class="p">(</span> <span class="n">HIbf_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">)</span> <span class="o">+</span> <span class="n">HIff_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">)</span> <span class="o">+</span> <span class="n">Hminus_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">,</span><span class="n">n_e</span><span class="p">)</span>
+              <span class="o">+</span> <span class="n">H2p_CrossSection</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">wl</span><span class="p">,</span><span class="n">n_e</span><span class="p">,</span><span class="n">n_H</span><span class="p">)</span> <span class="o">+</span> <span class="n">HIRayleigh_CrossSection</span><span class="p">(</span><span class="n">wl</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="mf">1.e-26</span>
+
+    <span class="k">return</span> <span class="n">xclte</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

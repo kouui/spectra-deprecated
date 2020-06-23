@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.Opacity.H2p_CrossSection &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.Atomic.Opacity.xclte" href="src.Atomic.Opacity.xclte.html" />
+    <link rel="prev" title="src.Atomic.Opacity.avH2p" href="src.Atomic.Opacity.avH2p.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.Opacity.H2p_CrossSection</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.Opacity.avH2p.html">src.Atomic.Opacity.avH2p</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.Opacity.xclte.html">src.Atomic.Opacity.xclte</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-opacity-h2p-crosssection">
+<h1>src.Atomic.Opacity.H2p_CrossSection<a class="headerlink" href="#src-atomic-opacity-h2p-crosssection" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.Opacity.H2p_CrossSection">
+<code class="descclassname">src.Atomic.Opacity.</code><code class="descname">H2p_CrossSection</code><span class="sig-paren">(</span><em>T</em>, <em>wl</em>, <em>n_e</em>, <em>n_H</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/Opacity.html#H2p_CrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.Opacity.H2p_CrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>return H2+ CrossSection per 1 HI atom n unit of e-26 cm^2 in LTE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (Temperature [<span class="math notranslate nohighlight">\(K\)</span>]) – </p></li>
+<li><p><strong>wl</strong> (wavelength [<span class="math notranslate nohighlight">\(\AA\)</span>]) – </p></li>
+<li><p><strong>n_e</strong> (electron number density [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]) – </p></li>
+<li><p><strong>n_H</strong> (hydrogen number density [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]) – </p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>H2+ opacity in LTE is</p>
+<blockquote>
+<div><p>kH2p = n_HI * H2p_CrossSection(T,wl,n_e,n_H) * 1.e-26 (/cm)</p>
+</div></blockquote>
+<p>use <cite>avH2p(T,wl)</cite></p>
+<p>Modification history:
+- 2019.9.15  K.Ichimoto</p>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.Opacity.avH2p.html">src.Atomic.Opacity.avH2p</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.Opacity.xclte.html">src.Atomic.Opacity.xclte</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

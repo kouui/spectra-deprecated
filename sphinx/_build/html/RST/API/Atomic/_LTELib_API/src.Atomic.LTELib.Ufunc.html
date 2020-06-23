@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.LTELib.Ufunc &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Opacity API" href="../Opacity_API.html" />
+    <link rel="prev" title="src.Atomic.LTELib.Planck_cm" href="src.Atomic.LTELib.Planck_cm.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.LTELib.Ufunc</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.LTELib.Planck_cm.html">src.Atomic.LTELib.Planck_cm</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../Opacity_API.html">Opacity API</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-ltelib-ufunc">
+<h1>src.Atomic.LTELib.Ufunc<a class="headerlink" href="#src-atomic-ltelib-ufunc" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.LTELib.Ufunc">
+<code class="descclassname">src.Atomic.LTELib.</code><code class="descname">Ufunc</code><span class="sig-paren">(</span><em>elm</em>, <em>T</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/LTELib.html#Ufunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.LTELib.Ufunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>partition function of neutral hydrogen</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elm</strong> (<em>element &amp; ionization stage as ca_i</em><em>, </em><em>fe_ii</em><em>, </em><em>etc.</em>) – </p></li>
+<li><p><strong>T</strong> (<em>temperature</em><em> (</em><em>k</em><em>)</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>from <a class="footnote-reference brackets" href="#id3" id="id1">1</a>, <a class="footnote-reference brackets" href="#id4" id="id2">2</a>.
+.. math:: log(u) = c_0 + c_1 cdot log(theta) + c_2 cdot log(theta)^2 + c_3 cdot log(theta)^3 + c_4 cdot log(theta)^4
+.. math:: log = log_{10}
+.. math:: theta = 5040 / T</p>
+<p>modification history:
+- 2006.5.23     k.i.
+- 2015.7.5      k.i.        ‘h_ii’
+- 2019.11.26    k.i.        ‘Ba’ from Gary 2009 (use poly_ufunc.pro)
+- 2020.2.13     k.i.        from IDL ufunc_gray.pro</p>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Gray 1992, “The observation and analysis of stellar photospheres”, app.D</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>2009  table</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.LTELib.Planck_cm.html">src.Atomic.LTELib.Planck_cm</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../Opacity_API.html">Opacity API</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

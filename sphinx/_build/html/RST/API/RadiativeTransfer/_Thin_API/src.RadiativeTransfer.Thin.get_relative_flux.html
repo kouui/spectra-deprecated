@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.RadiativeTransfer.Thin.get_relative_flux &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Numpy Cheat Sheet" href="../../../NumpyCollection.html" />
+    <link rel="prev" title="Thin API" href="../Thin_API.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.RadiativeTransfer.Thin.get_relative_flux</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="../Thin_API.html">Thin API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../../../NumpyCollection.html">Numpy Cheat Sheet</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-radiativetransfer-thin-get-relative-flux">
+<h1>src.RadiativeTransfer.Thin.get_relative_flux<a class="headerlink" href="#src-radiativetransfer-thin-get-relative-flux" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.RadiativeTransfer.Thin.get_relative_flux">
+<code class="descclassname">src.RadiativeTransfer.Thin.</code><code class="descname">get_relative_flux</code><span class="sig-paren">(</span><em>_AJI</em>, <em>_f0</em>, <em>_nj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/RadiativeTransfer/Thin.html#get_relative_flux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.RadiativeTransfer.Thin.get_relative_flux" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate optically thin relative flux (some constants are removed)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_AJI</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLine</em><em>,</em><em>) </em><em>; scalar</em>) – Einstein A coefficient, [<span class="math notranslate nohighlight">\(s^{-1}\)</span>]</p></li>
+<li><p><strong>_f0</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLine</em><em>,</em><em>)</em><em>; scalar</em>) – Transition line frequency, [<span class="math notranslate nohighlight">\(hz\)</span>]</p></li>
+<li><p><strong>_nj</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLine</em><em>)</em><em>; scalar</em>) – Population of the upper level of line transition, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>_rel_flux</strong> – relative flux under the assumption of optically thin. [<span class="math notranslate nohighlight">\(erg \; cm^{-3} \; s^{-1}\)</span>]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.double, np.array, (_atom.nLine,); scalar</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The absolute flux under the assumption of optically thin <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
+<div class="math notranslate nohighlight">
+\[F_{ji} = \frac{1}{4 \pi R^{2}} \int_{\Delta V} \epsilon_{ji} dV \quad [erg \; cm^{-2} \; s^{-1}]\]</div>
+<p>where the emissivity <span class="math notranslate nohighlight">\(\epsilon_{ji}\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[\epsilon_{ji} = h \nu n_{j} A_{ji} \quad [erg \; cm^{-3} \; s^{-1}]\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[\epsilon_{ji} = \int_{\nu} \epsilon_{\nu} d \nu = \int_{\nu} h \nu n_{j} A_{ji} \psi d \nu\]</div>
+<p>So our relative flux is given by</p>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>John T. Mariska, “The Solar Transition Region”,
+Cambridge University Press, pp. 19, 1992</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="../Thin_API.html">Thin API</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../../../NumpyCollection.html">Numpy Cheat Sheet</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

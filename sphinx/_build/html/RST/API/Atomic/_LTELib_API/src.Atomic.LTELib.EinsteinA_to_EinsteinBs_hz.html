@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm" href="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm.html" />
+    <link rel="prev" title="src.Atomic.LTELib.get_LTE_ratio" href="src.Atomic.LTELib.get_LTE_ratio.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.LTELib.get_LTE_ratio.html">src.Atomic.LTELib.get_LTE_ratio</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm.html">src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-ltelib-einsteina-to-einsteinbs-hz">
+<h1>src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz<a class="headerlink" href="#src-atomic-ltelib-einsteina-to-einsteinbs-hz" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz">
+<code class="descclassname">src.Atomic.LTELib.</code><code class="descname">EinsteinA_to_EinsteinBs_hz</code><span class="sig-paren">(</span><em>Aji</em>, <em>f0</em>, <em>gi</em>, <em>gj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/LTELib.html#EinsteinA_to_EinsteinBs_hz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz" title="Permalink to this definition">¶</a></dt>
+<dd><p>given Einstein A coefficient Aij,
+calculate Einstein B coefficients Bij and Bji.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Aji</strong> (<em>np.double</em><em> or </em><em>array-like</em>) – Einstein A coefficient Aji, [<span class="math notranslate nohighlight">\(s^{-1}\)</span>]</p></li>
+<li><p><strong>f0</strong> (<em>np.double</em><em> or </em><em>array-like</em>) – central frequency of corresponding line transition, [<span class="math notranslate nohighlight">\(Hz\)</span>]</p></li>
+<li><p><strong>gi</strong> (<em>np.uint8</em><em> or </em><em>array-like</em>) – statistical weight of lower level, [-]</p></li>
+<li><p><strong>gj</strong> (<em>np.uint8</em><em> or </em><em>array-like</em>) – statistical weight of upper level, [-]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Bji</strong> (<em>np.double or array-like</em>) – Einstein B coefficient Bji, [<span class="math notranslate nohighlight">\(s^{-1}/(erg/cm^{2}/Sr/Hz/s)\)</span>]</p></li>
+<li><p><strong>Bij</strong> (<em>np.double or array-like</em>) – Einstein B coefficient Bji, [<span class="math notranslate nohighlight">\(s^{-1}/(erg/cm^{2}/Sr/Hz/s)\)</span>]</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Einstein Relations for bound-bound transitions <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
+<div class="math notranslate nohighlight">
+\[B_{ji} = A_{ji} / \frac{2h\nu^{3}}{c^{2}}\]</div>
+<div class="math notranslate nohighlight">
+\[B_{ij} = B_{ji} \frac{g_{j}}{g_{i}}\]</div>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Ivan Hubeny, Dimitri Mihalas, “Theory of Stellar Atmosphere:
+An Introduction to Astrophysical Non-equilibrium
+Quantitative Spectroscopic Analysis”,
+Princeton University Press, pp. 117, 2015.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.LTELib.get_LTE_ratio.html">src.Atomic.LTELib.get_LTE_ratio</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm.html">src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

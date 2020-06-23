@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.RadiativeTransfer.Thin &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.RadiativeTransfer.Thin</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.RadiativeTransfer.Thin</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Constants</span> <span class="k">as</span> <span class="n">Cst</span>
+
+<div class="viewcode-block" id="get_relative_flux"><a class="viewcode-back" href="../../../RST/API/RadiativeTransfer/_Thin_API/src.RadiativeTransfer.Thin.get_relative_flux.html#src.RadiativeTransfer.Thin.get_relative_flux">[docs]</a><span class="k">def</span> <span class="nf">get_relative_flux</span><span class="p">(</span><span class="n">_AJI</span><span class="p">,</span> <span class="n">_f0</span><span class="p">,</span> <span class="n">_nj</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    calculate optically thin relative flux (some constants are removed)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _AJI : np.double, np.array, (nLine,) ; scalar</span>
+<span class="sd">        Einstein A coefficient, [:math:`s^{-1}`]</span>
+
+<span class="sd">    _f0 : np.double, np.array, (nLine,); scalar</span>
+<span class="sd">        Transition line frequency, [:math:`hz`]</span>
+
+<span class="sd">    _nj : np.double, np.array, (nLine); scalar</span>
+<span class="sd">        Population of the upper level of line transition, [:math:`cm^{-3}`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    _rel_flux : np.double, np.array, (_atom.nLine,); scalar</span>
+<span class="sd">        relative flux under the assumption of optically thin. [:math:`erg \; cm^{-3} \; s^{-1}`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The absolute flux under the assumption of optically thin [1]_.</span>
+
+<span class="sd">    .. math:: F_{ji} = \frac{1}{4 \pi R^{2}} \int_{\Delta V} \epsilon_{ji} dV \quad [erg \; cm^{-2} \; s^{-1}]</span>
+
+<span class="sd">    where the emissivity :math:`\epsilon_{ji}` is</span>
+
+<span class="sd">    .. math:: \epsilon_{ji} = h \nu n_{j} A_{ji} \quad [erg \; cm^{-3} \; s^{-1}]</span>
+
+<span class="sd">    and</span>
+
+<span class="sd">    .. math:: \epsilon_{ji} = \int_{\nu} \epsilon_{\nu} d \nu = \int_{\nu} h \nu n_{j} A_{ji} \psi d \nu</span>
+
+<span class="sd">    So our relative flux is given by</span>
+
+<span class="sd">    .. math: h \nu n_{j} A_{ji} \quad [erg \; cm^{-3} \; s^{-1}]</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] John T. Mariska, &quot;The Solar Transition Region&quot;,</span>
+<span class="sd">        Cambridge University Press, pp. 19, 1992</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_rf</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span> <span class="o">*</span> <span class="n">_f0</span><span class="p">[:]</span> <span class="o">*</span> <span class="n">_nj</span><span class="p">[:]</span> <span class="o">*</span> <span class="n">_AJI</span><span class="p">[:]</span>
+
+    <span class="k">return</span> <span class="n">_rf</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

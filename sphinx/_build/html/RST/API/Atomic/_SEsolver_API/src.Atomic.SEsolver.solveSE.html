@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.SEsolver.solveSE &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="RadiativeTransfer API" href="../../RadiativeTransfer_API.html" />
+    <link rel="prev" title="src.Atomic.SEsolver.setMatrixR" href="src.Atomic.SEsolver.setMatrixR.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.SEsolver.solveSE</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.SEsolver.setMatrixR.html">src.Atomic.SEsolver.setMatrixR</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../../RadiativeTransfer_API.html">RadiativeTransfer API</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-sesolver-solvese">
+<h1>src.Atomic.SEsolver.solveSE<a class="headerlink" href="#src-atomic-sesolver-solvese" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.SEsolver.solveSE">
+<code class="descclassname">src.Atomic.SEsolver.</code><code class="descname">solveSE</code><span class="sig-paren">(</span><em>_Rmat</em>, <em>_Cmat</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/SEsolver.html#solveSE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.SEsolver.solveSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>solve the linear equation system of statistical equilibrium.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_Rmat</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLevel</em><em>,</em><em>nLevel</em><em>)</em>) – radiative transition rate matrix, [<span class="math notranslate nohighlight">\(s^{-1}\)</span>]</p></li>
+<li><p><strong>_Cmat</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLevel</em><em>,</em><em>nLevel</em><em>)</em>) – collisional transition rate matrix, [<span class="math notranslate nohighlight">\(s^{-1}\)</span>]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>_nArr</strong> – normalized level population. [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.double, np.array, (nLevel,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.SEsolver.setMatrixR.html">src.Atomic.SEsolver.setMatrixR</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="../../RadiativeTransfer_API.html">RadiativeTransfer API</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

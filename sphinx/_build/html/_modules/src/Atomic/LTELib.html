@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.LTELib &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.LTELib</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.Atomic.LTELib</h1><div class="highlight"><pre>
+<span></span><span class="c1">################################################################################</span>
+<span class="c1"># this file defines functions for</span>
+<span class="c1">#     calculations related to LTE process</span>
+<span class="c1"># Modification History:</span>
+<span class="c1">#    2020.2.23   k.i.   Ufunc</span>
+<span class="c1">################################################################################</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Constants</span> <span class="k">as</span> <span class="n">Cst</span>
+<span class="kn">from</span> <span class="nn">..Structure</span> <span class="k">import</span> <span class="n">AtomCls</span>
+
+<div class="viewcode-block" id="Boltzmann_distribution"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Boltzmann_distribution.html#src.Atomic.LTELib.Boltzmann_distribution">[docs]</a><span class="k">def</span> <span class="nf">Boltzmann_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gj</span><span class="p">,</span> <span class="n">_Eji</span><span class="p">,</span> <span class="n">_Te</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    calculate the population ratio between upper level j and lower level i under LTE.</span>
+
+<span class="sd">    with `nb.vectorize( [nb.float64(nb.uint8, nb.uint8, nb.float64, nb.float64)])`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _gi  : np.uint8 or array-like</span>
+<span class="sd">        statistical weight of lower level i, [-]</span>
+<span class="sd">    _gj  : np.uint8 or array-like</span>
+<span class="sd">        statistical weight of upper level j, [-]</span>
+<span class="sd">    _Eji : np.double or array-like</span>
+<span class="sd">        the gap of level energy between upper level j and lower level i,</span>
+<span class="sd">        :math:`E_{ji}=E_j-E_i, \quad [erg]`</span>
+<span class="sd">    _Te  : np.double or array-like</span>
+<span class="sd">        electron temperature, [:math:`K`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    _rt : np.double or array-like</span>
+<span class="sd">        population ratio of upper level j and lower level i.</span>
+<span class="sd">        :math:`rt = n_j / n_i`, [-]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The population ratio according to Boltzmann distribution [1]_.</span>
+
+<span class="sd">    .. math:: \frac{n_j}{n_i} = \frac{g_j}{g_i} e^{-(E_j-E_i)/{kT}}</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
+<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
+<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
+<span class="sd">        Princeton University Press, pp. 262, 2015.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_kT</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">k_</span> <span class="o">*</span> <span class="n">_Te</span>
+    <span class="n">_rt</span> <span class="o">=</span> <span class="p">(</span><span class="n">_gj</span><span class="o">/</span><span class="n">_gi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">_Eji</span><span class="o">/</span><span class="n">_kT</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_rt</span></div>
+
+<div class="viewcode-block" id="Saha_distribution"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Saha_distribution.html#src.Atomic.LTELib.Saha_distribution">[docs]</a><span class="k">def</span> <span class="nf">Saha_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gk</span><span class="p">,</span> <span class="n">_chi</span><span class="p">,</span> <span class="n">_ne</span><span class="p">,</span> <span class="n">_Te</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    calculate the population ratio between the ground states of two subsequent ionization stage under LTE.</span>
+
+<span class="sd">    with `nb.vectorize( [nb.float64(nb.uint8,nb.uint8,nb.float64,nb.float64,nb.float64)])`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _gk: np.uint8 or array-like</span>
+<span class="sd">        statistical weight of the ground state in ionization stage I+1, [-]</span>
+<span class="sd">    _gi: np.uint8 or array-like</span>
+<span class="sd">        statistical weight of the ground state in ionization stage I, [-]</span>
+<span class="sd">    _chi: np.double or array-like</span>
+<span class="sd">        ionization energy from ground state in ionization stage I</span>
+<span class="sd">        to ground state in ionization stage I, [:math:`erg`]</span>
+<span class="sd">    _ne: np.double or array-like</span>
+<span class="sd">        electron density, [:math:`cm^{-3}`]</span>
+<span class="sd">    _Te: np.double or array-like</span>
+<span class="sd">        electron temperature, [:math:`K`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    _rt: np.double or array-like</span>
+<span class="sd">        :math:`n_k / n_i`, :math:`n_k` the population of the ground state of ionization stage I+1</span>
+<span class="sd">        and :math:`n_i` the population of the ground state of ionization stage I. [-]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The population ratio according to Saha&#39;s equation [1]_.</span>
+
+<span class="sd">    a factor contains physics constants only,</span>
+
+<span class="sd">    .. math:: f = 2(\frac{2 \pi m_e k}{h^2})^{3/2}</span>
+
+<span class="sd">    then the population ratio is,</span>
+
+<span class="sd">    .. math:: \frac{n_{0,k}}{n_{0,i}} = f \cdot \frac{g_{0,k}}{g_{0,i}} e^{\frac{-\chi_{ki}}{kT}}  T^{3/2} / n_e</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
+<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
+<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
+<span class="sd">        Princeton University Press, pp. 94, 2015.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_kT</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">k_</span> <span class="o">*</span> <span class="n">_Te</span>
+    <span class="n">_rt</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">saha_</span> <span class="o">*</span> <span class="n">_Te</span><span class="o">**</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">_gk</span><span class="o">/</span><span class="n">_gi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">_chi</span><span class="o">/</span><span class="n">_kT</span><span class="p">)</span> <span class="o">/</span> <span class="n">_ne</span>
+
+    <span class="k">return</span> <span class="n">_rt</span></div>
+
+<div class="viewcode-block" id="get_LTE_ratio"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.get_LTE_ratio.html#src.Atomic.LTELib.get_LTE_ratio">[docs]</a><span class="k">def</span> <span class="nf">get_LTE_ratio</span><span class="p">(</span><span class="n">_erg</span><span class="p">,</span> <span class="n">_g</span><span class="p">,</span> <span class="n">_stage</span><span class="p">,</span> <span class="n">_Te</span><span class="p">,</span> <span class="n">_Ne</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute LTE population ratio relative to 1st level.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _erg : numpy.1darray of np.double</span>
+<span class="sd">        level energy relative to 1st level, [:math:`erg`]</span>
+
+<span class="sd">    _weight : numpy.1darray of np.uint8</span>
+<span class="sd">        statistical weight, [-]</span>
+
+<span class="sd">    _stage : numpy.1darray of np.uint8</span>
+<span class="sd">        ionization stage, [-]</span>
+
+<span class="sd">    _Te : np.double</span>
+<span class="sd">        electron temperature, [:math:`K`]</span>
+
+<span class="sd">    _Ne : np.double</span>
+<span class="sd">        electron density, [:math:`cm^{-3}`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    _nRatio : numpy.1darray of np.double</span>
+<span class="sd">        population ratio. [-]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    We set the population of the 1st level to `1.0`, and then compute the</span>
+<span class="sd">    population ratio level by level. `Saha_distribution` is applied whenever</span>
+<span class="sd">    there is a jump of ionization stage.</span>
+<span class="sd">    Finnaly, we normalize the _nRatio array with respec to the total population.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_nLevel</span> <span class="o">=</span> <span class="n">_erg</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">_nRatio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">_nLevel</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="n">_nRatio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="c1">#kT = Cst.k_*Te</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">_nLevel</span><span class="p">):</span>
+        <span class="n">_gj</span><span class="p">,</span> <span class="n">_gi</span> <span class="o">=</span> <span class="n">_g</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">_g</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">_stage</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">_stage</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#nRatio[i] = nRatio[i-1] * gj/gi * np.exp(-(erg[i]-erg[i-1])/kT)</span>
+            <span class="n">_nRatio</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_nRatio</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Boltzmann_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gj</span><span class="p">,</span> <span class="n">_erg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">_erg</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">_Te</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">_stage</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">_stage</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1">#nRatio[i] = nRatio[i-1] * gj/gi * np.exp(-(erg[i]-erg[i-1])/kT) * Cst.saha_ * Te**(1.5) / Ne</span>
+            <span class="n">_nRatio</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_nRatio</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Saha_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gj</span><span class="p">,</span> <span class="n">_erg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">_erg</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">_Ne</span><span class="p">,</span> <span class="n">_Te</span><span class="p">)</span>
+
+        <span class="n">_nRatio</span><span class="p">[:]</span> <span class="o">/=</span> <span class="n">_nRatio</span><span class="p">[:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">_nRatio</span></div>
+
+
+<div class="viewcode-block" id="EinsteinA_to_EinsteinBs_hz"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz.html#src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz">[docs]</a><span class="k">def</span> <span class="nf">EinsteinA_to_EinsteinBs_hz</span><span class="p">(</span><span class="n">Aji</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">gi</span><span class="p">,</span> <span class="n">gj</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    given Einstein A coefficient Aij,</span>
+<span class="sd">    calculate Einstein B coefficients Bij and Bji.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Aji : np.double or array-like</span>
+<span class="sd">        Einstein A coefficient Aji, [:math:`s^{-1}`]</span>
+<span class="sd">    f0 : np.double or array-like</span>
+<span class="sd">        central frequency of corresponding line transition, [:math:`Hz`]</span>
+<span class="sd">    gi : np.uint8 or array-like</span>
+<span class="sd">        statistical weight of lower level, [-]</span>
+<span class="sd">    gj : np.uint8 or array-like</span>
+<span class="sd">        statistical weight of upper level, [-]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    Bji : np.double or array-like</span>
+<span class="sd">        Einstein B coefficient Bji, [:math:`s^{-1}/(erg/cm^{2}/Sr/Hz/s)`]</span>
+<span class="sd">    Bij : np.double or array-like</span>
+<span class="sd">        Einstein B coefficient Bji, [:math:`s^{-1}/(erg/cm^{2}/Sr/Hz/s)`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    Einstein Relations for bound-bound transitions [1]_.</span>
+
+<span class="sd">    .. math:: B_{ji} = A_{ji} / \frac{2h\nu^{3}}{c^{2}}</span>
+<span class="sd">    .. math:: B_{ij} = B_{ji} \frac{g_{j}}{g_{i}}</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
+<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
+<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
+<span class="sd">        Princeton University Press, pp. 117, 2015.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">factor_</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">f0</span><span class="o">**</span><span class="mi">3</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">Bji</span> <span class="o">=</span> <span class="n">Aji</span> <span class="o">/</span> <span class="n">factor_</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">Bji</span> <span class="o">*</span> <span class="n">gj</span> <span class="o">/</span> <span class="n">gi</span>
+
+    <span class="k">return</span> <span class="n">Bji</span><span class="p">,</span> <span class="n">Bij</span></div>
+
+
+<div class="viewcode-block" id="EinsteinA_to_EinsteinBs_cm"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm.html#src.Atomic.LTELib.EinsteinA_to_EinsteinBs_cm">[docs]</a><span class="k">def</span> <span class="nf">EinsteinA_to_EinsteinBs_cm</span><span class="p">(</span><span class="n">Aji</span><span class="p">,</span> <span class="n">w0</span><span class="p">,</span> <span class="n">gi</span><span class="p">,</span> <span class="n">gj</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    given Einstein A coefficient Aij,</span>
+<span class="sd">    calculate Einstein B coefficients Bij and Bji.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Aji : np.double or array-like</span>
+<span class="sd">        Einstein A coefficient Aji, [:math:`s^{-1}`]</span>
+<span class="sd">    f0 : np.double or array-like</span>
+<span class="sd">        central frequency of corresponding line transition, [:math:`Hz`]</span>
+<span class="sd">    gi : np.uint8 or array-like</span>
+<span class="sd">        statistical weight of lower level, [-]</span>
+<span class="sd">    gj : np.uint8 or array-like</span>
+<span class="sd">        statistical weight of upper level, [-]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    Bji : np.double or array-like</span>
+<span class="sd">        Einstein B coefficient Bji, [:math:`s^{-1}/(erg/cm^{2}/Sr/Hz/s)`]</span>
+<span class="sd">    Bij : np.double or array-like</span>
+<span class="sd">        Einstein B coefficient Bji, [:math:`s^{-1}/(erg/cm^{2}/Sr/Hz/s)`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    Einstein Relations for bound-bound transitions.</span>
+<span class="sd">    Since we are in wavelength unit, the relation between</span>
+<span class="sd">    [:math:`A_{ji}`] and [:math:`B_{ji}`] should be evaluated using</span>
+<span class="sd">    Planck function also in wavelength unit</span>
+
+<span class="sd">    .. math:: B_{ji} = A_{ji} / (2 h c^{2} \lambda^{5} )</span>
+<span class="sd">    .. math:: B_{ij} = B_{ji} \frac{g_{j}}{g_{i}}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">factor_</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">w0</span><span class="o">**</span><span class="mi">5</span>
+    <span class="n">Bji</span> <span class="o">=</span> <span class="n">Aji</span> <span class="o">/</span> <span class="n">factor_</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">Bji</span> <span class="o">*</span> <span class="n">gj</span> <span class="o">/</span> <span class="n">gi</span>
+
+    <span class="k">return</span> <span class="n">Bji</span><span class="p">,</span> <span class="n">Bij</span></div>
+
+
+<div class="viewcode-block" id="Planck_hz"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Planck_hz.html#src.Atomic.LTELib.Planck_hz">[docs]</a><span class="k">def</span> <span class="nf">Planck_hz</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    given frequency and temperature,</span>
+<span class="sd">    calculate the frequency based planck function.</span>
+
+<span class="sd">    with `nb.vectorize( [nb.float64(nb.float64,nb.float64)])`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    F : np.double or array-like</span>
+<span class="sd">        frequency, [:math:`Hz`]</span>
+<span class="sd">    T : np.double or array-like</span>
+<span class="sd">        temperature, [:math:`K`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    intensity : np.double or array-like</span>
+<span class="sd">        frequency based intensity, [:math:`erg/cm^2/Sr/Hz/s`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The Planck function [1]_.</span>
+
+<span class="sd">    .. math:: B_{\nu}(T) = \frac{2h\nu^3}{c^2} \frac{1}{e^{h\nu/kT}-1} \quad [erg/cm^2/Sr/Hz/s]</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
+<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
+<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
+<span class="sd">        Princeton University Press, pp. 102, 2015.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">F_T</span> <span class="o">=</span> <span class="n">F</span> <span class="o">/</span> <span class="n">T</span>
+    <span class="k">if</span> <span class="n">F_T</span> <span class="o">&gt;</span> <span class="mf">1.04183e+13</span><span class="p">:</span>                                        <span class="c1"># ignore exponential part, exponential &gt; 500</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="n">F_T</span> <span class="o">&gt;</span> <span class="mf">2.08366e+12</span><span class="p">:</span>                                      <span class="c1"># Wien approximation, exponential &gt; 100</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="o">-</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F_T</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">F_T</span> <span class="o">&lt;</span> <span class="mf">2.08366e+08</span><span class="p">:</span>                                      <span class="c1"># Rayleighâ€“Jeans approximation, exponential &lt; 0.01</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">*</span> <span class="n">Cst</span><span class="o">.</span><span class="n">k_</span> <span class="o">*</span> <span class="n">T</span>
+    <span class="k">else</span><span class="p">:</span>                                                        <span class="c1"># normal formula</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F_T</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">intensity</span></div>
+
+
+<div class="viewcode-block" id="Planck_cm"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Planck_cm.html#src.Atomic.LTELib.Planck_cm">[docs]</a><span class="k">def</span> <span class="nf">Planck_cm</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    given wavelength and temperature,</span>
+<span class="sd">    calculate the wavelength based planck function.</span>
+
+<span class="sd">    with `nb.vectorize( [nb.float64(nb.float64,nb.float64)])`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    W : np.double or array-like</span>
+<span class="sd">        wavelength, [:math:`cm`]</span>
+<span class="sd">    T : np.double or array-like</span>
+<span class="sd">        temperature, [:math:`K`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    intensity : np.double or array-like</span>
+<span class="sd">        wavelength based intensity, [:math:`erg/cm^2/Sr/cm/s`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The Planck function [1]_.</span>
+
+<span class="sd">    .. math:: B_{\lambda}(T) = \frac{2hc^2}{\lambda^5} \frac{1}{e^{hc/\lambda kT}-1} \quad [erg/cm^2/Sr/cm/s]</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Robert J. Rutten, &quot;Introduction to Astrophysical Radiative Transfer&quot;, pp. 43, 2015.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">WT</span> <span class="o">=</span> <span class="n">W</span><span class="o">*</span><span class="n">T</span>
+    <span class="k">if</span> <span class="n">WT</span> <span class="o">&lt;</span> <span class="mf">2.87755e-03</span><span class="p">:</span>                                         <span class="c1"># ignore exponential part, exponential &gt; 500</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">elif</span> <span class="n">WT</span> <span class="o">&lt;</span> <span class="mf">1.43878e-02</span><span class="p">:</span>                                       <span class="c1"># Wien approximation, exponential &gt; 100</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span><span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">**</span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="o">-</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">WT</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">WT</span> <span class="o">&gt;</span> <span class="mf">1.43878e+02</span><span class="p">:</span>                                       <span class="c1"># Rayleighâ€“Jeans approximation, exponential &lt; 0.01</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">T</span> <span class="o">/</span> <span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span>
+    <span class="k">else</span><span class="p">:</span>                                                        <span class="c1"># normal formula</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span><span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">**</span><span class="mi">5</span> <span class="o">/</span>  <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">WT</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">intensity</span></div>
+
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="Ufunc"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Ufunc.html#src.Atomic.LTELib.Ufunc">[docs]</a><span class="k">def</span> <span class="nf">Ufunc</span><span class="p">(</span><span class="n">elm</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    partition function of neutral hydrogen</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    elm : element &amp; ionization stage as ca_i, fe_ii, etc.</span>
+<span class="sd">    T   : temperature (k)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    from [1]_, [2]_.</span>
+<span class="sd">    .. math:: log(u) = c_0 + c_1 \cdot log(\theta) + c_2 \cdot log(\theta)^2 + c_3 \cdot log(\theta)^3 + c_4 \cdot log(\theta)^4</span>
+<span class="sd">    .. math:: log = log_{10}</span>
+<span class="sd">    .. math:: \theta = 5040 / T</span>
+
+<span class="sd">    modification history:</span>
+<span class="sd">    - 2006.5.23     k.i.</span>
+<span class="sd">    - 2015.7.5      k.i.	&#39;h_ii&#39;</span>
+<span class="sd">    - 2019.11.26    k.i.	&#39;Ba&#39; from Gary 2009 (use poly_ufunc.pro)</span>
+<span class="sd">    - 2020.2.13     k.i.	from IDL ufunc_gray.pro</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Gray 1992, &quot;The observation and analysis of stellar photospheres&quot;, app.D</span>
+<span class="sd">    .. [2] 2009  table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span>   <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;H_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.30103</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;H_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;He_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;He_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.30103</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Li_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.31804</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.20616</span><span class="p">,</span> <span class="mf">0.91456</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.66121</span><span class="p">,</span> <span class="mf">1.04195</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Be_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.00801</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.17135</span><span class="p">,</span> <span class="mf">0.62921</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.58945</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Be_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.30389</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00819</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;B_i&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.78028</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01622</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;C_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.96752</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.09452</span><span class="p">,</span> <span class="mf">0.08055</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;C_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.77239</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02540</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;N_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.60683</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.08674</span><span class="p">,</span> <span class="mf">0.30565</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.28114</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;N_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.94968</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.06463</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1291</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;O_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.05033</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05703</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;O_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.60405</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03025</span><span class="p">,</span> <span class="mf">0.04525</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;F_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.76284</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03582</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05619</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ne_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 1</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ne_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.74847</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.06562</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.07088</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Na_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.30955</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.17778</span><span class="p">,</span>  <span class="mf">1.10594</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.42847</span><span class="p">,</span> <span class="mf">1.70721</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Na_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 1</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Na_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc1 = 6.0   # Allen, 1976</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Mg_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.00556</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.12840</span><span class="p">,</span>  <span class="mf">0.81506</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.79635</span><span class="p">,</span> <span class="mf">1.26292</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Mg_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.30257</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00451</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Mg_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 1</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Al_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.76786</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05207</span><span class="p">,</span>  <span class="mf">0.14713</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.21376</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Al_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.00334</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00995</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Si_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.97896</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.19208</span><span class="p">,</span>  <span class="mf">0.04753</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Si_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.75647</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05490</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.10126</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;P_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.64618</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.31132</span><span class="p">,</span>  <span class="mf">0.68633</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.47505</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;P_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.93588</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.18848</span><span class="p">,</span>  <span class="mf">0.08921</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.22447</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;S_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.95254</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15166</span><span class="p">,</span>  <span class="mf">0.02340</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;S_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.61971</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.17465</span><span class="p">,</span>  <span class="mf">0.48283</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.39157</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Cl_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.74465</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.07389</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.06965</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Cl_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.92728</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15913</span><span class="p">,</span>  <span class="o">-</span><span class="mf">0.01983</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;K_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.34419</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.48157</span><span class="p">,</span>  <span class="mf">1.92563</span><span class="p">,</span>  <span class="o">-</span><span class="mf">3.17826</span><span class="p">,</span> <span class="mf">1.83211</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ca_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.07460</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.75759</span><span class="p">,</span> <span class="mf">2.58494</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.53170</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.65240</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ca_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.34383</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.41472</span><span class="p">,</span> <span class="mf">1.01550</span><span class="p">,</span> <span class="mf">0.31930</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ca_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 1</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Sc_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.08209</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.77814</span><span class="p">,</span> <span class="mf">1.78504</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.39179</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Sc_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.35894</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.51812</span><span class="p">,</span> <span class="mf">0.15634</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ti_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.47343</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.97220</span><span class="p">,</span> <span class="mf">1.47986</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.93275</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ti_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.74561</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.51230</span><span class="p">,</span> <span class="mf">0.27621</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ti_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 1</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;V_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.68359</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.82055</span><span class="p">,</span> <span class="mf">0.92361</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.78342</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;V_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.64112</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.74045</span><span class="p">,</span> <span class="mf">0.49148</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;V_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">28</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 28</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Cr_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.02332</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.02540</span><span class="p">,</span> <span class="mf">2.02181</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.32723</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Cr_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.85381</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.71166</span><span class="p">,</span> <span class="mf">2.18621</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.97590</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.72893</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="s1">&#39;Cr_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 25</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Mn_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.80810</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.39108</span><span class="p">,</span> <span class="mf">1.74756</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.13517</span><span class="p">,</span> <span class="mf">1.93514</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Mn_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.88861</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.36398</span><span class="p">,</span> <span class="mf">1.39674</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.86424</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.32389</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Mn_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 6</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Fe_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.44701</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.67040</span><span class="p">,</span> <span class="mf">1.01267</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.81428</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Fe_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.63506</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.47118</span><span class="p">,</span> <span class="mf">0.57918</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.12293</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Fe_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">25</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 25</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Co_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.52929</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.71430</span><span class="p">,</span> <span class="mf">0.37210</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.23278</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ni_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.49063</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.33662</span><span class="p">,</span> <span class="mf">0.08553</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.19277</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ni_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.03800</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.69572</span><span class="p">,</span> <span class="mf">0.53893</span><span class="p">,</span> <span class="mf">0.28861</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ni_III&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">21</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 21</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ba_I&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">4.83034</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.8244</span><span class="p">,</span> <span class="mf">10.0364</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.34979</span><span class="p">,</span> <span class="mf">0.719568</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ba_II&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.54797</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.38871</span><span class="p">,</span> <span class="mf">7.98813</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.38907</span><span class="p">,</span> <span class="mf">0.862666</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">elm</span> <span class="o">==</span> <span class="s1">&#39;Ba_iii&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># ufunc = 1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">elm</span><span class="p">,</span> <span class="s1">&#39;: partition function is not defined in &quot;Ufunc/LTElib_ki&quot;!&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># return 1</span>
+
+    <span class="n">th</span> <span class="o">=</span> <span class="mf">5040.</span><span class="o">/</span><span class="n">T</span>
+    <span class="n">nt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="n">nt</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">th</span><span class="p">))</span><span class="o">**</span><span class="n">i</span>
+    <span class="n">ufunc1</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">s</span>
+    <span class="c1">#if len(ufunc1) == 1</span>
+    <span class="c1">#    ufunc1=ufunc1[0]</span>
+
+    <span class="k">return</span> <span class="n">ufunc1</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># whether to compile them using numba&#39;s LLVM</span>
+<span class="c1">################################################################################</span>
+
+<span class="k">if</span> <span class="n">Cst</span><span class="o">.</span><span class="n">isJIT</span> <span class="o">==</span> <span class="kc">True</span> <span class="p">:</span>
+    <span class="n">Planck_cm</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span> <span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">)])(</span> <span class="n">Planck_cm</span> <span class="p">)</span>
+    <span class="n">Planck_hz</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span> <span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">)])(</span> <span class="n">Planck_hz</span> <span class="p">)</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

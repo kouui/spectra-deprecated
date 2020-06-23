@@ -16,7 +16,7 @@ from ..Math import BasicM
 #    - Voigt
 #    - Gaussian
 ################################################################################
-@nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)
+#@nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)
 def Voigt(a,x):
     r"""
     Calculate Doppler width normalized voigt function using polynomial fitting formula.
@@ -239,5 +239,5 @@ def makeContinuumMesh(nLambda):
 # whether to compile them using numba's LLVM
 ################################################################################
 
-#if Cst.isJIT == True:
-#    Voigt = nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)( Voigt )
+if Cst.isJIT == True:
+    Voigt = nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)( Voigt )

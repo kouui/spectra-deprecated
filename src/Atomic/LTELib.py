@@ -355,21 +355,35 @@ def Planck_cm(W,T):
     return intensity
 
 ################################################################################
-def Ufunc(elm,T):
+def Ufunc(elm, T):
     r"""
-    partition function by
-    Gray 1992, "The observation and analysis of stellar photospheres", app.D
-         2009  table
-    log(u) = c0 + c1*log(th) + c2*log(th)^2 + c3*log(th)^3 + c4*log(th)^4
-    log = log_10
-    th = 5040/T
-     2006.5.23     k.i.
-     2015.7.5      k.i.	'h_ii'
-     2019.11.26    k.i.	'Ba' from Gary 2009 (use poly_ufunc.pro)
-     2020.2.13     k.i.	from IDL ufunc_gray.pro
+    partition function of neutral hydrogen
+
+
+    Parameters
+    ----------
 
     elm : element & ionization stage as ca_i, fe_ii, etc.
     T   : temperature (k)
+
+    Notes
+    -----
+    from [1]_, [2]_.
+    .. math:: log(u) = c_0 + c_1 \cdot log(\theta) + c_2 \cdot log(\theta)^2 + c_3 \cdot log(\theta)^3 + c_4 \cdot log(\theta)^4
+    .. math:: log = log_{10}
+    .. math:: \theta = 5040 / T
+
+    modification history:
+    - 2006.5.23     k.i.
+    - 2015.7.5      k.i.	'h_ii'
+    - 2019.11.26    k.i.	'Ba' from Gary 2009 (use poly_ufunc.pro)
+    - 2020.2.13     k.i.	from IDL ufunc_gray.pro
+
+    References
+    ----------
+
+    .. [1] Gray 1992, "The observation and analysis of stellar photospheres", app.D
+    .. [2] 2009  table
     """
 
     if   elm == 'H_I':

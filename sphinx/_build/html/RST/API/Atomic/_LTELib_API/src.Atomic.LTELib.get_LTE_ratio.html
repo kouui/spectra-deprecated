@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.LTELib.get_LTE_ratio &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz" href="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz.html" />
+    <link rel="prev" title="src.Atomic.LTELib.Saha_distribution" href="src.Atomic.LTELib.Saha_distribution.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.LTELib.get_LTE_ratio</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.LTELib.Saha_distribution.html">src.Atomic.LTELib.Saha_distribution</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz.html">src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-ltelib-get-lte-ratio">
+<h1>src.Atomic.LTELib.get_LTE_ratio<a class="headerlink" href="#src-atomic-ltelib-get-lte-ratio" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.LTELib.get_LTE_ratio">
+<code class="descclassname">src.Atomic.LTELib.</code><code class="descname">get_LTE_ratio</code><span class="sig-paren">(</span><em>_erg</em>, <em>_g</em>, <em>_stage</em>, <em>_Te</em>, <em>_Ne</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/LTELib.html#get_LTE_ratio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.LTELib.get_LTE_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute LTE population ratio relative to 1st level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_erg</strong> (<em>numpy.1darray of np.double</em>) – level energy relative to 1st level, [<span class="math notranslate nohighlight">\(erg\)</span>]</p></li>
+<li><p><strong>_weight</strong> (<em>numpy.1darray of np.uint8</em>) – statistical weight, [-]</p></li>
+<li><p><strong>_stage</strong> (<em>numpy.1darray of np.uint8</em>) – ionization stage, [-]</p></li>
+<li><p><strong>_Te</strong> (<em>np.double</em>) – electron temperature, [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
+<li><p><strong>_Ne</strong> (<em>np.double</em>) – electron density, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>_nRatio</strong> – population ratio. [-]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.1darray of np.double</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>We set the population of the 1st level to <cite>1.0</cite>, and then compute the
+population ratio level by level. <cite>Saha_distribution</cite> is applied whenever
+there is a jump of ionization stage.
+Finnaly, we normalize the _nRatio array with respec to the total population.</p>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.LTELib.Saha_distribution.html">src.Atomic.LTELib.Saha_distribution</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz.html">src.Atomic.LTELib.EinsteinA_to_EinsteinBs_hz</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

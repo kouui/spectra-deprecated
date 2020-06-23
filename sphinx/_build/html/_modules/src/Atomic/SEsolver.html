@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.SEsolver &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.SEsolver</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.Atomic.SEsolver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="setMatrixC"><a class="viewcode-back" href="../../../RST/API/Atomic/_SEsolver_API/src.Atomic.SEsolver.setMatrixC.html#src.Atomic.SEsolver.setMatrixC">[docs]</a><span class="k">def</span> <span class="nf">setMatrixC</span><span class="p">(</span><span class="n">_Cmat</span><span class="p">,</span> <span class="n">_Cji</span><span class="p">,</span> <span class="n">_Cij</span><span class="p">,</span> <span class="n">_idxI</span><span class="p">,</span> <span class="n">_idxJ</span><span class="p">,</span> <span class="n">_Ne</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the collisional rate matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _Cmat : numpy.2darray of np.double</span>
+<span class="sd">        collisional rate matrix, a 2D Array to store computed results, [:math:`s^{-1}`]</span>
+
+<span class="sd">    _Cji : numpy.1darray of np.double</span>
+<span class="sd">        downward collisional transition rate, [:math:`s^{-1} \cdot cm^{3}`]</span>
+
+<span class="sd">    _Cij : numpy.1darray of np.double</span>
+<span class="sd">        upward collisional transition rate, [:math:`s^{-1} \cdot cm^{3}`]</span>
+
+<span class="sd">    _idxI : numpy.1darray of np.uint16</span>
+<span class="sd">        level index of lower level i, [-]</span>
+
+<span class="sd">    _idxJ : numpy.1darray of np.uint16</span>
+<span class="sd">        level index of upper level j, [-]</span>
+
+<span class="sd">    _Ne: np.double</span>
+<span class="sd">        electron density, [:math:`cm^{-3}`]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Refer to [1]_ Equation(9.80).</span>
+
+<span class="sd">    .. math:: \sum_{j \neq i} n_j (R_{ji}+n_{e} C_{ji}) - n_i \sum_{j \neq i}(R_{ij}+n_{e} C_{ij}) = 0</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
+<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
+<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
+<span class="sd">        Princeton University Press, pp. 282, 2015.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_n_row</span><span class="p">,</span> <span class="n">_n_col</span> <span class="o">=</span> <span class="n">_Cmat</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">_n_row</span> <span class="o">==</span> <span class="n">_n_col</span><span class="p">,</span> <span class="s1">&#39;_Cmat should be a squared matrix.&#39;</span>
+
+    <span class="n">_nTran</span> <span class="o">=</span> <span class="n">_Cji</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nTran</span><span class="p">):</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">_idxI</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">_idxJ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_Cmat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_Ne</span> <span class="o">*</span> <span class="n">_Cji</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_Cmat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_Ne</span> <span class="o">*</span> <span class="n">_Cij</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="setMatrixR"><a class="viewcode-back" href="../../../RST/API/Atomic/_SEsolver_API/src.Atomic.SEsolver.setMatrixR.html#src.Atomic.SEsolver.setMatrixR">[docs]</a><span class="k">def</span> <span class="nf">setMatrixR</span><span class="p">(</span><span class="n">_Rmat</span><span class="p">,</span> <span class="n">_Rji_spon</span><span class="p">,</span> <span class="n">_Rji_stim</span><span class="p">,</span> <span class="n">_Rij</span><span class="p">,</span> <span class="n">_idxI</span><span class="p">,</span> <span class="n">_idxJ</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the radiative rate matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _Rmat : numpy.2darray of np.double</span>
+<span class="sd">        radiative rate matrix, a 2D Array to store computed results, [:math:`s^{-1}`]</span>
+
+<span class="sd">    _Rji_spon : numpy.1darray of np.double</span>
+<span class="sd">        spontaneous radiative transition rate, [:math:`s^{-1}`]</span>
+
+<span class="sd">    _Rji_stim : numpy.1darray of np.double</span>
+<span class="sd">        spontaneous radiative transition rate, [:math:`s^{-1}`]</span>
+
+<span class="sd">    _Rij : numpy.1darray of np.double</span>
+<span class="sd">        upward radiative transition rate, [:math:`s^{-1}`]</span>
+
+<span class="sd">    _idxI : numpy.1darray of np.uint16</span>
+<span class="sd">        level index of lower level i, [-]</span>
+
+<span class="sd">    _idxJ : numpy.1darray of np.uint16</span>
+<span class="sd">        level index of upper level j, [-]</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Refer to [1]_ Equation(9.80).</span>
+
+<span class="sd">    .. math:: \sum_{j \neq i} n_j (R_{ji}+C_{ji}) - n_i \sum_{j \neq i}(R_{ij}+C_{ij}) = 0</span>
+
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
+<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
+<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
+<span class="sd">        Princeton University Press, pp. 282, 2015.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_n_row</span><span class="p">,</span> <span class="n">_n_col</span> <span class="o">=</span> <span class="n">_Rmat</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">assert</span> <span class="n">_n_row</span> <span class="o">==</span> <span class="n">_n_col</span><span class="p">,</span> <span class="s1">&#39;_Rmat should be a squared matrix.&#39;</span>
+
+    <span class="n">_nTran</span> <span class="o">=</span> <span class="n">_Rji_spon</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nTran</span><span class="p">):</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">_idxI</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">_idxJ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_Rmat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_Rji_spon</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="n">_Rji_stim</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_Rmat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">_Rij</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="solveSE"><a class="viewcode-back" href="../../../RST/API/Atomic/_SEsolver_API/src.Atomic.SEsolver.solveSE.html#src.Atomic.SEsolver.solveSE">[docs]</a><span class="k">def</span> <span class="nf">solveSE</span><span class="p">(</span><span class="n">_Rmat</span><span class="p">,</span> <span class="n">_Cmat</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    solve the linear equation system of statistical equilibrium.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _Rmat : np.double, np.array, (nLevel,nLevel)</span>
+<span class="sd">        radiative transition rate matrix, [:math:`s^{-1}`]</span>
+
+<span class="sd">    _Cmat : np.double, np.array, (nLevel,nLevel)</span>
+<span class="sd">        collisional transition rate matrix, [:math:`s^{-1}`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    _nArr : np.double, np.array, (nLevel,)</span>
+<span class="sd">        normalized level population. [:math:`cm^{-3}`]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_nLevel</span> <span class="o">=</span> <span class="n">_Rmat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">_A</span> <span class="o">=</span> <span class="n">_Cmat</span><span class="p">[:,:]</span> <span class="o">+</span> <span class="n">_Rmat</span><span class="p">[:,:]</span>
+    <span class="n">_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">_nLevel</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+
+    <span class="c1">#-------------------------------------------------------------</span>
+    <span class="c1"># diagnal components</span>
+    <span class="c1">#-------------------------------------------------------------</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nLevel</span><span class="p">):</span>
+        <span class="n">_A</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">_A</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1">#-------------------------------------------------------------</span>
+    <span class="c1"># abundance definition equation</span>
+    <span class="c1">#-------------------------------------------------------------</span>
+    <span class="n">_A</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">_b</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+
+    <span class="n">_nArr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">_A</span><span class="p">,</span><span class="n">_b</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_nArr</span></div>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

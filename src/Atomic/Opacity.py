@@ -12,47 +12,6 @@ from .. import Constants as Cst
 
 
 ################################################################################
-# Thomson scattering (wavelength independent)
-################################################################################
-
-def Thomson_scattering(n_e):
-    r"""
-    Thomson scattering of free electrons (non-relativistic).
-    Returns absorption coefficient instead of absorption cross section.
-
-    Parameters
-    ----------
-
-    n_e : np.double or array-like
-        electron density, [:math:`cm^{-3}`]
-
-    Returns
-    -------
-
-    kappa : np.double or array-like
-        absorption coefficient, [:math:`cm^{-1}`]
-
-    Notes
-    -----
-
-    .. math:: \kappa = \sigma_{T} n_{e}
-
-    where :math:`\sigma_{T}` is the absorption cross section for Thomson scattering
-    .. math:: \sigma_{T} = \frac{8 \pi e^{4}}{3 m_{e}^{2} c^{4}} = 6.6524 \times 10^{-25} \quad cm^{2}
-
-    References
-    ----------
-
-    .. [1] Ivan Hubeny, Dimitri Mihalas, "Theory of Stellar Atmosphere:
-        An Introduction to Astrophysical Non-equilibrium
-        Quantitative Spectroscopic Analysis",
-        Princeton University Press, pp. 149, 2015.
-    """
-
-    kappa = 6.6524E-25 * n_e
-    return kappa
-
-################################################################################
 def n_elements(a):
     a = np.asarray(a)
     na = a.size
@@ -81,6 +40,7 @@ def Thomson_scattering(n_e):
 
     Notes
     -----
+    from [1]_.
 
     .. math:: \kappa = \sigma_{T} n_{e}
 
@@ -109,25 +69,27 @@ def HIbf_CrossSec1(k,wl):
     Parameters
     ----------
     k  : principle quantum number of HI atom
-    wl : wavelength (A)
+    wl : wavelength, [:math:`\AA`]
 
     Notes
     -----
-    non-LTE ok
-    stimulated emission is not corrected
-    absorption coeff.:
+    from [1]_, [2]_.
+    - non-LTE ok
+    - stimulated emission is not corrected
+    - absorption coeff.:
+
             kbf = nk*shibf*(1.-exp(-hv/kt))*1.e-18 (/cm)
+
+    Modification history:
+    - k.ichimoto 15 jun.1987,	6 Jan.1992
+    - k.ichimoto 19 Feb.1994
+    - 2019.9.15   k.ichimoto from IDL ahic.pro
 
     References
     ----------
-    varnazza et al. (1976) ap.j.suppl. vol.30,1.
-    polynomial fitting for b-f gaunt factor is taken from
-    Carbon & Gingerich (1969) "theory and observation of
-         normal stellar atmosphere"  mit press
+    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30,1.
+    .. [2] polynomial fitting for b-f gaunt factor is taken from Carbon & Gingerich (1969) "theory and observation of normal stellar atmosphere"  mit press
 
-    k.ichimoto 15 jun.1987,	6 Jan.1992
-    k.ichimoto 19 Feb.1994
-    2019.9.15   k.ichimoto from IDL ahic.pro
 """
 
     HIbf_cs_const = {
@@ -163,24 +125,29 @@ def HIbf_CrossSection(T,wl):
 
     Parameters
     ----------
-    T  : Temperature [K]
-    wl : wavelength [A]
+    T  : Temperature [:math:`K`]
+    wl : wavelength [:math:`\AA`]
 
     Notes
     -----
+    from [1]_.
+
     HI bound-free opacity in LTE is
-          k(T,wl) = n_HI * HIbf_CrossSection(T,wl) *1e-26 (/cm)
-    n_HI: hydrogen number density in cm^(-3)
-    stimulated emission is corrected
-    partition function of HI is assumed to be 2.0
-                           which is valid for T < 2.e4 K
+
+          k(T,wl) = n_HI * HIbf_CrossSection(T,wl) * 1e-26 (/cm)
+
+    - n_HI: hydrogen number density in cm^(-3)
+    - stimulated emission is corrected
+    - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
+
+    Modification history:
+    - 2019.9.15  K.Ichimoto  from IDL ahic.pro
+
+
     References
     ----------
-    varnazza et al. (1976) ap.j.suppl. vol.30, 1.
+    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30, 1.
 
-    Modification history
-    --------------------
-    2019.9.15  K.Ichimoto  from IDL ahic.pro
 """
 
 #    wl = np.asarray(wl)
@@ -229,28 +196,28 @@ def HIff_CrossSection(T,wl):
 
     Parameters
     ----------
-    T  : Temperature [K]
-    wl : wavelength [A]
+    T  : Temperature, [:math:`K`]
+    wl : wavelength, [:math:`\AA`]
 
     Notes
     -----
+    from [1]_, [2]_.
     HI free-free opacity in LTE is
-          kff = n_HI * HIff_CrossSection(T,wl) *1e-26 (/cm)
-    n_HI: hydrogen number density in cm^(-3)
-    stimulated emission is corrected
-    partition function of HI is assumed to be 2.0
-                           which is valid for T < 2.e4 K
+
+          kff = n_HI * HIff_CrossSection(T,wl) * 1e-26 (/cm)
+
+    - n_HI: hydrogen number density in cm^(-3)
+    - stimulated emission is corrected
+    - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
+
+    Modification history:
+    - 2019.9.15  K.Ichimoto  from IDL ahic.pro
 
     References
     ----------
-    varnazza et al. (1976) ap.j.suppl. vol.30, 1.
-    porinomial fitting for f-f gaunt factor is taken from
-    Carbon & Gingerich (1969) "theory and observation of
+    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30, 1.
+    .. [2] porinomial fitting for f-f gaunt factor is taken from Carbon & Gingerich (1969) "theory and observation of
            normal stellar atmosphere"  MIT press
-
-    Modification history
-    --------------------
-    2019.9.15  K.Ichimoto  from IDL ahic.pro
 """
 
     nwl = n_elements(wl)
@@ -302,31 +269,34 @@ def Hminus_CrossSection(T,wl,n_e):
 
     Parameters
     ----------
-    T  : Temperature [K]
-    wl : wavelength [A]
-    n_e: electron number density [cm^(-3)]
+    T  : Temperature, [:math:`K`]
+    wl : wavelength, [:math:`\AA`]
+    n_e: electron number density, [:math:`cm^{-3}`]
 
     Notes
     -----
+    from [1]_, [2]_.
+
     H- opacity in LTE is
-          khm = n_HI *Hminus_CrossSection(T,wl,n_e)*1.e-26 (/cm)
-    n_HI: hydrogen number density in cm^(-3)
-    stimulated emission is corrected
-    partition function of HI is assumed to be 2.0
-                           which is valid for T < 2.e4 K
+
+          khm = n_HI * Hminus_CrossSection(T,wl,n_e) * 1.e-26 (/cm)
+
+    - n_HI: hydrogen number density in cm^(-3)
+    - stimulated emission is corrected
+    - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
+
+    Modification history:
+    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
+    - k.ichimoto  19 Feb.1994
+    - 2019.9.15  K.Ichimoto  from IDL ahic.pro
 
     References
     ----------
-    varnazza et al. (1976) ap.j.suppl. vol.30, 1.
-    porinomial fitting for f-f gaunt factor is taken from
-    Carbon & Gingerich (1969) "theory and observation of
+    .. [1] varnazza et al. (1976) ap.j.suppl. vol.30, 1.
+    .. [2] porinomial fitting for f-f gaunt factor is taken from Carbon & Gingerich (1969) "theory and observation of
            normal stellar atmosphere"  MIT press
 
-    Modification history
-    --------------------
-    k.ichimoto 18 jun. 1987, 	6 Jan. 1992
-    k.ichimoto  19 Feb.1994
-    2019.9.15  K.Ichimoto  from IDL ahic.pro
+
 """
 
     nwl = n_elements(wl)
@@ -379,31 +349,30 @@ def HIRayleigh_CrossSection(wl):
 
     Parameters
     ----------
-    T  : Temperature [K]
-    wl : wavelength [A]
-    n_e: electron number density [cm^(-3)]
+    wl : wavelength, [:math:`A`]
 
     Notes
     -----
+    from [1]_, [2]_.
+
     HI Rayleigh opacity in LTE is
-         khray = n_HI * HIRayleigh_CrossSection(wl) *1.e-26 (/cm)
-    n_HI: hydrogen number density in cm^(-3)
-    stimulated emission is corrected
-    partition function of HI is assumed to be 2.0
-                           which is valid for T < 2.e4 K
+
+         khray = n_HI * HIRayleigh_CrossSection(wl) * 1.e-26 (/cm)
+
+    - n_HI: hydrogen number density in cm^(-3)
+    - stimulated emission is corrected
+    - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
+
+    modification history:
+    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
+    - k.ichimoto  19 Feb.1994
+    - 2019.9.10  K.Ichimoto  from IDL avray.pro
 
     References
     ----------
-    Gingerich SAO special report 167,21,1964.
-    porinomial fitting for f-f gaunt factor is taken from
-    Carbon & Gingerich (1969) "theory and observation of
+    .. [1] Gingerich SAO special report 167,21,1964.
+    .. [2] porinomial fitting for f-f gaunt factor is taken from Carbon & Gingerich (1969) "theory and observation of
            normal stellar atmosphere"  MIT press
-
-    Modification history
-    --------------------
-    k.ichimoto 18 jun. 1987, 	6 Jan. 1992
-    k.ichimoto  19 Feb.1994
-    2019.9.10  K.Ichimoto  from IDL avray.pro
 """
 
     #w2 = (wl>1026.)**2
@@ -419,27 +388,35 @@ def HIRayleigh_CrossSection(wl):
 def avH2p(T,wl):
 #  k.i.   2019.9.11
     r"""
-    ;+/*******************************************************************/
-    function avh2p,t,wl
-    ;/*******************************************************************/
-    ;  H2+ opacity per 1 HI atom and per 1 H+, scaled by e26
-    ;  stimulated emission is corrected
-    ;      T : temperature [K]
-    ;      wl : wave length [A]
-    ;  absorption coeff.:
-    ;            kh2 = nhi*np*avh2p*1.e-26 (/cm)
+
+    H2+ opacity per 1 HI atom and per 1 H+, scaled by e26,
+
+    Parameters
+    ----------
+    T  : temperature, [:math:`K`]
+    wl : wave length, [:math:`\AA`]
+
+    Returns
+    -------
+    kh2 : absorption coeff,
+        kh2 = nhi * np * avh2p * 1.e-26, [:math:`cm^{-1}`]
+
+    Notes
+    -----
+    from [1]_, [2]_.
+
+    - stimulated emission is corrected.
+
+    Modification history:
+    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
+    - k.ichimoto  19 Feb.1994
+    - 2019.9.11  K.Ichimoto  from IDL avh2p.pro
+
 
     References
     ----------
-    Gingerich SAO special report 167,21,1964.
-    Carbon & Gingerich (1969) "theory and observation of
-           normal stellar atmosphere"  MIT press
-
-    Modification history
-    --------------------
-    k.ichimoto 18 jun. 1987, 	6 Jan. 1992
-    k.ichimoto  19 Feb.1994
-    2019.9.11  K.Ichimoto  from IDL avh2p.pro
+    .. [1] Gingerich SAO special report 167,21,1964.
+    .. [2] Carbon & Gingerich (1969) "theory and observation of normal stellar atmosphere"  MIT press
     """
     nwl = n_elements(wl)
     nT = n_elements(T)
@@ -527,20 +504,21 @@ def H2p_CrossSection(T,wl,n_e,n_H):
 
     Parameters
     ----------
-    T  : Temperature [K]
-    wl : wavelength [A]
-    n_e: electron number density [cm^(-3)]
-    n_H: hydrogen number density [cm^(-3)]
+    T  : Temperature [:math:`K`]
+    wl : wavelength [:math:`\AA`]
+    n_e: electron number density [:math:`cm^{-3}`]
+    n_H: hydrogen number density [:math:`cm^{-3}``]
 
     Notes
     -----
     H2+ opacity in LTE is
-         kH2p = n_HI * H2p_CrossSection(T,wl,n_e,n_H) *1.e-26 (/cm)
-    use avH2p(T,wl)
 
-    Modification history
-    --------------------
-    2019.9.15  K.Ichimoto
+         kH2p = n_HI * H2p_CrossSection(T,wl,n_e,n_H) * 1.e-26 (/cm)
+
+    use `avH2p(T,wl)`
+
+    Modification history:
+    - 2019.9.15  K.Ichimoto
     """
 
     pe = 1.38066e-16 * n_e*T
@@ -556,38 +534,34 @@ def H2p_CrossSection(T,wl,n_e,n_H):
 ################################################################################
 def xclte(T,n_H,n_e,wl):
     r"""
-    LTE continuum opacity in cm-1
-    incruding HI, H-, H2, rayleigh scat.
+    LTE continuum opacity in cm-1, incruding HI, H-, H2, rayleigh scat.
 
     Parameters
     ----------
-    T  : Temperature [K]
-    n_H: H atom number density [cm^(-3)]
-    n_e: electron number density [cm^(-3)]
-    wl : wavelength [A]
+    T  : Temperature, [:math:`K`]
+    n_H: H atom number density, [:math:`cm^{-3}`]
+    n_e: electron number density, [:math:`cm^{-3}`]
+    wl : wavelength, [:math:`\AA`]
 
     Notes
     -----
-    HI Rayleigh opacity in LTE is
-         khray = n_HI * HIRayleigh_CrossSection(wl) *1.e-26 (/cm)
-    n_HI: hydrogen number density in cm^(-3)
-    stimulated emission is corrected
-    partition function of HI is assumed to be 2.0
-                           which is valid for T < 2.e4 K
+    HI Rayleigh opacity in LTE is [1]_.
+
+         khray = n_HI * HIRayleigh_CrossSection(wl) * 1.e-26 (/cm)
+
+    - n_HI: hydrogen number density in cm^(-3)
+    - stimulated emission is corrected
+    - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
+
+    Modification history:
+    - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
+    - k.ichimoto  19 Feb.1994
+    - 2019.9.15  K.Ichimoto  from IDL avray.pro
 
     References
     ----------
-    Gingerich SAO special report 167,21,1964.
-    porinomial fitting for f-f gaunt factor is taken from
-    Carbon & Gingerich (1969) "theory and observation of
-           normal stellar atmosphere"  MIT press
-
-    Modification history
-    --------------------
-    k.ichimoto 18 jun. 1987, 	6 Jan. 1992
-    k.ichimoto  19 Feb.1994
-    2019.9.15  K.Ichimoto  from IDL avray.pro
-"""
+    .. [1] Gingerich SAO special report 167,21,1964. porinomial fitting for f-f gaunt factor is taken from Carbon & Gingerich (1969) "theory and observation of normal stellar atmosphere"  MIT press
+    """
     nwl = n_elements(wl)
     nT  = n_elements(T)
     nnH = n_elements(n_H)

@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.Opacity.HIff_CrossSection &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="src.Atomic.Opacity.Hminus_CrossSection" href="src.Atomic.Opacity.Hminus_CrossSection.html" />
+    <link rel="prev" title="src.Atomic.Opacity.HIbf_CrossSection" href="src.Atomic.Opacity.HIbf_CrossSection.html" /> 
+  </head><body>
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../../index.html">
+          <span>Spectra  documentation</span></a></h1>
+        <h2 class="heading"><span>src.Atomic.Opacity.HIff_CrossSection</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.Opacity.HIbf_CrossSection.html">src.Atomic.Opacity.HIbf_CrossSection</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.Opacity.Hminus_CrossSection.html">src.Atomic.Opacity.Hminus_CrossSection</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="src-atomic-opacity-hiff-crosssection">
+<h1>src.Atomic.Opacity.HIff_CrossSection<a class="headerlink" href="#src-atomic-opacity-hiff-crosssection" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.Opacity.HIff_CrossSection">
+<code class="descclassname">src.Atomic.Opacity.</code><code class="descname">HIff_CrossSection</code><span class="sig-paren">(</span><em>T</em>, <em>wl</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/Opacity.html#HIff_CrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.Opacity.HIff_CrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>return free-free cross section of a HI atom in LTE in unit of e-26 cm^2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (Temperature, [<span class="math notranslate nohighlight">\(K\)</span>]) – </p></li>
+<li><p><strong>wl</strong> (wavelength, [<span class="math notranslate nohighlight">\(\AA\)</span>]) – </p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>from <a class="footnote-reference brackets" href="#id3" id="id1">1</a>, <a class="footnote-reference brackets" href="#id4" id="id2">2</a>.
+HI free-free opacity in LTE is</p>
+<blockquote>
+<div><p>kff = n_HI * HIff_CrossSection(T,wl) * 1e-26 (/cm)</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>n_HI: hydrogen number density in cm^(-3)</p></li>
+<li><p>stimulated emission is corrected</p></li>
+<li><p>partition function of HI is assumed to be 2.0, which is valid for T &lt; 2.e4 K</p></li>
+</ul>
+<p>Modification history:
+- 2019.9.15  K.Ichimoto  from IDL ahic.pro</p>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>varnazza et al. (1976) ap.j.suppl. vol.30, 1.</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>porinomial fitting for f-f gaunt factor is taken from Carbon &amp; Gingerich (1969) “theory and observation of
+normal stellar atmosphere”  MIT press</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="src.Atomic.Opacity.HIbf_CrossSection.html">src.Atomic.Opacity.HIbf_CrossSection</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="../../../../index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="src.Atomic.Opacity.Hminus_CrossSection.html">src.Atomic.Opacity.Hminus_CrossSection</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>
