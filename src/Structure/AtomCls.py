@@ -1,8 +1,12 @@
 
 import numpy as np
 from .. import Constants as Cst
+from .. import Element
 from . import AtomIO
 from ..RadiativeTransfer import Profile
+from ..Atomic import BasicP
+
+#from numba.typed import List
 
 class Atom:
 
@@ -54,12 +58,15 @@ class Atom:
         rs, self.Title, self.Z, self.Element, self.nLevel = AtomIO.read_general_info(_rs=0, _lns=fLines)
         self.nLine = self.nLevel * (self.nLevel-1) // 2
         self.nCont = 0
+        self.Z = int(self.Z)
+        self.am = Element.AMTuple[ Element.nZTuple.index(self.Z) ]
 
         #--- read Level info
         dtype  = np.dtype([
                           ('erg',np.double),            #: level energy, erg
                           ('g',np.uint8),               #: g=2J+1, statistical weight
                           ('stage',np.uint8),           #: ionization stage
+                          ('gamma',np.double),          #: radiative damping constant of Level
                           ])
         self.Level = np.recarray(self.nLevel, dtype=dtype)
         self.Level_info = {"configuration" : [], "term" : [], "J": [], "2S+1": []}
@@ -120,6 +127,7 @@ class Atom:
                            ('w0',np.double),            #: central wavelength in cm
                            ('w0_AA',np.double),         #: central wavelength in Angstrom
                            ("isContinuum",np.uint8),    #: continuum tansition identifier, 0: same stage, 1: continuum transition, 2: others
+                           ('Gamma',np.double),          #: radiative damping constant of Line
                            ])
         self.Line = np.recarray(self.nLine, dtype=dtype)
         # idxI and idxJ
@@ -147,6 +155,7 @@ class Atom:
             self.Line.f0[k] = (self.Level.erg[j]-self.Level.erg[i]) / Cst.h_
         self.Line.w0[:] = Cst.c_ / self.Line.f0[:]
         self.Line.w0_AA[:] = self.Line.w0[:] * 1E+8
+
 
         print("Finished.")
         print()
@@ -309,7 +318,8 @@ class Atom:
 
         nCont, rs, nMesh = AtomIO.read_PI_Info(_lns=fLines)
         #assert nCont == self.nCont
-        self.PI_table = np.zeros((nCont, nMesh, 2), dtype=np.double)
+        #self.PI_table = np.zeros((nCont, nMesh, 2), dtype=np.double)
+        self.PI_table_list = [] # List()
         # change this to numba.types.List in the future for inhomogenious array
 
         dtype  = np.dtype([
@@ -325,11 +335,14 @@ class Atom:
         self.PI_coe = np.recarray(nCont, dtype=dtype)
 
         AtomIO.read_PI_table(_rs=rs, _lns=fLines,
-                        _PI_table = self.PI_table[:,:,:],
+                        _PI_table_list = self.PI_table_list,
                         _PI_coe = self.PI_coe,
                         _level_info_table=self.Level_info_table,
                         _line_ctj_table=self.Line_ctj_table)
-        self.PI_table[:,:,0] *= 1E-7 # nm --> cm   (cm, cm^2)
+
+        #self.PI_table[:,:,0] *= 1E-7 # nm --> cm   (cm, cm^2)
+        for mesh_arr in self.PI_table_list:
+            mesh_arr[0,:] *= 1E-7 # nm --> cm   (cm, cm^2)
 
 
         for k in range(nCont):
@@ -338,7 +351,8 @@ class Atom:
             self.PI_coe.dEij[k] = self.Level.erg[self.PI_coe.idxJ[k]] - self.Level.erg[self.PI_coe.idxI[k]]
 
             # shift edge wavelength to the computed wavelength w0
-            self.PI_table[k,:self.PI_coe.nLambda[k],0] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table[k,0,0]
+            #self.PI_table[k,:self.PI_coe.nLambda[k],0] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table[k,0,0]
+            self.PI_table_list[k][0,:] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table_list[k][0,0]
 
         print("Finished.")
         print()
@@ -382,11 +396,13 @@ class Atom:
                         _level_info_table=self.Level_info_table,
                         _line_ctj_table=self.Line_ctj_table)
 
+        self.RadLine_coe = self.Mesh_coe
+
 
     def make_Mesh(self):
 
         #--- make line mesh
-        self.line_mesh_list = []
+        self.line_mesh_list = [] # List()
 
         for k in range(self.nRadiativeLine):
             nLambda = self.Mesh_coe.nLambda[k]
@@ -399,7 +415,7 @@ class Atom:
         print("line mesh prepared.")
 
         #--- make continuum mesh
-        self.continuum_mesh_list = []
+        self.continuum_mesh_list = [] # List()
         for k in range(self.nCont):
             mesh = Profile.makeContinuumMesh(21) # in limit wavelength unit
             w0 = self.Line.w0[self.CI_coe.lineIndex[k]]
@@ -409,26 +425,30 @@ class Atom:
 
     def read_Radiative_Line_intensity(self, _folder):
 
-        self.radiative_line_intensity_list = []
+        self.radiative_line_intensity_cm_list = [] # List()
+        self.radiative_line_intensity_hz_list = [] # List()
 
         for k in range(self.nRadiativeLine):
             filename = self.RadiativeLine_filename[k]
             arr = AtomIO.read_half_intensity_hz(_folder+'/'+filename)
             f0 = self.Line.f0[self.Mesh_coe.lineIndex[k]]
             w0 = self.Line.w0[self.Mesh_coe.lineIndex[k]]
-            fac1 = Cst.c_ / (f0 * f0)
-            fac2 = Cst.c_ / (w0 * w0)
-            arr[:,0] *= fac1 # d\nu -> d\lambda
-            arr[:,1] *= fac2 # intensity_hz -> intensity_cm
+
+            #arr[:,0] *= fac1 # d\nu -> d\lambda
+            #arr[:,1] *= fac2 # intensity_hz -> intensity_cm
             nLmid = arr.shape[0]
             nLfull = (nLmid-1) * 2 + 1
-            arr_full = np.zeros((2,nLfull), dtype=np.double)
-            arr_full[0, nLmid:] = arr[1:,0]
-            arr_full[0,:nLmid] = -arr[::-1,0]
-            arr_full[1, nLmid:] = arr[1:,1]
-            arr_full[1,:nLmid] = arr[::-1,1]
+            arr_full_hz = np.zeros((2,nLfull), dtype=np.double)
+            arr_full_hz[0,:] = Profile.half_to_full(_arr_half=arr[:,0], _isMinus=True)
+            arr_full_hz[1,:] = Profile.half_to_full(_arr_half=arr[:,1], _isMinus=False)
+            self.radiative_line_intensity_hz_list.append( arr_full_hz )
 
-            self.radiative_line_intensity_list.append( arr_full )
+            fac1 = Cst.c_ / (f0 * f0)
+            fac2 = Cst.c_ / (w0 * w0)
+            arr_full_cm = np.zeros((2,nLfull), dtype=np.double)
+            arr_full_cm[0,:] = arr_full_hz[0,:] * fac1 # # d\nu -> d\lambda, symmetric
+            arr_full_cm[1,:] = arr_full_hz[1,:] * fac2 # intensity_hz -> intensity_cm
+            self.radiative_line_intensity_cm_list.append( arr_full_cm )
 
 
 

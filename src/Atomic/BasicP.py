@@ -142,3 +142,125 @@ def get_Doppler_width(p0, Te, Vt, am):
     eta0_ = (2.*Cst.k_*Te/(Cst.mH_*am) + Vt*Vt)**(0.5)
     dp = p0 * eta0_ / Cst.c_
     return dp
+
+def get_Level_gamma(Aji,idxJ,gamma):
+    r"""
+    Given Einstein A coefficient of Levels, upper index of Lines,
+    compute radiative damping constant for each Level.
+
+    Parameters
+    ----------
+
+    Aji : array-like, dtype of np.double
+        Einstein A coefficient of Lines, [:math:`s^{-1}`]
+    idxJ : array-like, np.uint8 or anyother integer types.
+        index of upper level of Lines.
+    gamma : array-like, dtype of np.double
+        radiative damping constant of each Level, [:math:`s^{-1}`].
+        An array to store output result.
+
+    Notes
+    -----
+
+    Here only spantaneous radiative de-excitation is included [1]_.
+
+    .. math:: \gamma_j^{rad} = \sum_{i<j}A_{ji}
+
+    To be more accurate, we should also include radiative de-excitation/excitation [2]_.
+
+    .. math:: \gamma_j^{rad} = \sum_{i<j}(A_{ji}+B_{ji}\overline{J}_{ji}) + \sum_{k>j}B_{jk}\overline{J}_{jk}
+
+    Although this will complicate calculation since radiation is update every iteration
+    and has spatial dependency in optically thick atmosphere.
+
+    References
+    -----------
+
+    .. [1] Robert J. Rutten, "Radiative Transfer in Stellar Atmosphere", pp. 54, 2003.
+    .. [2] Ivan Hubeny, Dimitri Mihalas, "Theory of Stellar Atmosphere:
+        An Introduction to Astrophysical Non-equilibrium
+        Quantitative Spectroscopic Analysis",
+        Princeton University Press, pp. 230, 2015.
+    """
+    gamma[:] = 0
+    for i in range(Aji.shape[0]):
+        gamma[idxJ[i]] += Aji[i]
+
+def get_Line_Gamma(idxI, idxJ, gamma, Gamma, isCont):
+    r"""
+    Given Einstein radiative damping constant of Levels,
+    compute radiative damping constant of Lines.
+
+    Parameters
+    ----------
+
+    idxI : array-like, np.uint8 or anyother integer types.
+        index of lower level of Lines.
+    idxJ : array-like, np.uint8 or anyother integer types.
+        index of upper level of Lines.
+    gamma : array-like, dtype of np.double
+        radiative damping constant of each Level, [:math:`s^{-1}`].
+    Gamma : array-like, dtype of np.double
+        radiative damping constant of each Lines, [:math:`s^{-1}`].
+        An array to store output result.
+    isCont : array-like, dtype of boolean
+        whether the line is continuum transition
+
+    Notes
+    -----
+
+    Damping constant of a Line is the sum of damping constants of Lower and Upper Levels [1]_.
+
+    .. math:: \Gamma^{rad} = \gamma_i^{rad} + \gamma_j^{rad}
+
+    References
+    -----------
+
+    .. [1] Robert J. Rutten, "Radiative Transfer in Stellar Atmosphere", pp. 54, 2003.
+    """
+    Gamma[:] = 0
+    for i in range(Gamma.shape[0]):
+        if isCont[i]:
+            continue
+        Gamma[i] = gamma[idxI[i]] + gamma[idxJ[i]]
+
+def get_damping_a(_Gamma, _dopWidth_hz):
+    r"""
+    Given the radiative damping constant and
+    the Doppler Width (in frequency unit) of the line,
+    compute damping constant a.
+
+    Parameters
+    ----------
+
+    _Gamma : np.double,
+        radiative damping constant of each Lines, [:math:`s^{-1}`].
+
+    _dopWidth_hz : np.double,
+        Doppler Width in frequency unit, [:math:`s^{-1}`].
+
+    Returns
+    -------
+
+    _a : np.double,
+        damping constant, [-]
+
+    Notes
+    -----
+
+    From [1]_.
+
+    .. math::
+        a = \frac{\Gamma}{4 \pi \Delta\nu_{D}}
+
+    References
+    -----------
+
+    .. [1] Ivan Hubeny, Dimitri Mihalas, "Theory of Stellar Atmosphere:
+        An Introduction to Astrophysical Non-equilibrium
+        Quantitative Spectroscopic Analysis",
+        Princeton University Press, pp. 232, 2015.
+
+    """
+    _a = _Gamma / ( 4 * Cst.pi_ * _dopWidth_hz )
+    return _a

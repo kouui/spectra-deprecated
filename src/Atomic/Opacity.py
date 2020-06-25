@@ -45,7 +45,9 @@ def Thomson_scattering(n_e):
     .. math:: \kappa = \sigma_{T} n_{e}
 
     where :math:`\sigma_{T}` is the absorption cross section for Thomson scattering
-    .. math:: \sigma_{T} = \frac{8 \pi e^{4}}{3 m_{e}^{2} c^{4}} = 6.6524 \times 10^{-25} \quad cm^{2}
+
+    .. math::
+        \sigma_{T} = \frac{8 \pi e^{4}}{3 m_{e}^{2} c^{4}} = 6.6524 \times 10^{-25} \quad cm^{2}
 
     References
     ----------
@@ -74,6 +76,7 @@ def HIbf_CrossSec1(k,wl):
     Notes
     -----
     from [1]_, [2]_.
+
     - non-LTE ok
     - stimulated emission is not corrected
     - absorption coeff.:
@@ -81,6 +84,7 @@ def HIbf_CrossSec1(k,wl):
             kbf = nk*shibf*(1.-exp(-hv/kt))*1.e-18 (/cm)
 
     Modification history:
+
     - k.ichimoto 15 jun.1987,	6 Jan.1992
     - k.ichimoto 19 Feb.1994
     - 2019.9.15   k.ichimoto from IDL ahic.pro
@@ -141,6 +145,7 @@ def HIbf_CrossSection(T,wl):
     - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
 
     Modification history:
+
     - 2019.9.15  K.Ichimoto  from IDL ahic.pro
 
 
@@ -202,6 +207,7 @@ def HIff_CrossSection(T,wl):
     Notes
     -----
     from [1]_, [2]_.
+
     HI free-free opacity in LTE is
 
           kff = n_HI * HIff_CrossSection(T,wl) * 1e-26 (/cm)
@@ -211,6 +217,7 @@ def HIff_CrossSection(T,wl):
     - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
 
     Modification history:
+
     - 2019.9.15  K.Ichimoto  from IDL ahic.pro
 
     References
@@ -286,6 +293,7 @@ def Hminus_CrossSection(T,wl,n_e):
     - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
 
     Modification history:
+
     - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
     - k.ichimoto  19 Feb.1994
     - 2019.9.15  K.Ichimoto  from IDL ahic.pro
@@ -364,6 +372,7 @@ def HIRayleigh_CrossSection(wl):
     - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
 
     modification history:
+
     - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
     - k.ichimoto  19 Feb.1994
     - 2019.9.10  K.Ichimoto  from IDL avray.pro
@@ -408,6 +417,7 @@ def avH2p(T,wl):
     - stimulated emission is corrected.
 
     Modification history:
+
     - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
     - k.ichimoto  19 Feb.1994
     - 2019.9.11  K.Ichimoto  from IDL avh2p.pro
@@ -518,6 +528,7 @@ def H2p_CrossSection(T,wl,n_e,n_H):
     use `avH2p(T,wl)`
 
     Modification history:
+
     - 2019.9.15  K.Ichimoto
     """
 
@@ -554,6 +565,7 @@ def xclte(T,n_H,n_e,wl):
     - partition function of HI is assumed to be 2.0, which is valid for T < 2.e4 K
 
     Modification history:
+
     - k.ichimoto 18 jun. 1987, 	6 Jan. 1992
     - k.ichimoto  19 Feb.1994
     - 2019.9.15  K.Ichimoto  from IDL avray.pro

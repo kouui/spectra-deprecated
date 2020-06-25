@@ -16,7 +16,7 @@ from ..Math import BasicM
 #    - Voigt
 #    - Gaussian
 ################################################################################
-#@nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)
+
 def Voigt(a,x):
     r"""
     Calculate Doppler width normalized voigt function using polynomial fitting formula.
@@ -233,6 +233,40 @@ def makeContinuumMesh(nLambda):
         mesh[j-1] = qj_**(0.5)
 
     return mesh
+
+def half_to_full(_arr_half, _isMinus=False):
+    r"""
+    create full (anti-)symmetric full array according to half array
+
+    Parameters
+    ----------
+
+    _arr_half : 1darray,
+        half array.
+
+    _isMinus : boolean
+        True : anti-symmetric full array; False : symmetric full array
+
+    Returns
+    --------
+
+    _arr_full : 1darray,
+        full array.
+
+    """
+    _nLmid = _arr_half.shape[0]
+    _nLfull = (_nLmid-1) * 2 + 1
+    _arr_full = np.zeros(_nLfull, dtype=_arr_half.dtype)
+
+    if _isMinus:
+        _fac = -1
+    else:
+        _fac = 1
+
+    _arr_full[_nLmid:] = _arr_half[1:]
+    _arr_full[:_nLmid] = _fac * _arr_half[::-1]
+
+    return _arr_full
 
 
 ################################################################################

@@ -264,7 +264,7 @@ def read_PI_Info(_lns):
 
     return _nCont, _re, _nMesh
 
-def read_PI_table(_rs, _lns, _PI_table, _PI_coe, _level_info_table, _line_ctj_table):
+def read_PI_table(_rs, _lns, _PI_table_list, _PI_coe, _level_info_table, _line_ctj_table):
     r"""
     read PI table for interpolation
     """
@@ -286,16 +286,22 @@ def read_PI_table(_rs, _lns, _PI_table, _PI_coe, _level_info_table, _line_ctj_ta
             _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
 
             _countLine += 1
-            _PI_coe.nLambda[_countLine] = int(_words[6])
+            nLambda = int(_words[6])
+            _PI_coe.nLambda[_countLine] = nLambda
             _PI_coe.alpha0[_countLine] = float(_words[8])
             _PI_coe.lineIndex[_countLine] = _line_ctj_table.index( _ctj_ij )
             _PI_coe.idxI[_countLine] = _level_info_table.index( _ctj_ij[0] )
             _PI_coe.idxJ[_countLine] = _level_info_table.index( _ctj_ij[1] )
 
             _countMesh = 0
+            mesh_array = np.zeros((2,nLambda),np.double)
 
         else:
-            _PI_table[_countLine,_countMesh,:] += [float(v) for v in _words]
+            #_PI_table[_countLine,_countMesh,:] += [float(v) for v in _words]
+            mesh_array[:,_countMesh] = [float(v) for v in _words]
+
+            if _countMesh == (nLambda-1):
+                _PI_table_list.append( mesh_array )
 
             _countMesh += 1
 

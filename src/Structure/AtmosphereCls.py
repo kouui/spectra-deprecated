@@ -104,12 +104,58 @@ class AtmosphereCartesian:
 
 
 ################################################################################
+# zero dimensional Cartesion atmosphere
+################################################################################
+class AtmosphereC0d(AtmosphereCartesian):
+    r"""
+    zero dimensional Cartesian Atmosphere,
+    inheritting parent class `AtmosphereCartesian`
+
+    Attributes
+    ----------
+    data : numpy.recarray, dtype of dTpye
+        a structured array to store physical parameter
+
+    dType : numpy.dtype
+        a data type object decleared in parent class `AtmosphereCartesian`
+    """
+    def __init__(self, Te=1E4, Vt=5.E5, Ne=1E10, Pg=5E-1, Vd=0.E5):
+        r"""
+
+        initialization method of AtmosphereC0d
+
+        Parameters
+        ----------
+        Te : np.double
+            temparature, [:math:`K`]
+        Vt : np.double
+            turbulent velocity, [:math:`cm \cdot s^{-1}`]
+        Ne : np.double
+            electron density, [:math:`cm^{-3}`]
+        Pg : np.double
+            gas pressure, [:math:`Ba = g \cdot cm^{-1} \cdot s^{-2}`]
+        Vd : np.double
+            line of sight Doppler velocity, [:math:`cm \cdot s^{-1}`]
+        """
+        super().__init__()
+        
+        self.data = np.recarray(1, dtype=self.dType)
+        self.data.Te[:] = Te
+        self.data.Vt[:] = Vt
+        self.data.Ne[:] = Ne
+        self.data.Pg[:] = Pg
+        self.data.Vd[:] = Vd
+        self.data.Mesh[:] = np.nan
+        self.data.Spatial[:] = np.nan
+
+
+################################################################################
 # one dimensional Cartesion atmosphere
 ################################################################################
 
 class AtmosphereC1d(AtmosphereCartesian):
     r"""
-    one dimensional Cartesion Atmosphere,
+    one dimensional Cartesian Atmosphere,
     inheritting parent class `AtmosphereCartesian`
 
     Attributes
@@ -159,7 +205,7 @@ class AtmosphereC1d(AtmosphereCartesian):
             Mesh = self.__defaultSlabSpatialMesh__(isHalf)
         else:
             assert Mesh.ndim==1, "keyword argument Mesh must be a one dimensional numpy.ndarray."
-            #assert Mesh[0]==0 and Mesh[-1]==1, "Mesh runs from 0 to 1 ."
+            assert Mesh[0]==0 and Mesh[-1]==1, "Mesh runs from 0 to 1 ."
 
         data = np.recarray(Mesh.shape, dtype=self.dType); self.data = data
         data.Mesh[:] = Mesh[:]
