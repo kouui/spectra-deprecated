@@ -12,3 +12,6 @@ description here.
     freq_to_wave
     Dvlocity_to_Dshift
     get_Doppler_width
+    get_Level_gamma
+    get_Line_Gamma
+    get_damping_a

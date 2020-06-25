@@ -1,35 +1,51 @@
 
+
+
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
     <title>src.RadiativeTransfer.Profile &#8212; Spectra  documentation</title>
-    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/p_sphinx_theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/local_fonts.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../../../_static/p_sphinx_theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
+            <meta name="viewport" content="width=device-width, initial-scale=1">
   </head><body>
-      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
-          <span>Spectra  documentation</span></a></h1>
-        <h2 class="heading"><span>src.RadiativeTransfer.Profile</span></h2>
-      </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
-      
-        <p>
-        <a class="uplink" href="../../../index.html">Contents</a>
-        </p>
+      <div class="relbar-top">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../index.html">Spectra  documentation</a> &#187;</li>
 
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
-      <div class="content">
-        
-        
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for src.RadiativeTransfer.Profile</h1><div class="highlight"><pre>
 <span></span><span class="c1">################################################################################</span>
 <span class="c1"># this file defines functions for</span>
@@ -49,8 +65,8 @@
 <span class="c1">#    - Voigt</span>
 <span class="c1">#    - Gaussian</span>
 <span class="c1">################################################################################</span>
-<span class="c1">#@nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)</span>
-<div class="viewcode-block" id="Voigt"><a class="viewcode-back" href="../../../RST/API/RadiativeTransfer/_Profile_API/src.RadiativeTransfer.Profile.Voigt.html#src.RadiativeTransfer.Profile.Voigt">[docs]</a><span class="k">def</span> <span class="nf">Voigt</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">Voigt</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate Doppler width normalized voigt function using polynomial fitting formula.</span>
 
@@ -122,7 +138,7 @@
              <span class="p">(</span> <span class="n">B0</span> <span class="o">+</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span> <span class="n">B1</span> <span class="o">+</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span> <span class="n">B2</span> <span class="o">+</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span> <span class="n">B3</span> <span class="o">+</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span> <span class="n">B4</span> <span class="o">+</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span> <span class="n">B5</span> <span class="o">+</span> <span class="n">Z</span> <span class="o">*</span> <span class="p">(</span> <span class="n">B6</span> <span class="o">+</span> <span class="n">Z</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">real</span> <span class="o">/</span> <span class="n">Cst</span><span class="o">.</span><span class="n">sqrtPi_</span>
-    <span class="k">return</span> <span class="n">res</span></div>
+    <span class="k">return</span> <span class="n">res</span>
 
 <div class="viewcode-block" id="Gaussian"><a class="viewcode-back" href="../../../RST/API/RadiativeTransfer/_Profile_API/src.RadiativeTransfer.Profile.Gaussian.html#src.RadiativeTransfer.Profile.Gaussian">[docs]</a><span class="k">def</span> <span class="nf">Gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -267,6 +283,40 @@
 
     <span class="k">return</span> <span class="n">mesh</span></div>
 
+<div class="viewcode-block" id="half_to_full"><a class="viewcode-back" href="../../../RST/API/RadiativeTransfer/_Profile_API/src.RadiativeTransfer.Profile.half_to_full.html#src.RadiativeTransfer.Profile.half_to_full">[docs]</a><span class="k">def</span> <span class="nf">half_to_full</span><span class="p">(</span><span class="n">_arr_half</span><span class="p">,</span> <span class="n">_isMinus</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    create full (anti-)symmetric full array according to half array</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _arr_half : 1darray,</span>
+<span class="sd">        half array.</span>
+
+<span class="sd">    _isMinus : boolean</span>
+<span class="sd">        True : anti-symmetric full array; False : symmetric full array</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    _arr_full : 1darray,</span>
+<span class="sd">        full array.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_nLmid</span> <span class="o">=</span> <span class="n">_arr_half</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">_nLfull</span> <span class="o">=</span> <span class="p">(</span><span class="n">_nLmid</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">_arr_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">_nLfull</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">_arr_half</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_isMinus</span><span class="p">:</span>
+        <span class="n">_fac</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_fac</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">_arr_full</span><span class="p">[</span><span class="n">_nLmid</span><span class="p">:]</span> <span class="o">=</span> <span class="n">_arr_half</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">_arr_full</span><span class="p">[:</span><span class="n">_nLmid</span><span class="p">]</span> <span class="o">=</span> <span class="n">_fac</span> <span class="o">*</span> <span class="n">_arr_half</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">_arr_full</span></div>
+
 
 <span class="c1">################################################################################</span>
 <span class="c1"># whether to compile them using numba&#39;s LLVM</span>
@@ -276,18 +326,60 @@
     <span class="n">Voigt</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span> <span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">)],</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span> <span class="n">Voigt</span> <span class="p">)</span>
 </pre></div>
 
+          </div>
+        </div>
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
-      
-        <p>
-        <a class="uplink" href="../../../index.html">Contents</a>
-        </p>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../../../index.html">Page contents</a></h3>
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/NumpyCollection.html">Numpy Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/PythonCollection.html">Python Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
+</ul>
 
+  </div>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+      <div class="relbar-bottom">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, kouui.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
     </div>
+      <!-- PSphinxTheme -->
   </body>
 </html>

@@ -1,0 +1,214 @@
+
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/p_sphinx_theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/local_fonts.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../../../../_static/p_sphinx_theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="RadiativeTransfer API" href="../../RadiativeTransfer_API.html" />
+    <link rel="prev" title="src.Atomic.PhotoIonize.interpolate_PI_alpha" href="src.Atomic.PhotoIonize.interpolate_PI_alpha.html" /> 
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+      <div class="relbar-top">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="../../RadiativeTransfer_API.html" title="RadiativeTransfer API"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="src.Atomic.PhotoIonize.interpolate_PI_alpha.html" title="src.Atomic.PhotoIonize.interpolate_PI_alpha"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../../Documentation.html" >Documentation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../Atomic_API.html" >Atomic API</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../PhotoIonize_API.html" accesskey="U">PhotoIonize API</a> &#187;</li> 
+      </ul>
+    </div>
+      </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="src-atomic-photoionize-bound-free-radiative-transition-coefficient">
+<h1>src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient<a class="headerlink" href="#src-atomic-photoionize-bound-free-radiative-transition-coefficient" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient">
+<code class="descclassname">src.Atomic.PhotoIonize.</code><code class="descname">bound_free_radiative_transition_coefficient</code><span class="sig-paren">(</span><em>wave</em>, <em>J</em>, <em>alpha</em>, <em>Te</em>, <em>ni_lte</em>, <em>nk_lte</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/PhotoIonize.html#bound_free_radiative_transition_coefficient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given wavelength mesh, mean intensity (as function of wavelength),
+photoionization cross section, compute</p>
+<ul class="simple">
+<li><p>radiative ionization rate,</p></li>
+<li><p>stimulated radiative recombination rate,</p></li>
+<li><p>spontaneous radiative recombination rate.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wave</strong> (<em>array-like of np.double</em>) – wavelength mesh, [<span class="math notranslate nohighlight">\(cm\)</span>]</p></li>
+<li><p><strong>J</strong> (<em>array-like of np.double</em>) – mean intensity as function of wavelength, [<span class="math notranslate nohighlight">\(erg/cm^2/Sr/cm/s\)</span>]</p></li>
+<li><p><strong>alpha</strong> (<em>array-like of np.double</em>) – photoionization cross section as function of wavelength, [<span class="math notranslate nohighlight">\(cm^{2}\)</span>]</p></li>
+<li><p><strong>Te</strong> (<em>np.double</em>) – Temperature, [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
+<li><p><strong>ni_lte</strong> (<em>np.double</em>) – LTE population of level i, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
+<li><p><strong>nk_lte</strong> (<em>np.double</em>) – LTE population of level k, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>Rik</strong> (<em>np.double</em>) – Radiative ionization rate, [<span class="math notranslate nohighlight">\(s^{-1} \cdot cm^{-3}\)</span>]</p></li>
+<li><p><strong>Rki_stim</strong> (<em>np.double</em>) – Stimulated Radiative ionization rate, [<span class="math notranslate nohighlight">\(s^{-1} \cdot cm^{-3}\)</span>]</p></li>
+<li><p><strong>Rki_spon</strong> (<em>np.double</em>) – Spontaneous Radiative ionization rate, [<span class="math notranslate nohighlight">\(s^{-1} \cdot cm^{-3}\)</span>]</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Radiative ionization rate <a class="footnote-reference brackets" href="#id4" id="id1">1</a> Equation(9.43),</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[R_{ik} = 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} J(\nu) d\nu\]</div>
+</div></blockquote>
+<p>Stimulated radiative recombination rate <a class="footnote-reference brackets" href="#id4" id="id2">1</a> Equation(9.47),</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[R_{ki}^{stim} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} J(\nu) e^{-h\nu/kT} d\nu\]</div>
+</div></blockquote>
+<p>Spontaneous radiative recombination rate <a class="footnote-reference brackets" href="#id4" id="id3">1</a> Equation(9.45)</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[R_{ki}^{stim} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} (2h\nu^{3}/c^2) e^{-h\nu/kT} d\nu\]</div>
+</div></blockquote>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id4"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id3">3</a>)</span></dt>
+<dd><p>Ivan Hubeny, Dimitri Mihalas, “Theory of Stellar Atmosphere:
+An Introduction to Astrophysical Non-equilibrium
+Quantitative Spectroscopic Analysis”,
+Princeton University Press, pp. 273, 2015.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../../../../index.html">Page contents</a></h3>
+    <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../Documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../Constants_API.html">Constants API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Structure_API.html">Structure API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Math_API.html">Math API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../Visual_API.html">Visual API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../Atomic_API.html">Atomic API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../BasicP_API.html">BasicP API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../Collision_API.html">Collision API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../Gaunt_API.html">Gaunt API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../LTELib_API.html">LTELib API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../Opacity_API.html">Opacity API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../SEsolver_API.html">SEsolver API</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../PhotoIonize_API.html">PhotoIonize API</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.Atomic.PhotoIonize.interpolate_PI_intensity.html">src.Atomic.PhotoIonize.interpolate_PI_intensity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.Atomic.PhotoIonize.interpolate_PI_alpha.html">src.Atomic.PhotoIonize.interpolate_PI_alpha</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../RadiativeTransfer_API.html">RadiativeTransfer API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../NumpyCollection.html">Numpy Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../PythonCollection.html">Python Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ChangeLog.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Attention.html">Attention</a></li>
+</ul>
+
+  </div>
+
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/RST/API/Atomic/_PhotoIonize_API/src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+      <div class="relbar-bottom">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="../../RadiativeTransfer_API.html" title="RadiativeTransfer API"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="src.Atomic.PhotoIonize.interpolate_PI_alpha.html" title="src.Atomic.PhotoIonize.interpolate_PI_alpha"
+             >previous</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../../Documentation.html" >Documentation</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../Atomic_API.html" >Atomic API</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="../PhotoIonize_API.html" >PhotoIonize API</a> &#187;</li> 
+      </ul>
+    </div>
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+      <!-- PSphinxTheme -->
+  </body>
+</html>

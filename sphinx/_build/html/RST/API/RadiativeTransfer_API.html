@@ -1,41 +1,59 @@
 
+
+
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
     <title>RadiativeTransfer API &#8212; Spectra  documentation</title>
-    <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/p_sphinx_theme.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/local_fonts.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../../_static/p_sphinx_theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Profile API" href="RadiativeTransfer/Profile_API.html" />
-    <link rel="prev" title="src.Atomic.SEsolver.solveSE" href="Atomic/_SEsolver_API/src.Atomic.SEsolver.solveSE.html" /> 
+    <link rel="prev" title="src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient" href="Atomic/_PhotoIonize_API/src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient.html" /> 
+            <meta name="viewport" content="width=device-width, initial-scale=1">
   </head><body>
-      <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
-          <span>Spectra  documentation</span></a></h1>
-        <h2 class="heading"><span>RadiativeTransfer API</span></h2>
-      </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
-      
-        <p>
-        «&#160;&#160;<a href="Atomic/_SEsolver_API/src.Atomic.SEsolver.solveSE.html">src.Atomic.SEsolver.solveSE</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="../../index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="RadiativeTransfer/Profile_API.html">Profile API</a>&#160;&#160;»
-        </p>
+      <div class="relbar-top">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="RadiativeTransfer/Profile_API.html" title="Profile API"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="Atomic/_PhotoIonize_API/src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient.html" title="src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+      <li><a href="../../index.html">Spectra  documentation</a> &#187;</li>
 
+          <li class="nav-item nav-item-1"><a href="../Documentation.html" accesskey="U">Documentation</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
-      <div class="content">
-        
-        
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <div class="section" id="radiativetransfer-api">
 <h1>RadiativeTransfer API<a class="headerlink" href="#radiativetransfer-api" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
@@ -46,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="RadiativeTransfer/_Profile_API/src.RadiativeTransfer.Profile.makeLineMesh_Half.html">src.RadiativeTransfer.Profile.makeLineMesh_Half</a></li>
 <li class="toctree-l2"><a class="reference internal" href="RadiativeTransfer/_Profile_API/src.RadiativeTransfer.Profile.makeLineMesh_Full.html">src.RadiativeTransfer.Profile.makeLineMesh_Full</a></li>
 <li class="toctree-l2"><a class="reference internal" href="RadiativeTransfer/_Profile_API/src.RadiativeTransfer.Profile.makeContinuumMesh.html">src.RadiativeTransfer.Profile.makeContinuumMesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RadiativeTransfer/_Profile_API/src.RadiativeTransfer.Profile.half_to_full.html">src.RadiativeTransfer.Profile.half_to_full</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="RadiativeTransfer/Thin_API.html">Thin API</a><ul>
@@ -57,22 +76,85 @@
 </div>
 
 
+          </div>
+        </div>
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
-      
-        <p>
-        «&#160;&#160;<a href="Atomic/_SEsolver_API/src.Atomic.SEsolver.solveSE.html">src.Atomic.SEsolver.solveSE</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="../../index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="RadiativeTransfer/Profile_API.html">Profile API</a>&#160;&#160;»
-        </p>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../../index.html">Page contents</a></h3>
+    <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Documentation.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Constants_API.html">Constants API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Structure_API.html">Structure API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Math_API.html">Math API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Visual_API.html">Visual API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Atomic_API.html">Atomic API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RadiativeTransfer API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="RadiativeTransfer/Profile_API.html">Profile API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RadiativeTransfer/Thin_API.html">Thin API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../NumpyCollection.html">Numpy Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PythonCollection.html">Python Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Attention.html">Attention</a></li>
+</ul>
 
+  </div>
+
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/RST/API/RadiativeTransfer_API.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+      <div class="relbar-bottom">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="RadiativeTransfer/Profile_API.html" title="Profile API"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="Atomic/_PhotoIonize_API/src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient.html" title="src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient"
+             >previous</a> &nbsp; &nbsp;</li>
+      <li><a href="../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../Documentation.html" >Documentation</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, kouui.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
     </div>
+      <!-- PSphinxTheme -->
   </body>
 </html>

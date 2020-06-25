@@ -1,35 +1,51 @@
 
+
+
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
     <title>src.Structure.AtmosphereCls &#8212; Spectra  documentation</title>
-    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/p_sphinx_theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/local_fonts.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../../../_static/p_sphinx_theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
+            <meta name="viewport" content="width=device-width, initial-scale=1">
   </head><body>
-      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
-          <span>Spectra  documentation</span></a></h1>
-        <h2 class="heading"><span>src.Structure.AtmosphereCls</span></h2>
-      </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
-      
-        <p>
-        <a class="uplink" href="../../../index.html">Contents</a>
-        </p>
+      <div class="relbar-top">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../index.html">Spectra  documentation</a> &#187;</li>
 
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
-      <div class="content">
-        
-        
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for src.Structure.AtmosphereCls</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module defines several class for Solar Atmosphere model.</span>
@@ -137,12 +153,58 @@
 
 
 <span class="c1">################################################################################</span>
+<span class="c1"># zero dimensional Cartesion atmosphere</span>
+<span class="c1">################################################################################</span>
+<span class="k">class</span> <span class="nc">AtmosphereC0d</span><span class="p">(</span><span class="n">AtmosphereCartesian</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    zero dimensional Cartesian Atmosphere,</span>
+<span class="sd">    inheritting parent class `AtmosphereCartesian`</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : numpy.recarray, dtype of dTpye</span>
+<span class="sd">        a structured array to store physical parameter</span>
+
+<span class="sd">    dType : numpy.dtype</span>
+<span class="sd">        a data type object decleared in parent class `AtmosphereCartesian`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Te</span><span class="o">=</span><span class="mf">1E4</span><span class="p">,</span> <span class="n">Vt</span><span class="o">=</span><span class="mf">5.E5</span><span class="p">,</span> <span class="n">Ne</span><span class="o">=</span><span class="mf">1E10</span><span class="p">,</span> <span class="n">Pg</span><span class="o">=</span><span class="mf">5E-1</span><span class="p">,</span> <span class="n">Vd</span><span class="o">=</span><span class="mf">0.E5</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        initialization method of AtmosphereC0d</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Te : np.double</span>
+<span class="sd">            temparature, [:math:`K`]</span>
+<span class="sd">        Vt : np.double</span>
+<span class="sd">            turbulent velocity, [:math:`cm \cdot s^{-1}`]</span>
+<span class="sd">        Ne : np.double</span>
+<span class="sd">            electron density, [:math:`cm^{-3}`]</span>
+<span class="sd">        Pg : np.double</span>
+<span class="sd">            gas pressure, [:math:`Ba = g \cdot cm^{-1} \cdot s^{-2}`]</span>
+<span class="sd">        Vd : np.double</span>
+<span class="sd">            line of sight Doppler velocity, [:math:`cm \cdot s^{-1}`]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">recarray</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dType</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Te</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Te</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Vt</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Vt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Ne</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Ne</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Pg</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Pg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Vd</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Vd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Mesh</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Spatial</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+
+<span class="c1">################################################################################</span>
 <span class="c1"># one dimensional Cartesion atmosphere</span>
 <span class="c1">################################################################################</span>
 
 <div class="viewcode-block" id="AtmosphereC1d"><a class="viewcode-back" href="../../../RST/API/Structure/_AtmosphereCls_API/src.Structure.AtmosphereCls.AtmosphereC1d.html#src.Structure.AtmosphereCls.AtmosphereC1d">[docs]</a><span class="k">class</span> <span class="nc">AtmosphereC1d</span><span class="p">(</span><span class="n">AtmosphereCartesian</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    one dimensional Cartesion Atmosphere,</span>
+<span class="sd">    one dimensional Cartesian Atmosphere,</span>
 <span class="sd">    inheritting parent class `AtmosphereCartesian`</span>
 
 <span class="sd">    Attributes</span>
@@ -192,7 +254,7 @@
             <span class="n">Mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__defaultSlabSpatialMesh__</span><span class="p">(</span><span class="n">isHalf</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;keyword argument Mesh must be a one dimensional numpy.ndarray.&quot;</span>
-            <span class="c1">#assert Mesh[0]==0 and Mesh[-1]==1, &quot;Mesh runs from 0 to 1 .&quot;</span>
+            <span class="k">assert</span> <span class="n">Mesh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">Mesh</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Mesh runs from 0 to 1 .&quot;</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">recarray</span><span class="p">(</span><span class="n">Mesh</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dType</span><span class="p">);</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="n">data</span><span class="o">.</span><span class="n">Mesh</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">[:]</span>
@@ -286,18 +348,60 @@
     <span class="c1">#atmos.readBackgroundIntensity(pwd+&#39;data/IntensityData/ASTM_E490+PROM7_HI_CaII.dat&#39;)</span>
 </pre></div>
 
+          </div>
+        </div>
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
-      
-        <p>
-        <a class="uplink" href="../../../index.html">Contents</a>
-        </p>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../../../index.html">Page contents</a></h3>
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/NumpyCollection.html">Numpy Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/PythonCollection.html">Python Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
+</ul>
 
+  </div>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+      <div class="relbar-bottom">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, kouui.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
     </div>
+      <!-- PSphinxTheme -->
   </body>
 </html>

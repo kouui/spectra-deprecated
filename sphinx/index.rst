@@ -17,6 +17,7 @@ This code aims at understanding the atomic and radiative transfer processes in s
    RST/PythonCollection
    RST/rst-cheatsheet/rst-cheatsheet.rst
    RST/ChangeLog
+   RST/Attention
 
 
 Indices and tables
@@ -25,3 +26,9 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Contacts
+=========
+
+* Github repository : https://github.com/kouui/spectra/
+* E-mail : kouui@kwasan.kyoto-u.ac.jp

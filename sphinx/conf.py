@@ -46,6 +46,8 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
+    'sphinx.ext.todo',
+    'sphinxcontrib.fulltoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -82,7 +84,33 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 #html_theme = 'alabaster'
-html_theme = 'haiku'
+
+#html_theme = 'haiku'
+
+
+#html_theme = 'bizstyle'
+
+#html_theme = 'nature'
+
+#html_theme = 'scrolls'
+
+html_theme = 'p-greycreme'
+import os
+from PSphinxTheme import utils
+p, html_theme, needs_sphinx = utils.set_psphinxtheme(html_theme)
+html_theme_path = p
+
+#html_theme = 'yeen'
+
+#import mozilla_sphinx_theme
+#import os
+#html_theme_path = [os.path.dirname(mozilla_sphinx_theme.__file__)]
+#html_theme = 'mozilla'
+
+#html_theme = 'better'
+#from better import better_theme_path
+#html_theme_path = [better_theme_path]
+
 
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -105,14 +133,14 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-html_sidebars = {
-    '**': [
-        'about.html',
-        'navigation.html',
-        'relations.html',
-        'searchbox.html',
-    ]
-}
+#html_sidebars = {
+#    '**': [
+#        'about.html',
+#        'navigation.html',
+#        'relations.html',
+#        'searchbox.html',
+#    ]
+#}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

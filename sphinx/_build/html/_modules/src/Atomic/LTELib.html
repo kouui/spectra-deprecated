@@ -1,35 +1,51 @@
 
+
+
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
     <title>src.Atomic.LTELib &#8212; Spectra  documentation</title>
-    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/p_sphinx_theme.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/local_fonts.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../../_static/language_data.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../../../_static/p_sphinx_theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
+            <meta name="viewport" content="width=device-width, initial-scale=1">
   </head><body>
-      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
-          <span>Spectra  documentation</span></a></h1>
-        <h2 class="heading"><span>src.Atomic.LTELib</span></h2>
-      </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
-      
-        <p>
-        <a class="uplink" href="../../../index.html">Contents</a>
-        </p>
+      <div class="relbar-top">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../index.html">Spectra  documentation</a> &#187;</li>
 
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
-      <div class="content">
-        
-        
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <h1>Source code for src.Atomic.LTELib</h1><div class="highlight"><pre>
 <span></span><span class="c1">################################################################################</span>
 <span class="c1"># this file defines functions for</span>
@@ -293,7 +309,7 @@
     <span class="k">return</span> <span class="n">Bji</span><span class="p">,</span> <span class="n">Bij</span></div>
 
 
-<div class="viewcode-block" id="Planck_hz"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Planck_hz.html#src.Atomic.LTELib.Planck_hz">[docs]</a><span class="k">def</span> <span class="nf">Planck_hz</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">T</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">Planck_hz</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">T</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    given frequency and temperature,</span>
 <span class="sd">    calculate the frequency based planck function.</span>
@@ -339,10 +355,10 @@
     <span class="k">else</span><span class="p">:</span>                                                        <span class="c1"># normal formula</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F_T</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">intensity</span></div>
+    <span class="k">return</span> <span class="n">intensity</span>
 
 
-<div class="viewcode-block" id="Planck_cm"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Planck_cm.html#src.Atomic.LTELib.Planck_cm">[docs]</a><span class="k">def</span> <span class="nf">Planck_cm</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">T</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">Planck_cm</span><span class="p">(</span><span class="n">W</span><span class="p">,</span><span class="n">T</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    given wavelength and temperature,</span>
 <span class="sd">    calculate the wavelength based planck function.</span>
@@ -385,7 +401,7 @@
     <span class="k">else</span><span class="p">:</span>                                                        <span class="c1"># normal formula</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span><span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">**</span><span class="mi">5</span> <span class="o">/</span>  <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">WT</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">intensity</span></div>
+    <span class="k">return</span> <span class="n">intensity</span>
 
 <span class="c1">################################################################################</span>
 <div class="viewcode-block" id="Ufunc"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Ufunc.html#src.Atomic.LTELib.Ufunc">[docs]</a><span class="k">def</span> <span class="nf">Ufunc</span><span class="p">(</span><span class="n">elm</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
@@ -565,18 +581,60 @@
     <span class="n">Planck_hz</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span> <span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">)])(</span> <span class="n">Planck_hz</span> <span class="p">)</span>
 </pre></div>
 
+          </div>
+        </div>
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
-      
-        <p>
-        <a class="uplink" href="../../../index.html">Contents</a>
-        </p>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../../../index.html">Page contents</a></h3>
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/NumpyCollection.html">Numpy Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/PythonCollection.html">Python Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
+</ul>
 
+  </div>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+      <div class="relbar-bottom">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+      <li><a href="../../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
       </div>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, kouui.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
     </div>
+      <!-- PSphinxTheme -->
   </body>
 </html>

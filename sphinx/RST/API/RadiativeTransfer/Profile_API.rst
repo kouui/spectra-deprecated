@@ -13,4 +13,4 @@ description here.
     makeLineMesh_Half
     makeLineMesh_Full
     makeContinuumMesh
-    
+    half_to_full
