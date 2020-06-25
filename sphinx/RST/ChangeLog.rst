@@ -2,11 +2,6 @@ Change Log
 ======================
 
 
-2020/06/23
------------------
-
-1. added documentation `./index.html`
-
 
 2020/06/26
 -----------------
@@ -67,3 +62,9 @@ Change Log
 10. `Attention.rst` has been added to the main page of documentation website. Currently, it includes
 
   - `Convention of wavelength-frequency conversion` : related to wavelength/frequency mesh. intensity unit and input argument of Voigt function.
+
+
+2020/06/23
+-----------------
+
+1. added documentation `./index.html`
