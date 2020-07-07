@@ -161,6 +161,8 @@ def get_LTE_ratio(_erg, _g, _stage, _Te, _Ne):
             #nRatio[i] = nRatio[i-1] * gj/gi * np.exp(-(erg[i]-erg[i-1])/kT) * Cst.saha_ * Te**(1.5) / Ne
             _nRatio[i] = _nRatio[i-1] * Saha_distribution(_gi, _gj, _erg[i]-_erg[i-1], _Ne, _Te)
 
+        #print(f"erg[i] : {_erg[i]}, erg[i-1] : {_erg[i-1]}, Ne : {_Ne}, Te : {_Te}")
+
         _nRatio[:] /= _nRatio[:].sum()
 
     return _nRatio
@@ -368,6 +370,8 @@ def Ufunc(elm, T):
 
     Notes
     -----
+    Wanring : this polynomial fitting formula(table) is only avaible for low temperature (:math:`<10000 K`)
+
     from [1]_, [2]_.
     .. math:: log(u) = c_0 + c_1 \cdot log(\theta) + c_2 \cdot log(\theta)^2 + c_3 \cdot log(\theta)^3 + c_4 \cdot log(\theta)^4
     .. math:: log = log_{10}
@@ -513,13 +517,10 @@ def Ufunc(elm, T):
         c = [0., 0., 0., 0., 0.]  # return 1
 
     th = 5040./T
-    nt=np.size(th)
-    s = [c[0]]*nt
+    s = c[0]
     for i in range(1,5):
-        s = s + c[i]*(np.log10(th))**i
+        s += c[i]*(np.log10(th))**i
     ufunc1 = 10.**s
-    #if len(ufunc1) == 1
-    #    ufunc1=ufunc1[0]
 
     return ufunc1
 
@@ -530,3 +531,5 @@ def Ufunc(elm, T):
 if Cst.isJIT == True :
     Planck_cm = nb.vectorize( [nb.float64(nb.float64,nb.float64)])( Planck_cm )
     Planck_hz = nb.vectorize( [nb.float64(nb.float64,nb.float64)])( Planck_hz )
+    #Ufunc = nb.jit(nb.float64(nb.types.unicode_type,nb.float64), nopython=True)( Ufunc )
+    #Ufunc = nb.jit(nopython=True)( Ufunc )

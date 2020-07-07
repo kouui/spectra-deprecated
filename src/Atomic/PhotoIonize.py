@@ -213,7 +213,7 @@ def bound_free_radiative_transition_coefficient_v0(wave,J,alpha,Te,gi,gk,ne):
 
     Spontaneous radiative recombination rate [1]_ Equation(9.45)
 
-        .. math:: R_{ki}^{stim} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} (2h\nu^{3}/c^2) e^{-h\nu/kT} d\nu
+        .. math:: R_{ki}^{spon} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} (2h\nu^{3}/c^2) e^{-h\nu/kT} d\nu
 
     References
     -----------
