@@ -1,12 +1,14 @@
-
 import numpy as np
 from .. import Constants as Cst
 from .. import Element
 from . import AtomIO
-from ..RadiativeTransfer import Profile
-from ..Atomic import BasicP
+from . import MeshCls
+from . import RadLineCls
+
+from collections import OrderedDict
 
 #from numba.typed import List
+
 
 class Atom:
 
@@ -35,7 +37,11 @@ class Atom:
 
         }
         self.read_Level()
-        self.make_line_idx_ctj_table()
+        self.get_nTran_nLine_nCont()
+        self._prepare_idx_ctj_mapping()
+
+        if self.hasContinuum:
+            self.make_Cont()
 
         # whether to read *.Aji file at __init__
         if _file_Aji is not None:
@@ -44,7 +50,6 @@ class Atom:
         # whether to read *.Electron and *.Proton files at __init__
         if _file_CEe is not None:
             self.read_CE(_file_CEe, _file_CEp)
-
 
     def read_Level(self):
         r"""
@@ -57,10 +62,9 @@ class Atom:
 
         #--- read general info
         rs, self.Title, self.Z, self.Element, self.nLevel = AtomIO.read_general_info(_rs=0, _lns=fLines)
-        self.nLine = self.nLevel * (self.nLevel-1) // 2
-        self.nCont = 0
         self.Z = int(self.Z)
-        self.Mass = Element.AMTuple[ Element.nZTuple.index(self.Z) ]
+        self.Mass = Element.Element_dict[self.Element]["Mass"]
+        self.Abun = 10**(Element.Element_dict[self.Element]["Abundance"]-12.0)
 
         #--- read Level info
         dtype  = np.dtype([
@@ -68,6 +72,7 @@ class Atom:
                           ('g',np.uint8),               #: g=2J+1, statistical weight
                           ('stage',np.uint8),           #: ionization stage
                           ('gamma',np.double),          #: radiative damping constant of Level
+                          ("isGround",np.bool),         #: whether a level is ground level
                           ])
         self.Level = np.recarray(self.nLevel, dtype=dtype)
         self.Level_info = {"configuration" : [], "term" : [], "J": [], "2S+1": []}
@@ -75,34 +80,136 @@ class Atom:
                             _erg=self.Level.erg[:], _g=self.Level.g[:], _stage=self.Level.stage[:])
         self.Level.erg[:] *= Cst.eV2erg_
 
+        self.Level.isGround[:] = 1
+        for k in range(1,self.nLevel):
+            if self.Level.stage[k] == self.Level.stage[k-1]:
+                self.Level.isGround[k] = 0
+
+        self.Level.gamma[:] = 0
+
         #--- make tuple of tuple (configuration, term, J)
-        self.Level_info_table = []
+        self._Level_info_table = []
         for k in range(self.nLevel):
-            self.Level_info_table.append((self.Level_info["configuration"][k],
+            self._Level_info_table.append((self.Level_info["configuration"][k],
                                           self.Level_info["term"][k],
                                           self.Level_info["J"][k]))
-        self.Level_info_table = tuple(self.Level_info_table)
+        self._Level_info_table = tuple(self._Level_info_table)
 
-    def make_line_idx_ctj_table(self):
+    def get_nTran_nLine_nCont(self):
+        r"""
+        based on self.Level,
+        compute self.nTran, self.nLine, self.nCont
+
+        """
+        _stage = self.Level.stage
+        count = 0
+        current_stage = _stage[0]
+        counter = OrderedDict()
+        for k,s in enumerate(_stage):
+            if s == current_stage:
+                count += 1
+                if k == self.nLevel-1:
+                    counter[current_stage] = count
+                    break
+            elif s > current_stage:
+                counter[current_stage] = count
+                count = 1
+                current_stage = s
+                counter[current_stage] = count
+
+        nLine, nCont = 0, 0
+        for k, v in counter.items():
+            nLine += v * (v-1) // 2
+            if k+1 in counter.keys():
+                nCont += v
+        nTran = nLine + nCont
+
+        self.nTran = nTran
+        self.nLine = nLine
+        self.nCont = nCont
+
+        if self.nCont > 0:
+            self.hasContinuum = True
+
+    def _idx_ctj_into_dict(self, _dict, _i, _j):
+        r"""
+        """
+        _dict["idxI"].append( _i )
+        _dict["idxJ"].append( _j )
+        _dict["ctj_i"].append( self._Level_info_table[_i] )
+        _dict["ctj_j"].append( self._Level_info_table[_j] )
+
+    def _prepare_idx_ctj_mapping(self):
         r"""
         make tuples for mapping
 
-        tranIndex <--> (ctj_i, ctj_j)
-        tranIndex <--> (idxI, idxJ)
+        lineIndex <--> (ctj_i, ctj_j)
+        lineIndex <--> (idxI, idxJ)
+        contIndex <--> (ctj_i, ctj_j)
+        contIndex <--> (idxI, idxJ)
 
         """
+        _Tran_dict = {}
+        _Line_dict = {}
+        _Cont_dict = {}
+        for key in ("idxI", "idxJ", "ctj_i", "ctj_j"):
+            _Tran_dict[key] = []
+            _Line_dict[key] = []
+            _Cont_dict[key] = []
 
-        Line_idx_table = []
-        Line_ctj_table = []
         for i in range(0, self.nLevel):
             for j in range(i+1, self.nLevel):
                 # i : lower level
                 # j : upper level
-                Line_idx_table.append( ( i, j ) )
-                Line_ctj_table.append( ( self.Level_info_table[i], self.Level_info_table[j] ) )
+                if self.Level.stage[i] == self.Level.stage[j]:
+                    self._idx_ctj_into_dict(_Tran_dict, i, j)
+                    self._idx_ctj_into_dict(_Line_dict, i, j)
+                elif self.Level.stage[i] == self.Level.stage[j]-1 and self.Level.isGround[j]:
+                    self._idx_ctj_into_dict(_Tran_dict, i, j)
+                    self._idx_ctj_into_dict(_Cont_dict, i, j)
 
+        assert self.nLine == len(_Line_dict["idxI"])
+        assert self.nCont == len(_Cont_dict["idxI"])
+
+        self._Tran_dict = _Tran_dict
+        self._Line_dict = _Line_dict
+        self._Cont_dict = _Cont_dict
+
+        Line_idx_table = []
+        Line_ctj_table = []
+        for k in range(self.nLine):
+            Line_idx_table.append( ( _Line_dict["idxI"][k], _Line_dict["idxJ"][k] ) )
+            Line_ctj_table.append( ( _Line_dict["ctj_i"][k], _Line_dict["ctj_j"][k] ) )
         self.Line_idx_table = tuple( Line_idx_table )
         self.Line_ctj_table = tuple( Line_ctj_table )
+
+        Cont_idx_table = []
+        Cont_ctj_table = []
+        for k in range(self.nCont):
+            Cont_idx_table.append( ( _Cont_dict["idxI"][k], _Cont_dict["idxJ"][k] ) )
+            Cont_ctj_table.append( ( _Cont_dict["ctj_i"][k], _Cont_dict["ctj_j"][k] ) )
+        self.Cont_idx_table = tuple( Cont_idx_table )
+        self.Cont_ctj_table = tuple( Cont_ctj_table )
+
+    def make_Cont(self):
+        r"""
+        """
+        dtype = np.dtype([('idxI',np.uint16),           #: level index, the Level index of lower level
+                           ('idxJ',np.uint16),          #: level index, the Level index of lower level
+                           ('f0',np.double),            #: central frequency
+                           ('w0',np.double),            #: central wavelength in cm
+                           ('w0_AA',np.double),         #: central wavelength in Angstrom
+                           ])
+        self.Cont = np.recarray(self.nCont, dtype=dtype)
+
+
+        for k in range(self.nCont):
+            i, j = self.Cont_idx_table[k]
+            self.Cont.idxI[k], self.Cont.idxJ[k] = i, j
+            self.Cont.f0[k] = (self.Level.erg[j]-self.Level.erg[i]) / Cst.h_
+        self.Cont.w0[:] = Cst.c_ / self.Cont.f0[:]
+        self.Cont.w0_AA[:] = self.Cont.w0[:] * 1E+8
+
 
     def read_Aji(self, _path):
         r"""
@@ -129,24 +236,15 @@ class Atom:
                            ('f0',np.double),            #: central frequency
                            ('w0',np.double),            #: central wavelength in cm
                            ('w0_AA',np.double),         #: central wavelength in Angstrom
-                           ("isContinuum",np.uint8),    #: continuum tansition identifier, 0: same stage, 1: continuum transition, 2: others
+                           #("isContinuum",np.uint8),    #: continuum tansition identifier, 0: same stage, 1: continuum transition, 2: others
                            ('Gamma',np.double),         #: radiative damping constant of Line
                            ])
         self.Line = np.recarray(self.nLine, dtype=dtype)
-        # idxI and idxJ
-        idx = 0
-        for i in range(0, self.nLevel):
-            for j in range(i+1, self.nLevel):
-                self.Line.idxI[idx], self.Line.idxJ[idx] = i, j
 
-                if self.Level.stage[i] == self.Level.stage[j]:
-                    self.Line.isContinuum[idx] = 0
-                elif self.Level.stage[i] == (self.Level.stage[j]-1):
-                    self.Line.isContinuum[idx] = 1
-                else:
-                    self.Line.isContinuum[idx] = 2
-                idx += 1
-        del idx    # for safety
+        # idxI and idxJ
+        for k in range(self.nLine):
+            self.Line.idxI[k], self.Line.idxJ[k] = self.Line_idx_table[k]
+
         self.Line.AJI[:] = 0
 
         AtomIO.read_line_info(_lns=fLines, _Aji=self.Line.AJI[:], _line_ctj_table=self.Line_ctj_table)
@@ -158,6 +256,8 @@ class Atom:
             self.Line.f0[k] = (self.Level.erg[j]-self.Level.erg[i]) / Cst.h_
         self.Line.w0[:] = Cst.c_ / self.Line.f0[:]
         self.Line.w0_AA[:] = self.Line.w0[:] * 1E+8
+
+        self.Line.Gamma[:] = 0
 
 
         print("Finished.")
@@ -177,67 +277,8 @@ class Atom:
         _path_proton : str
             path to *.proton
         """
-        #---------------------------------------------------------------------
-        # read Electron impact data
-        #---------------------------------------------------------------------
-        print("Reading Electron impact Effective Collisional Strength from : \n", _path_electron)
-        print("...")
 
-        self.filepath_dict["CE_electron"] = _path_electron
-        with open(_path_electron, 'r') as file:
-            fLines = file.readlines()
-
-        # read Temperature grid for interpolation
-        rs, nTe, Te, self.CE_type = AtomIO.read_CE_Temperature(_lns=fLines)
-        self.CE_Te_table = np.array(Te, dtype=np.double)
-        self.CE_table = np.zeros((self.nLine, nTe), dtype=np.double)
-        dtype  = np.dtype([
-                          ('idxI',np.uint8),      #: level index, the Level index of lower level
-                          ('idxJ',np.uint8),      #: level index, the Level index of upper level
-                          ('f1',np.uint8),        #: a factor for ESC calculation due to fine structure, \Omega * f1 / f2
-                          ('f2',np.uint8),        #: a factor for ESC calculation due to fine structure, \Omega * f1 / f2
-                          ('gi',np.uint8),        #: statistical weight of lower level
-                          ('gj',np.uint8),        #: statistical weight of upper level
-                          ('dEij',np.double)      #: excitation energy, [:math:`erg`]
-                          ])
-
-        self.CE_coe = np.recarray(self.nLine, dtype=dtype)
-
-        # idxI and idxJ
-        idx = 0
-        for i in range(0, self.nLevel):
-            for j in range(i+1, self.nLevel):
-                self.CE_coe.idxI[idx], self.CE_coe.idxJ[idx] = i, j
-                idx += 1
-        del idx    # for safety
-
-        # read CE_table
-        AtomIO.read_CE_table(_rs=rs, _lns=fLines, _CE_table=self.CE_table,
-                _f1=self.CE_coe.f1[:], _f2=self.CE_coe.f2[:], _line_ctj_table=self.Line_ctj_table)
-
-        for k in range(self.nLine):
-            self.CE_coe.gi[k] = self.Level.g[self.CE_coe.idxI[k]]
-            self.CE_coe.gj[k] = self.Level.g[self.CE_coe.idxJ[k]]
-            self.CE_coe.dEij[k] = self.Level.erg[self.CE_coe.idxJ[k]] - self.Level.erg[self.CE_coe.idxI[k]]
-
-        print("Finished.")
-        print()
-
-        #---------------------------------------------------------------------
-        # read Proton impact data (not yet imported)
-        #---------------------------------------------------------------------
-        if _path_proton is not None:
-
-            print("Reading Proton impact Effective Collisional Strength from : \n", _path_proton)
-            print("...")
-            print("Finished.")
-            print()
-
-            self.filepath_dict["CE_proton"] = _path_proton
-            with open(_path_proton, 'r') as file:
-                fLines = file.readlines()
-
-            pass
+        self.CE = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CE")
 
     def read_CI(self, _path_electron, _path_proton=None):
         r"""
@@ -252,53 +293,8 @@ class Atom:
         _path_proton : str
             path to *.proton
         """
-        #---------------------------------------------------------------------
-        # read Electron impact data
-        #---------------------------------------------------------------------
-        print("Reading Electron impact Collisional Ionization coefficient from : \n", _path_electron)
-        print("...")
 
-        self.filepath_dict["CI_electron"] = _path_electron
-        with open(_path_electron, 'r') as file:
-            fLines = file.readlines()
-
-        # read Temperature grid for interpolation
-        self.nCont, rs, nTe, Te = AtomIO.read_CI_Temperature(_lns=fLines)
-        self.CI_Te_table = np.array(Te, dtype=np.double)
-        self.CI_table = np.zeros((self.nCont, nTe), dtype=np.double)
-        dtype  = np.dtype([
-                          ('idxI',np.uint8),      #: level index, the Level index of lower level
-                          ('idxJ',np.uint8),      #: level index, the Level index of upper level
-                          ('lineIndex',np.uint16),#: line index
-                          #('f1',np.uint8),        #: a factor for ESC calculation due to fine structure, \Omega * f1 / f2
-                          ('f2',np.uint8),        #: a factor for ESC calculation due to fine structure, \Omega * f1 / f2
-                          ('gi',np.uint8),        #: statistical weight of lower level
-                          ('gj',np.uint8),        #: statistical weight of upper level
-                          ('dEij',np.double)      #: ionization limit, [:math:`erg`]
-                          ])
-
-        self.CI_coe = np.recarray(self.nCont, dtype=dtype)
-
-        # read CE_table
-        AtomIO.read_CI_table(_rs=rs, _lns=fLines,
-                        _CI_table=self.CI_table[:,:], _f2=self.CI_coe.f2[:],
-                        _idxI=self.CI_coe.idxI[:],_idxJ=self.CI_coe.idxJ[:],
-                        _lineIndex = self.CI_coe.lineIndex[:],
-                        _level_info_table=self.Level_info_table,
-                        _line_ctj_table=self.Line_ctj_table)
-
-        for k in range(self.nCont):
-            self.CI_coe.gi[k] = self.Level.g[self.CI_coe.idxI[k]]
-            self.CI_coe.gj[k] = self.Level.g[self.CI_coe.idxJ[k]]
-            self.CI_coe.dEij[k] = self.Level.erg[self.CI_coe.idxJ[k]] - self.Level.erg[self.CI_coe.idxI[k]]
-
-        print("Finished.")
-        print()
-
-        #---------------------------------------------------------------------
-        # read Proton impact data (not yet imported)
-        #---------------------------------------------------------------------
-        pass
+        self.CI = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CI")
 
     def read_PI(self, _path_alpha):
         r"""
@@ -313,56 +309,14 @@ class Atom:
         """
 
         print("Reading Photoionization cross section from : \n", _path_alpha)
-        print("...")
 
         self.filepath_dict["Photoionization"] = _path_alpha
-        with open(_path_alpha, 'r') as file:
-            fLines = file.readlines()
+        self.PI = Photoionization(_parent=self, _path_alpha=_path_alpha)
 
-        nCont, rs, nMesh = AtomIO.read_PI_Info(_lns=fLines)
-        #assert nCont == self.nCont
-        #self.PI_table = np.zeros((nCont, nMesh, 2), dtype=np.double)
-        self.PI_table_list = [] # List()
-        # change this to numba.types.List in the future for inhomogenious array
-
-        dtype  = np.dtype([
-                          ('idxI',np.uint8),      #: level index, the Level index of lower level
-                          ('idxJ',np.uint8),      #: level index, the Level index of upper level
-                          ('lineIndex',np.uint16),#: line index
-                          ('nLambda', np.uint16), #: number of meaningful wavelength mesh point
-                          ('alpha0', np.double),  #: Photoionization cross section at frequency edge
-                          ('gi',np.uint8),        #: statistical weight of lower level
-                          ('gj',np.uint8),        #: statistical weight of upper level
-                          ('dEij',np.double)      #: ionization limit, [:math:`erg`]
-                          ])
-        self.PI_coe = np.recarray(nCont, dtype=dtype)
-
-        AtomIO.read_PI_table(_rs=rs, _lns=fLines,
-                        _PI_table_list = self.PI_table_list,
-                        _PI_coe = self.PI_coe,
-                        _level_info_table=self.Level_info_table,
-                        _line_ctj_table=self.Line_ctj_table)
-
-        #self.PI_table[:,:,0] *= 1E-7 # nm --> cm   (cm, cm^2)
-        for mesh_arr in self.PI_table_list:
-            mesh_arr[0,:] *= 1E-7 # nm --> cm   (cm, cm^2)
-
-
-        for k in range(nCont):
-            self.PI_coe.gi[k]   = self.Level.g[self.PI_coe.idxI[k]]
-            self.PI_coe.gj[k]   = self.Level.g[self.PI_coe.idxJ[k]]
-            self.PI_coe.dEij[k] = self.Level.erg[self.PI_coe.idxJ[k]] - self.Level.erg[self.PI_coe.idxI[k]]
-
-            # shift edge wavelength to the computed wavelength w0
-            #self.PI_table[k,:self.PI_coe.nLambda[k],0] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table[k,0,0]
-            self.PI_table_list[k][0,:] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table_list[k][0,0]
-
-        print("Finished.")
-        print()
-
-    def read_Mesh(self, _path):
+    def read_RadiativeLine_and_make_Line_Mesh(self, _path):
         r"""
         read wavelength mesh information from *.RadiativeLine
+        and make Mesh for RadiativeLine and Cont
 
         Parameters
         ----------
@@ -372,95 +326,27 @@ class Atom:
 
         """
 
-        print("Reading wavelength mesh information from : \n", _path)
-        print("...")
-
+        print("Reading Radiative Line information from : \n", _path)
         self.filepath_dict["RadiativeLine"] = _path
-        with open(_path, 'r') as file:
-            fLines = file.readlines()
+        self.Mesh = MeshCls.WavelengthMesh(_parent=self)
+        self.Mesh.make_Line_Mesh(_path=_path)
 
-        self.nRadiativeLine, rs = AtomIO.read_Radiative_Line_Number(_lns=fLines)
-
-        dtype  = np.dtype([
-                          ('idxI',np.uint8),      #: level index, the Level index of lower level
-                          ('idxJ',np.uint8),      #: level index, the Level index of upper level
-                          ('lineIndex',np.uint16),#: line index
-                          ('ProfileType',np.uint8),#: 0: Voigt; 1:...
-                          ('qcore', np.double),
-                          ('qwing', np.double),
-                          ('nLambda', np.uint16), #: number of meaningful wavelength mesh point
-                          ])
-        self.Mesh_coe = np.recarray(self.nRadiativeLine, dtype=dtype)
-        self.RadiativeLine_filename = []
-
-        AtomIO.read_Mesh_Info(_rs=rs, _lns=fLines,
-                        _Mesh_coe = self.Mesh_coe,
-                        _filename = self.RadiativeLine_filename,
-                        _level_info_table=self.Level_info_table,
-                        _line_ctj_table=self.Line_ctj_table)
-
-        self.RadLine_coe = self.Mesh_coe
-
-
-    def make_Mesh(self):
+    def make_Cont_Mesh(self):
         r"""
-        create line/continuum wavelength mesh
-
         """
+        if not hasattr(self, 'Mesh'):
+            self.Mesh = MeshCls.WavelengthMesh(_parent=self)
+        self.Mesh.make_Cont_Mesh()
 
-        #--- make line mesh
-        self.line_mesh_list = [] # List()
-
-        for k in range(self.nRadiativeLine):
-            nLambda = self.Mesh_coe.nLambda[k]
-            qcore = self.Mesh_coe.qcore[k]
-            qwing = self.Mesh_coe.qwing[k]
-            mesh = Profile.makeLineMesh_Full(nLambda, qcore, qwing) # in Doppler width unit
-
-            self.line_mesh_list.append( mesh )
-
-        print("line mesh prepared.")
-
-        #--- make continuum mesh
-        self.continuum_mesh_list = [] # List()
-        for k in range(self.nCont):
-            mesh = Profile.makeContinuumMesh(21) # in limit wavelength unit
-            w0 = self.Line.w0[self.CI_coe.lineIndex[k]]
-            self.continuum_mesh_list.append( mesh * w0 )
-
-        print("continuum mesh prepared.")
-
-    def read_Radiative_Line_intensity(self, _folder):
+    def read_RadLine_intensity(self, _folder):
         r"""
         read line profiles of incident radiation for
         specific line transition
 
         """
+        self.I_Rad = RadLineCls.RadiativeLine(_parent=self, _folder=_folder)
 
-        self.radiative_line_intensity_cm_list = [] # List()
-        self.radiative_line_intensity_hz_list = [] # List()
 
-        for k in range(self.nRadiativeLine):
-            filename = self.RadiativeLine_filename[k]
-            arr = AtomIO.read_half_intensity_hz(_folder+'/'+filename)
-            f0 = self.Line.f0[self.Mesh_coe.lineIndex[k]]
-            w0 = self.Line.w0[self.Mesh_coe.lineIndex[k]]
-
-            #arr[:,0] *= fac1 # d\nu -> d\lambda
-            #arr[:,1] *= fac2 # intensity_hz -> intensity_cm
-            nLmid = arr.shape[0]
-            nLfull = (nLmid-1) * 2 + 1
-            arr_full_hz = np.zeros((2,nLfull), dtype=np.double)
-            arr_full_hz[0,:] = Profile.half_to_full(_arr_half=arr[:,0], _isMinus=True)
-            arr_full_hz[1,:] = Profile.half_to_full(_arr_half=arr[:,1], _isMinus=False)
-            self.radiative_line_intensity_hz_list.append( arr_full_hz )
-
-            fac1 = Cst.c_ / (f0 * f0)
-            fac2 = Cst.c_ / (w0 * w0)
-            arr_full_cm = np.zeros((2,nLfull), dtype=np.double)
-            arr_full_cm[0,:] = arr_full_hz[0,:] * fac1 # # d\nu -> d\lambda, symmetric
-            arr_full_cm[1,:] = arr_full_hz[1,:] * fac2 # intensity_hz -> intensity_cm
-            self.radiative_line_intensity_cm_list.append( arr_full_cm )
 
 
 
@@ -471,7 +357,7 @@ class Atom:
 
         """
 
-        return self.Level_info_table.index(ctj)
+        return self._Level_info_table.index(ctj)
 
     def level_idx_to_ctj(self, idx):
         r"""
@@ -479,7 +365,7 @@ class Atom:
 
         """
 
-        return self.Level_info_table[idx]
+        return self._Level_info_table[idx]
 
     def line_ctj_to_line_idx(self, line_ctj):
         r"""
@@ -529,17 +415,194 @@ class Atom:
 
         return self.Line_idx_table.index(line_idx)
 
-    def conf_to_line_idx(self, conf_lower, conf_upper):
-        r"""
-        given the configuration tuple of
-        lower and upper level, respectively,
-        return the index of that transition.
 
-        Warning :
-        this method is left from the Atom() class
-        before the mergeof combining with AtomicQuery.
-        use `self.line_ctj_to_line_index()` instead
+
+
+
+    def cont_ctj_to_cont_idx(self, cont_ctj):
+        r"""
+        (ctj_i, ctj_j) --> (idxI, idxJ)
 
         """
-        _line_ctj = ( conf_lower, conf_upper )
-        return self.line_ctj_to_line_index( _line_ctj )
+
+        return self.Cont_idx_table[ self.Cont_ctj_table.index( cont_ctj ) ]
+
+    def cont_idx_to_cont_ctj(self, cont_idx):
+        r"""
+        (idxI, idxJ) --> (ctj_i, ctj_j)
+
+        """
+
+        return self.Cont_ctj_table[ self.Cont_idx_table.index( cont_idx ) ]
+
+    def cont_index_to_cont_ctj(self, _index):
+        r"""
+        line index (line No.) --> (ctj_i, ctj_j)
+
+        """
+
+        return self.Cont_ctj_table[_index]
+
+    def cont_ctj_to_cont_index(self, cont_ctj):
+        r"""
+        (ctj_i, ctj_j) --> cont index (cont No.)
+
+        """
+
+        return self.Cont_ctj_table.index(cont_ctj)
+
+    def cont_index_to_cont_idx(self, _index):
+        r"""
+        cont index (cont No.) --> (idxI, idxJ)
+
+        """
+
+        return self.Cont_idx_table[_index]
+
+    def cont_idx_to_cont_index(self, cont_idx):
+        r"""
+        (idxI, idxJ) --> cont index (cont No.)
+
+        """
+
+        return self.Cont_idx_table.index(cont_idx)
+
+
+
+
+
+class Collisional_Transition:
+
+
+    def __init__(self, _parent, _path_electron, _path_proton=None, _type=""):
+
+        assert _type in ("CE", "CI")
+        self._parent = _parent
+
+        #---------------------------------------------------------------------
+        # read Electron impact data
+        #---------------------------------------------------------------------
+        if _type == "CE":
+            print("Reading Electron impact Effective Collisional Strength from : \n", _path_electron)
+            _parent.filepath_dict["CE_electron"] = _path_electron
+            N = _parent.nLine
+        elif _type == "CI":
+            print("Reading Electron impact Collisional Ionization coefficient from : \n", _path_electron)
+            _parent.filepath_dict["CI_electron"] = _path_electron
+            N = _parent.nCont
+
+        with open(_path_electron, 'r') as file:
+            fLines = file.readlines()
+
+        # read Temperature grid for interpolation
+        if _type == "CE":
+            rs, nTe, Te, self.CE_type = AtomIO.read_CE_Temperature(_lns=fLines)
+        elif _type == "CI":
+            rs, nTe, Te = AtomIO.read_CI_Temperature(_lns=fLines)
+
+        self.Te_table = np.array(Te, dtype=np.double)
+        self.Omega_table = np.zeros((N, nTe), dtype=np.double)
+        dtype  = np.dtype([
+                          ('idxI',np.uint8),      #: level index, the Level index of lower level
+                          ('idxJ',np.uint8),      #: level index, the Level index of upper level
+                          ('f1',np.uint8),        #: a factor for ESC calculation due to fine structure, \Omega * f1 / f2
+                          ('f2',np.uint8),        #: a factor for ESC calculation due to fine structure, \Omega * f1 / f2
+                          ('gi',np.uint8),        #: statistical weight of lower level
+                          ('gj',np.uint8),        #: statistical weight of upper level
+                          ('dEij',np.double)      #: excitation energy, [:math:`erg`]
+                          ])
+        self.Coe = np.recarray(N, dtype=dtype)
+
+        if _type == "CE":
+            AtomIO.read_CE_table(_rs=rs, _lns=fLines, _CE_table=self.Omega_table,
+                    _idxI=self.Coe.idxI[:],_idxJ=self.Coe.idxJ[:],
+                    _f1=self.Coe.f1[:], _f2=self.Coe.f2[:],
+                    _level_info_table=_parent._Level_info_table,
+                    _line_ctj_table=_parent.Line_ctj_table)
+
+        elif _type == "CI":
+            AtomIO.read_CI_table(_rs=rs, _lns=fLines, _CI_table=self.Omega_table[:,:],
+                            _f2=self.Coe.f2[:],
+                            _idxI=self.Coe.idxI[:],_idxJ=self.Coe.idxJ[:],
+                            _level_info_table=_parent._Level_info_table,
+                            _cont_ctj_table=_parent.Cont_ctj_table)
+            self.Coe.f1[:] = 0
+
+        for k in range(N):
+            self.Coe.gi[k] = _parent.Level.g[self.Coe.idxI[k]]
+            self.Coe.gj[k] = _parent.Level.g[self.Coe.idxJ[k]]
+            self.Coe.dEij[k] = _parent.Level.erg[self.Coe.idxJ[k]] - _parent.Level.erg[self.Coe.idxI[k]]
+
+        print("Finished.")
+        print()
+
+        #---------------------------------------------------------------------
+        # read Proton impact data (not yet imported)
+        #---------------------------------------------------------------------
+        if _path_proton is not None:
+
+            print("Reading Proton impact Effective Collisional Strength from : \n", _path_proton)
+            print("...")
+            print("Finished.")
+            print()
+
+            self.filepath_dict["CE_proton"] = _path_proton
+            with open(_path_proton, 'r') as file:
+                fLines = file.readlines()
+
+            pass
+
+class Photoionization:
+
+    def __init__(self, _parent, _path_alpha):
+        r"""
+        """
+
+        with open(_path_alpha, 'r') as file:
+            fLines = file.readlines()
+
+        N = _parent.nCont
+
+        nCont, rs = AtomIO.read_PI_Info(_lns=fLines)
+        alpha_table_dict = OrderedDict()
+
+        dtype  = np.dtype([
+                          ('idxI',np.uint8),      #: level index, the Level index of lower level
+                          ('idxJ',np.uint8),      #: level index, the Level index of upper level
+                          #('lineIndex',np.uint16),#: line index
+                          ('nLambda', np.uint16), #: number of meaningful wavelength mesh point
+                          ('alpha0', np.double),  #: Photoionization cross section at frequency edge
+                          ('gi',np.uint8),        #: statistical weight of lower level
+                          ('gj',np.uint8),        #: statistical weight of upper level
+                          ('dEij',np.double)      #: ionization limit, [:math:`erg`]
+                          ])
+        self.Coe = np.recarray(N, dtype=dtype)
+
+        AtomIO.read_PI_table(_rs=rs, _lns=fLines,
+                        _PI_table_dict = alpha_table_dict,
+                        _PI_coe = self.Coe,
+                        _level_info_table=_parent._Level_info_table,
+                        _cont_ctj_table=_parent.Cont_ctj_table)
+
+        self.alpha_table = []
+        sorted_keys = sorted( list(alpha_table_dict.keys()) )
+        for key in sorted_keys:
+            self.alpha_table.append(  alpha_table_dict[key]  )
+
+
+        #self.PI_table[:,:,0] *= 1E-7 # nm --> cm   (cm, cm^2)
+        for mesh_arr in self.alpha_table:
+            mesh_arr[0,:] *= 1E-7 # nm --> cm   (cm, cm^2)
+
+
+        for k in range(N):
+            self.Coe.gi[k]   = _parent.Level.g[self.Coe.idxI[k]]
+            self.Coe.gj[k]   = _parent.Level.g[self.Coe.idxJ[k]]
+            self.Coe.dEij[k] = _parent.Level.erg[self.Coe.idxJ[k]] - _parent.Level.erg[self.Coe.idxI[k]]
+
+            # shift edge wavelength to the computed wavelength w0
+            #self.PI_table[k,:self.PI_coe.nLambda[k],0] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table[k,0,0]
+            self.alpha_table[k][0,:] += _parent.Cont.w0[k] - self.alpha_table[k][0,0]
+
+        print("Finished.")
+        print()

@@ -22,7 +22,7 @@
 #       - data          : 1     -->     reads data from experimental result
 #-----------------------------------------------------------------------------
 nCont   5
-nMesh   20
+#nMesh   20
 End
 #-----------------------------------------------------------------------------
 # configuration_i         term_i      J_i       configuration_j             term_j      J_j nLambda   Wavelength-Dependence   alpha0[cm^2]

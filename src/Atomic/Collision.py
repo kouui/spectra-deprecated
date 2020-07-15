@@ -3,7 +3,7 @@ from .. import Constants as Cst
 
 from scipy.interpolate import splrep, splev
 
-def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2, _isCont):
+def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2):
     r"""
     given temperature, interpolate collisional excitation coefficient
 
@@ -25,9 +25,6 @@ def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2, _isCont):
     _f2 : int, array
         a factor needed to compute CE rate coefficient
 
-    _isCont : boolean, array
-        True : is a continuum transition; False : not a continuum transition
-
     Returns
     -------
 
@@ -48,11 +45,9 @@ def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2, _isCont):
         Cambridge University Press, pp. 22, 1992
     """
 
-    _nTran = _table.shape[0]
-    _CE_fac = np.zeros(_nTran, dtype=np.double)
-    for k in range(_nTran):
-        if _isCont[k]:
-            continue
+    _nLine = _table.shape[0]
+    _CE_fac = np.zeros(_nLine, dtype=np.double)
+    for k in range(_nLine):
         #--- scipy B-spline interpolation
         _Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
         # ext=3 : return boundary value
@@ -60,7 +55,7 @@ def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2, _isCont):
 
     return _CE_fac
 
-def interpolate_CI_fac(_table, _Te, _Te_table, _f2, _lineIndex, _nTran):
+def interpolate_CI_fac(_table, _Te, _Te_table, _f2):
     r"""
     given temperature, interpolate collisional ionization coefficient
 
@@ -79,12 +74,6 @@ def interpolate_CI_fac(_table, _Te, _Te_table, _f2, _lineIndex, _nTran):
     _f2 : int, array
         a factor needed to compute CI rate coefficient
 
-    _lineIndex : int, array
-        correspnding line index of each continuum transition
-
-    _nTran : int
-        total number of transitions including line transition and continuum transition
-
     Returns
     -------
 
@@ -101,13 +90,13 @@ def interpolate_CI_fac(_table, _Te, _Te_table, _f2, _lineIndex, _nTran):
 
     """
 
-    _CI_fac = np.zeros(_nTran, dtype=np.double)
-    for k in range(_table.shape[0]):
-        _line_index = _lineIndex[k]
+    _nCont = _table.shape[0]
+    _CI_fac = np.zeros(_nCont, dtype=np.double)
+    for k in range(_nCont):
         #--- scipy B-spline interpolation
         _Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
         # ext=3 : return boundary value
-        _CI_fac[_line_index] = splev(_Te, _Bsp_obj, ext=3) / _f2[k]
+        _CI_fac[k] = splev(_Te, _Bsp_obj, ext=3) / _f2[k]
 
     return _CI_fac
 

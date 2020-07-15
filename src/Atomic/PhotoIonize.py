@@ -60,6 +60,9 @@ def interpolate_PI_alpha(_PI_table_list, _continuum_mesh_list):
 
     _alpha_mesh_list = []
     for _alpha_table, _cont_mesh in zip(_PI_table_list, _continuum_mesh_list):
+    #for k in range(len(_continuum_mesh_list)):
+    #    _alpha_table = _PI_table_dict[k]
+    #    _cont_mesh = _continuum_mesh_list[k]
         #_fill_value = (_alpha_table[1,-1], 0)
         _bsp_obj = interp1d(x=_alpha_table[0,:], y=_alpha_table[1,:], kind="cubic",
                             bounds_error=False, fill_value="extrapolate")

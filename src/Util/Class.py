@@ -47,6 +47,7 @@ def print_attribute(_attrs):
     r"""
     """
     _s = ""
+    _class_name_list = []
     for _name, _value in _attrs.items():
 
 
@@ -54,9 +55,16 @@ def print_attribute(_attrs):
         if _type in (np.dtype, ):
             continue
 
+        if _type.__name__ in ("Collisional_Transition", "Photoionization", "WavelengthMesh","RadiativeLine"):
+            _class_name_list.append( _name )
+            continue
+
+        if _name[0] == "_":
+            continue
+
         _s += f"{_name:25s}    {type_string(_type.__name__, _value):15s}"
 
-        if _type in (int, float, complex):
+        if _type in (int, float, complex, bool):
             _s += f"    v: {_value}\n"
 
         elif _type in (str,):
@@ -77,6 +85,19 @@ def print_attribute(_attrs):
         else:
             _s += "\n"
 
+
+    print(_s)
+
+    return _class_name_list
+
+def help_recarray(_recarray):
+    r"""
+    """
+    _s = f"{'name':<25s}    {'type':<15s}    {'value/len/shape':15s}\n"
+    _s += "-" * 70 + '\n'
+    _s += f"{' ':25s}    {'recarray':15s}"
+    _s += attribute_string_recarray(_recarray)
+
     print(_s)
 
 
@@ -93,7 +114,19 @@ def help_attribute(_obj):
 
     print(_s)
 
-    print_attribute(_attrs)
+    _class_name_list = print_attribute(_attrs)
+
+    if len(_class_name_list)>0:
+        for _name in _class_name_list:
+            _sub_obj = _attrs[_name]
+            _s = f"{_obj.__class__.__name__}.{_name}\n"
+            _s += "-" * 30 + '\n'
+            print(_s)
+            _sub_attrs = vars(_sub_obj)
+            _class_name_list0 = print_attribute(_sub_attrs)
+            assert len(_class_name_list0)==0
+
+
 
 def get_method_doc_description(_doc):
     r"""
@@ -111,6 +144,9 @@ def print_method(_obj):
     for _m in inspect.getmembers(_obj, inspect.ismethod):
         _name = _m[0]
         _method = _m[1]
+
+        if _name[0] == "_":
+            continue
 
         #_obj.__class__.__name__ to get the _obj name as a string
         _s += f"{_name}\n"

@@ -96,7 +96,7 @@ def read_line_info(_lns, _Aji, _line_ctj_table):
     r"""
     read line information
     """
-    #_count = 0
+    _count = 0
     for _i, _ln in enumerate(_lns[:]):
 
         if skip_line(_ln):
@@ -109,11 +109,27 @@ def read_line_info(_lns, _Aji, _line_ctj_table):
 
         # get ctj pair
         ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+        # get line_index
+        """
+        try :
+            line_index = _line_ctj_table.index( ctj_ij )
+        except ValueError:
+            continue
+        else:
+            assert False, "Error in function `AtomIO.read_line_info()``"
 
+        _Aji[line_index] = float( _words[6] )
+        _w0_AA[line_index] = float( _words[7] )
+
+        _count += 1
+
+        if _count == _Aji.size:
+            break
+        """
         if ctj_ij in _line_ctj_table:
             line_index = _line_ctj_table.index( ctj_ij )
             _Aji[line_index] += float( _words[6] )
-            #_count += 1
+            _count += 1
 
     return None
 
@@ -142,11 +158,11 @@ def read_CE_Temperature(_lns):
 
     return _re, _nTe, _Te, _type
 
-def read_CE_table(_rs, _lns, _CE_table, _idxI, _idxJ, _f1, _f2, _level_info_table, _line_ctj_table):
+def read_CE_table(_rs, _lns, _CE_table, _f1, _f2, _line_ctj_table):
     r"""
     read CE table for interpolation
     """
-    #_count = 0
+    _count = 0
     for _i, _ln in enumerate(_lns[_rs:]):
 
         if skip_line(_ln):
@@ -162,13 +178,11 @@ def read_CE_table(_rs, _lns, _CE_table, _idxI, _idxJ, _f1, _f2, _level_info_tabl
 
         if _ctj_ij in _line_ctj_table:
             line_index = _line_ctj_table.index( _ctj_ij )
-            _idxI[line_index] = _level_info_table.index( _ctj_ij[0] )
-            _idxJ[line_index] = _level_info_table.index( _ctj_ij[1] )
             _CE_table[line_index,:] += [float(v) for v in _words[6:-2]]
             _f1[line_index] = float(_words[-2])
             _f2[line_index] = float(_words[-1])
 
-            #_count += 1
+            _count += 1
 
     return None
 
@@ -186,8 +200,8 @@ def read_CI_Temperature(_lns):
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
-        #if _words[0].lower() == "ncont":
-        #    _nCont = int( _words[1] )
+        if _words[0].lower() == "ncont":
+            _nCont = int( _words[1] )
 
         if _words[0].lower() == "temperature":
             _Te = [float(_v) for _v in _words[1:]]
@@ -195,13 +209,13 @@ def read_CI_Temperature(_lns):
     _nTe = len( _Te )
     _re = _i + 1
 
-    return _re, _nTe, _Te
+    return _nCont, _re, _nTe, _Te
 
-def read_CI_table(_rs, _lns, _CI_table, _f2, _idxI, _idxJ, _level_info_table, _cont_ctj_table):
+def read_CI_table(_rs, _lns, _CI_table, _f2, _idxI, _idxJ, _lineIndex, _level_info_table, _line_ctj_table):
     r"""
     read CI table for interpolation
     """
-    #_count = 0
+    _count = 0
     for _i, _ln in enumerate(_lns[_rs:]):
 
         if skip_line(_ln):
@@ -215,14 +229,14 @@ def read_CI_table(_rs, _lns, _CI_table, _f2, _idxI, _idxJ, _level_info_table, _c
         # get ctj pair
         _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
 
-        if _ctj_ij in _cont_ctj_table:
-            contIndex = _cont_ctj_table.index( _ctj_ij )
-            _idxI[contIndex] = _level_info_table.index( _ctj_ij[0] )
-            _idxJ[contIndex] = _level_info_table.index( _ctj_ij[1] )
-            _CI_table[contIndex,:] += [float(v) for v in _words[6:-1]]
-            _f2[contIndex] = float(_words[-1])
+        #if _ctj_ij in _line_ctj_table:
+        _lineIndex[_count] = _line_ctj_table.index( _ctj_ij )
+        _idxI[_count] = _level_info_table.index( _ctj_ij[0] )
+        _idxJ[_count] = _level_info_table.index( _ctj_ij[1] )
+        _CI_table[_count,:] += [float(v) for v in _words[6:-1]]
+        _f2[_count] = float(_words[-1])
 
-        #_count += 1
+        _count += 1
 
     return None
 
@@ -243,19 +257,19 @@ def read_PI_Info(_lns):
         if _words[0].lower() == "ncont":
             _nCont = int( _words[1] )
 
-        #if _words[0].lower() == "nmesh":
-        #    _nMesh = int( _words[1] )
+        if _words[0].lower() == "nmesh":
+            _nMesh = int( _words[1] )
 
     _re = _i + 1
 
-    return _nCont, _re#, _nMesh
+    return _nCont, _re, _nMesh
 
-def read_PI_table(_rs, _lns, _PI_table_dict, _PI_coe, _level_info_table, _cont_ctj_table):
+def read_PI_table(_rs, _lns, _PI_table_list, _PI_coe, _level_info_table, _line_ctj_table):
     r"""
     read PI table for interpolation
     """
+    _countLine = -1
     _countMesh = 0
-    _readMesh = False
 
     for _i, _ln in enumerate(_lns[_rs:]):
 
@@ -271,29 +285,23 @@ def read_PI_table(_rs, _lns, _PI_table_dict, _PI_coe, _level_info_table, _cont_c
         if len(_words) > 2:
             _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
 
-            if _ctj_ij in _cont_ctj_table:
-                contIndex = _cont_ctj_table.index( _ctj_ij )
-                _PI_coe.idxI[contIndex] = _level_info_table.index( _ctj_ij[0] )
-                _PI_coe.idxJ[contIndex] = _level_info_table.index( _ctj_ij[1] )
+            _countLine += 1
+            nLambda = int(_words[6])
+            _PI_coe.nLambda[_countLine] = nLambda
+            _PI_coe.alpha0[_countLine] = float(_words[8])
+            _PI_coe.lineIndex[_countLine] = _line_ctj_table.index( _ctj_ij )
+            _PI_coe.idxI[_countLine] = _level_info_table.index( _ctj_ij[0] )
+            _PI_coe.idxJ[_countLine] = _level_info_table.index( _ctj_ij[1] )
 
-                nLambda = int(_words[6])
-                _PI_coe.nLambda[contIndex] = nLambda
-                _PI_coe.alpha0[contIndex] = float(_words[8])
-
-                _readMesh = True
-                _countMesh = 0
-                mesh_array = np.zeros((2,nLambda),np.double)
-            else:
-                _readMesh = False
+            _countMesh = 0
+            mesh_array = np.zeros((2,nLambda),np.double)
 
         else:
-            if not _readMesh:
-                continue
             #_PI_table[_countLine,_countMesh,:] += [float(v) for v in _words]
             mesh_array[:,_countMesh] = [float(v) for v in _words]
 
             if _countMesh == (nLambda-1):
-                _PI_table_dict[contIndex] = mesh_array
+                _PI_table_list.append( mesh_array )
 
             _countMesh += 1
 
@@ -338,8 +346,7 @@ def read_Mesh_Info(_rs, _lns, _Mesh_coe, _filename, _level_info_table, _line_ctj
         # get ctj pair
         _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
 
-        assert _ctj_ij in _line_ctj_table
-
+        #if _ctj_ij in _line_ctj_table:
         _Mesh_coe.lineIndex[_count] = _line_ctj_table.index( _ctj_ij )
         _Mesh_coe.idxI[_count] = _level_info_table.index( _ctj_ij[0] )
         _Mesh_coe.idxJ[_count] = _level_info_table.index( _ctj_ij[1] )

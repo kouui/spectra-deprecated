@@ -186,7 +186,7 @@ def get_Level_gamma(Aji,idxJ,gamma):
     for i in range(Aji.shape[0]):
         gamma[idxJ[i]] += Aji[i]
 
-def get_Line_Gamma(idxI, idxJ, gamma, Gamma, isCont):
+def get_Line_Gamma(idxI, idxJ, gamma, Gamma):
     r"""
     Given Einstein radiative damping constant of Levels,
     compute radiative damping constant of Lines.
@@ -203,8 +203,6 @@ def get_Line_Gamma(idxI, idxJ, gamma, Gamma, isCont):
     Gamma : array-like, dtype of np.double
         radiative damping constant of each Lines, [:math:`s^{-1}`].
         An array to store output result.
-    isCont : array-like, dtype of boolean
-        whether the line is continuum transition
 
     Notes
     -----
@@ -220,8 +218,6 @@ def get_Line_Gamma(idxI, idxJ, gamma, Gamma, isCont):
     """
     Gamma[:] = 0
     for i in range(Gamma.shape[0]):
-        if isCont[i]:
-            continue
         Gamma[i] = gamma[idxI[i]] + gamma[idxJ[i]]
 
 def get_damping_a(_Gamma, _dopWidth_hz):
