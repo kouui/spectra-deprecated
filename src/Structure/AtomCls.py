@@ -34,8 +34,8 @@ class Atom:
             "config" : _filepath,
 
         }
-        self.__read_Level()
-        self.__make_line_idx_ctj_table()
+        self.read_Level()
+        self.make_line_idx_ctj_table()
 
         # whether to read *.Aji file at __init__
         if _file_Aji is not None:
@@ -46,9 +46,10 @@ class Atom:
             self.read_CE(_file_CEe, _file_CEp)
 
 
-    def __read_Level(self):
+    def read_Level(self):
         r"""
         read the Level information from config file *.Level
+
         """
 
         with open(self.filepath_dict["config"], 'r') as file:
@@ -59,7 +60,7 @@ class Atom:
         self.nLine = self.nLevel * (self.nLevel-1) // 2
         self.nCont = 0
         self.Z = int(self.Z)
-        self.am = Element.AMTuple[ Element.nZTuple.index(self.Z) ]
+        self.Mass = Element.AMTuple[ Element.nZTuple.index(self.Z) ]
 
         #--- read Level info
         dtype  = np.dtype([
@@ -82,11 +83,12 @@ class Atom:
                                           self.Level_info["J"][k]))
         self.Level_info_table = tuple(self.Level_info_table)
 
-    def __make_line_idx_ctj_table(self):
+    def make_line_idx_ctj_table(self):
         r"""
         make a hash dictionary for mapping
 
         (ctj_i, ctj_j) --> (idxI, idxJ)
+
         """
 
         Line_idx_table = []
@@ -400,6 +402,10 @@ class Atom:
 
 
     def make_Mesh(self):
+        r"""
+        create line/continuum wavelength mesh
+
+        """
 
         #--- make line mesh
         self.line_mesh_list = [] # List()
@@ -424,6 +430,11 @@ class Atom:
         print("continuum mesh prepared.")
 
     def read_Radiative_Line_intensity(self, _folder):
+        r"""
+        read line profiles of incident radiation for
+        specific line transition
+
+        """
 
         self.radiative_line_intensity_cm_list = [] # List()
         self.radiative_line_intensity_hz_list = [] # List()
@@ -456,6 +467,7 @@ class Atom:
     def ctj_to_level_idx(self, ctj):
         r"""
         ctj --> idx
+
         """
 
         return self.Level_info_table.index(ctj)
@@ -463,6 +475,7 @@ class Atom:
     def level_idx_to_ctj(self, idx):
         r"""
         idx --> ctj
+
         """
 
         return self.Level_info_table[idx]
@@ -470,6 +483,7 @@ class Atom:
     def line_ctj_to_line_idx(self, line_ctj):
         r"""
         (ctj_i, ctj_j) --> (idxI, idxJ)
+
         """
 
         return self.Line_idx_table[ self.Line_ctj_table.index( line_ctj ) ]
@@ -477,6 +491,7 @@ class Atom:
     def line_idx_to_line_ctj(self, line_idx):
         r"""
         (idxI, idxJ) --> (ctj_i, ctj_j)
+
         """
 
         return self.Line_ctj_table[ self.Line_idx_table.index( line_idx ) ]
@@ -484,6 +499,7 @@ class Atom:
     def line_index_to_line_ctj(self, _index):
         r"""
         line index (line No.) --> (ctj_i, ctj_j)
+
         """
 
         return self.Line_ctj_table[_index]
@@ -491,6 +507,7 @@ class Atom:
     def line_ctj_to_line_index(self, line_ctj):
         r"""
         (ctj_i, ctj_j) --> line index (line No.)
+
         """
 
         return self.Line_ctj_table.index(line_ctj)
@@ -498,6 +515,7 @@ class Atom:
     def line_index_to_line_idx(self, _index):
         r"""
         line index (line No.) --> (idxI, idxJ)
+
         """
 
         return self.Line_idx_table[_index]
@@ -505,19 +523,22 @@ class Atom:
     def line_idx_to_line_index(self, line_idx):
         r"""
         (idxI, idxJ) --> line index (line No.)
+
         """
 
         return self.Line_idx_table.index(line_idx)
 
     def conf_to_line_idx(self, conf_lower, conf_upper):
         r"""
-        given the configuration tuple of lower and upper level, respectively,
+        given the configuration tuple of
+        lower and upper level, respectively,
         return the index of that transition.
 
         Warning :
-        this method is left from the Atom() class before the merge
-        of combining with AtomicQuery.
+        this method is left from the Atom() class
+        before the mergeof combining with AtomicQuery.
         use `self.line_ctj_to_line_index()` instead
+
         """
         _line_ctj = ( conf_lower, conf_upper )
         return self.line_ctj_to_line_index( _line_ctj )

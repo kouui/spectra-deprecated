@@ -1,6 +1,18 @@
 Change Log
 ======================
 
+2020/07/15
+----------------
+
+1. in `src.Uilt.Class`, we added functions
+
+  - `help` : print all attributes and methods in the class object
+
+  - `help_method` : print all methods in the class object
+
+  - `help_attribute` : print all attributes in the class object
+
+2. in `src.Structure.AtomCls`, in class `Atom()`, attribute `.am` has been renamed to `.Mass`
 
 
 2020/06/26

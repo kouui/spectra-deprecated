@@ -8,7 +8,6 @@
 import numpy as np
 import numba as nb
 from .. import Constants as Cst
-from ..Structure import AtomCls
 
 def Boltzmann_distribution(_gi, _gj, _Eji, _Te):
     r"""
