@@ -85,9 +85,10 @@ class Atom:
 
     def make_line_idx_ctj_table(self):
         r"""
-        make a hash dictionary for mapping
+        make tuples for mapping
 
-        (ctj_i, ctj_j) --> (idxI, idxJ)
+        tranIndex <--> (ctj_i, ctj_j)
+        tranIndex <--> (idxI, idxJ)
 
         """
 
@@ -129,7 +130,7 @@ class Atom:
                            ('w0',np.double),            #: central wavelength in cm
                            ('w0_AA',np.double),         #: central wavelength in Angstrom
                            ("isContinuum",np.uint8),    #: continuum tansition identifier, 0: same stage, 1: continuum transition, 2: others
-                           ('Gamma',np.double),          #: radiative damping constant of Line
+                           ('Gamma',np.double),         #: radiative damping constant of Line
                            ])
         self.Line = np.recarray(self.nLine, dtype=dtype)
         # idxI and idxJ
