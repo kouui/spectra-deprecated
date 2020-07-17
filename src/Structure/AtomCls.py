@@ -75,8 +75,8 @@ class Atom:
                           ("isGround",np.bool),         #: whether a level is ground level
                           ])
         self.Level = np.recarray(self.nLevel, dtype=dtype)
-        self.Level_info = {"configuration" : [], "term" : [], "J": [], "2S+1": []}
-        rs = AtomIO.read_level_info(rs, _lns=fLines, _Level_info=self.Level_info,
+        self._Level_info = {"configuration" : [], "term" : [], "J": [], "2S+1": []}
+        rs = AtomIO.read_level_info(rs, _lns=fLines, _Level_info=self._Level_info,
                             _erg=self.Level.erg[:], _g=self.Level.g[:], _stage=self.Level.stage[:])
         self.Level.erg[:] *= Cst.eV2erg_
 
@@ -90,10 +90,11 @@ class Atom:
         #--- make tuple of tuple (configuration, term, J)
         self._Level_info_table = []
         for k in range(self.nLevel):
-            self._Level_info_table.append((self.Level_info["configuration"][k],
-                                          self.Level_info["term"][k],
-                                          self.Level_info["J"][k]))
+            self._Level_info_table.append((self._Level_info["configuration"][k],
+                                          self._Level_info["term"][k],
+                                          self._Level_info["J"][k]))
         self._Level_info_table = tuple(self._Level_info_table)
+        self.Level_ctj_table = self._Level_info_table
 
     def get_nTran_nLine_nCont(self):
         r"""

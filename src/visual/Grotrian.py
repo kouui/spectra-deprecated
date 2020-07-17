@@ -33,7 +33,7 @@ def _prepare_dict(_atom, _conf_prefix):
     #-------------------------------------------------------------------------
     # create and count list of (conf, term)
     #-------------------------------------------------------------------------
-    _conf_term = list( zip( _atom.Level_info["configuration"], _atom.Level_info["term"] ) )
+    _conf_term = list( zip( _atom._Level_info["configuration"], _atom._Level_info["term"] ) )
     _count = Counter( _conf_term )
     #-------------------------------------------------------------------------
 
@@ -51,11 +51,11 @@ def _prepare_dict(_atom, _conf_prefix):
         # - remove inner shell electron configuration
         # - remove all '.' in conf
         #---------------------------------------------------------------------
-        _conf = _atom.Level_info["configuration"][k]
+        _conf = _atom._Level_info["configuration"][k]
         _conf_clean = _conf[_L_prefix:].replace('.','')
         #---------------------------------------------------------------------
-        _term = _atom.Level_info["term"][k]
-        _J = _atom.Level_info["J"][k]
+        _term = _atom._Level_info["term"][k]
+        _J = _atom._Level_info["J"][k]
         _L = Cst.L_s2i[ _term[-1] ]
 
         if _count[ (_conf, _term) ] == 1:
