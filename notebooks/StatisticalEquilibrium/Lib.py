@@ -58,7 +58,7 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _ni_LTE, _nj_LTE):
 
     return _Rik, _Rki_stim, _Rki_spon
 
-def B_Jbar(_Level, _Line, _lineIndex, _MeshRadLine, _Te=None, _Vt=None,_Vd=None,
+def B_Jbar(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_Vd=None,
                 _Mass=None, _I_cm=None, _Jbar=None):
     r"""
     """

@@ -168,8 +168,14 @@ def help_method(_obj):
 
     print_method(_obj)
 
-def help(_obj):
+def help(_obj, _method=False):
     r"""
     """
-    help_attribute(_obj)
-    help_method(_obj)
+    assert _method in (True, False)
+
+    if type(_obj).__name__ == "recarray":
+        help_recarray(_obj)
+    else:
+        help_attribute(_obj)
+        if _method:
+            help_method(_obj)
