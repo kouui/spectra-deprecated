@@ -52,7 +52,7 @@
 
 <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">splrep</span><span class="p">,</span> <span class="n">splev</span>
 
-<div class="viewcode-block" id="interpolate_CE_fac"><a class="viewcode-back" href="../../../RST/API/Atomic/_Collision_API/src.Atomic.Collision.interpolate_CE_fac.html#src.Atomic.Collision.interpolate_CE_fac">[docs]</a><span class="k">def</span> <span class="nf">interpolate_CE_fac</span><span class="p">(</span><span class="n">_table</span><span class="p">,</span> <span class="n">_Te</span><span class="p">,</span> <span class="n">_Te_table</span><span class="p">,</span> <span class="n">_f1</span><span class="p">,</span> <span class="n">_f2</span><span class="p">,</span> <span class="n">_isCont</span><span class="p">):</span>
+<div class="viewcode-block" id="interpolate_CE_fac"><a class="viewcode-back" href="../../../RST/API/Atomic/_Collision_API/src.Atomic.Collision.interpolate_CE_fac.html#src.Atomic.Collision.interpolate_CE_fac">[docs]</a><span class="k">def</span> <span class="nf">interpolate_CE_fac</span><span class="p">(</span><span class="n">_table</span><span class="p">,</span> <span class="n">_Te</span><span class="p">,</span> <span class="n">_Te_table</span><span class="p">,</span> <span class="n">_f1</span><span class="p">,</span> <span class="n">_f2</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    given temperature, interpolate collisional excitation coefficient</span>
 
@@ -74,9 +74,6 @@
 <span class="sd">    _f2 : int, array</span>
 <span class="sd">        a factor needed to compute CE rate coefficient</span>
 
-<span class="sd">    _isCont : boolean, array</span>
-<span class="sd">        True : is a continuum transition; False : not a continuum transition</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 
@@ -97,11 +94,9 @@
 <span class="sd">        Cambridge University Press, pp. 22, 1992</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_nTran</span> <span class="o">=</span> <span class="n">_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">_CE_fac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">_nTran</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nTran</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">_isCont</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
-            <span class="k">continue</span>
+    <span class="n">_nLine</span> <span class="o">=</span> <span class="n">_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">_CE_fac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">_nLine</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nLine</span><span class="p">):</span>
         <span class="c1">#--- scipy B-spline interpolation</span>
         <span class="n">_Bsp_obj</span> <span class="o">=</span> <span class="n">splrep</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">_Te_table</span><span class="p">[:],</span> <span class="n">y</span><span class="o">=</span><span class="n">_table</span><span class="p">[</span><span class="n">k</span><span class="p">,:])</span>
         <span class="c1"># ext=3 : return boundary value</span>
@@ -109,7 +104,7 @@
 
     <span class="k">return</span> <span class="n">_CE_fac</span></div>
 
-<div class="viewcode-block" id="interpolate_CI_fac"><a class="viewcode-back" href="../../../RST/API/Atomic/_Collision_API/src.Atomic.Collision.interpolate_CI_fac.html#src.Atomic.Collision.interpolate_CI_fac">[docs]</a><span class="k">def</span> <span class="nf">interpolate_CI_fac</span><span class="p">(</span><span class="n">_table</span><span class="p">,</span> <span class="n">_Te</span><span class="p">,</span> <span class="n">_Te_table</span><span class="p">,</span> <span class="n">_f2</span><span class="p">,</span> <span class="n">_lineIndex</span><span class="p">,</span> <span class="n">_nTran</span><span class="p">):</span>
+<div class="viewcode-block" id="interpolate_CI_fac"><a class="viewcode-back" href="../../../RST/API/Atomic/_Collision_API/src.Atomic.Collision.interpolate_CI_fac.html#src.Atomic.Collision.interpolate_CI_fac">[docs]</a><span class="k">def</span> <span class="nf">interpolate_CI_fac</span><span class="p">(</span><span class="n">_table</span><span class="p">,</span> <span class="n">_Te</span><span class="p">,</span> <span class="n">_Te_table</span><span class="p">,</span> <span class="n">_f2</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    given temperature, interpolate collisional ionization coefficient</span>
 
@@ -128,12 +123,6 @@
 <span class="sd">    _f2 : int, array</span>
 <span class="sd">        a factor needed to compute CI rate coefficient</span>
 
-<span class="sd">    _lineIndex : int, array</span>
-<span class="sd">        correspnding line index of each continuum transition</span>
-
-<span class="sd">    _nTran : int</span>
-<span class="sd">        total number of transitions including line transition and continuum transition</span>
-
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 
@@ -150,13 +139,13 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_CI_fac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">_nTran</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-        <span class="n">_line_index</span> <span class="o">=</span> <span class="n">_lineIndex</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">_nCont</span> <span class="o">=</span> <span class="n">_table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">_CI_fac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">_nCont</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nCont</span><span class="p">):</span>
         <span class="c1">#--- scipy B-spline interpolation</span>
         <span class="n">_Bsp_obj</span> <span class="o">=</span> <span class="n">splrep</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">_Te_table</span><span class="p">[:],</span> <span class="n">y</span><span class="o">=</span><span class="n">_table</span><span class="p">[</span><span class="n">k</span><span class="p">,:])</span>
         <span class="c1"># ext=3 : return boundary value</span>
-        <span class="n">_CI_fac</span><span class="p">[</span><span class="n">_line_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">splev</span><span class="p">(</span><span class="n">_Te</span><span class="p">,</span> <span class="n">_Bsp_obj</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="n">_f2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_CI_fac</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">splev</span><span class="p">(</span><span class="n">_Te</span><span class="p">,</span> <span class="n">_Bsp_obj</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">/</span> <span class="n">_f2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">_CI_fac</span></div>
 
@@ -285,6 +274,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Atlas.html">Atlas</a></li>
 </ul>
 
   </div>

@@ -1,6 +1,18 @@
 Change Log
 ======================
 
+2020/07/20
+---------------
+
+1. `src.Uilt.Class.help()` now can response to both `class` and `recarray`
+
+2. in `data/atom/Ca_II/Ca_II.Level`, energies have been adjusted to fit each central wavelength
+
+3. quiet sun intensity atlas is now available : `data/intensity/atlas/QS/atlas_QS.npy`
+
+    - `notebooks/Atlas/Atlas_QS.ipynb` gives a naive illustration to this atlas
+    
+
 2020/07/15
 ----------------
 
@@ -13,6 +25,18 @@ Change Log
   - `help_attribute` : print all attributes in the class object
 
 2. in `src.Structure.AtomCls`, in class `Atom()`, attribute `.am` has been renamed to `.Mass`
+
+3. reconstructed `src.Structure.AtomCls.Atom()`, now we have
+
+  - `Atom().Level`, `Atom().Line`, `Atom.Cont` to store information of energy level, line transition and continuum transitions, respectively.
+
+  - `src.Structure.AtomCls.Collisional_Transition()` to store information of Collisional Excitation/Ionization
+
+  - `src.Structure.AtomCls.Photoionization()` to store information of Photoionization
+
+  - `src.Structure.MeshCls.WavelengthMesh()` to take charge of wavelength construction for Line/Continuum
+
+  - `src.Structure.RadLineCls.RadiativeLine()` to take charge of radiative lines
 
 
 2020/06/26

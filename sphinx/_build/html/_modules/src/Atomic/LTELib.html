@@ -57,7 +57,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Constants</span> <span class="k">as</span> <span class="n">Cst</span>
-<span class="kn">from</span> <span class="nn">..Structure</span> <span class="k">import</span> <span class="n">AtomCls</span>
 
 <div class="viewcode-block" id="Boltzmann_distribution"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.Boltzmann_distribution.html#src.Atomic.LTELib.Boltzmann_distribution">[docs]</a><span class="k">def</span> <span class="nf">Boltzmann_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gj</span><span class="p">,</span> <span class="n">_Eji</span><span class="p">,</span> <span class="n">_Te</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -209,6 +208,8 @@
         <span class="k">elif</span> <span class="n">_stage</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">_stage</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1">#nRatio[i] = nRatio[i-1] * gj/gi * np.exp(-(erg[i]-erg[i-1])/kT) * Cst.saha_ * Te**(1.5) / Ne</span>
             <span class="n">_nRatio</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_nRatio</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Saha_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gj</span><span class="p">,</span> <span class="n">_erg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">_erg</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">_Ne</span><span class="p">,</span> <span class="n">_Te</span><span class="p">)</span>
+
+        <span class="c1">#print(f&quot;erg[i] : {_erg[i]}, erg[i-1] : {_erg[i-1]}, Ne : {_Ne}, Te : {_Te}&quot;)</span>
 
         <span class="n">_nRatio</span><span class="p">[:]</span> <span class="o">/=</span> <span class="n">_nRatio</span><span class="p">[:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
@@ -417,6 +418,8 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
+<span class="sd">    Wanring : this polynomial fitting formula(table) is only avaible for low temperature (:math:`&lt;10000 K`)</span>
+
 <span class="sd">    from [1]_, [2]_.</span>
 <span class="sd">    .. math:: log(u) = c_0 + c_1 \cdot log(\theta) + c_2 \cdot log(\theta)^2 + c_3 \cdot log(\theta)^3 + c_4 \cdot log(\theta)^4</span>
 <span class="sd">    .. math:: log = log_{10}</span>
@@ -562,13 +565,10 @@
         <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]</span>  <span class="c1"># return 1</span>
 
     <span class="n">th</span> <span class="o">=</span> <span class="mf">5040.</span><span class="o">/</span><span class="n">T</span>
-    <span class="n">nt</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">*</span><span class="n">nt</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">th</span><span class="p">))</span><span class="o">**</span><span class="n">i</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">th</span><span class="p">))</span><span class="o">**</span><span class="n">i</span>
     <span class="n">ufunc1</span> <span class="o">=</span> <span class="mf">10.</span><span class="o">**</span><span class="n">s</span>
-    <span class="c1">#if len(ufunc1) == 1</span>
-    <span class="c1">#    ufunc1=ufunc1[0]</span>
 
     <span class="k">return</span> <span class="n">ufunc1</span></div>
 
@@ -579,6 +579,8 @@
 <span class="k">if</span> <span class="n">Cst</span><span class="o">.</span><span class="n">isJIT</span> <span class="o">==</span> <span class="kc">True</span> <span class="p">:</span>
     <span class="n">Planck_cm</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span> <span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">)])(</span> <span class="n">Planck_cm</span> <span class="p">)</span>
     <span class="n">Planck_hz</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span> <span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">)])(</span> <span class="n">Planck_hz</span> <span class="p">)</span>
+    <span class="c1">#Ufunc = nb.jit(nb.float64(nb.types.unicode_type,nb.float64), nopython=True)( Ufunc )</span>
+    <span class="c1">#Ufunc = nb.jit(nopython=True)( Ufunc )</span>
 </pre></div>
 
           </div>
@@ -594,6 +596,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Atlas.html">Atlas</a></li>
 </ul>
 
   </div>

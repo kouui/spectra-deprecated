@@ -60,7 +60,7 @@
 <h1>src.Atomic.Collision.interpolate_CI_fac<a class="headerlink" href="#src-atomic-collision-interpolate-ci-fac" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="src.Atomic.Collision.interpolate_CI_fac">
-<code class="descclassname">src.Atomic.Collision.</code><code class="descname">interpolate_CI_fac</code><span class="sig-paren">(</span><em>_table</em>, <em>_Te</em>, <em>_Te_table</em>, <em>_f2</em>, <em>_lineIndex</em>, <em>_nTran</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/Collision.html#interpolate_CI_fac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.Collision.interpolate_CI_fac" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.Atomic.Collision.</code><code class="descname">interpolate_CI_fac</code><span class="sig-paren">(</span><em>_table</em>, <em>_Te</em>, <em>_Te_table</em>, <em>_f2</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/Collision.html#interpolate_CI_fac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.Collision.interpolate_CI_fac" title="Permalink to this definition">¶</a></dt>
 <dd><p>given temperature, interpolate collisional ionization coefficient</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -69,8 +69,6 @@
 <li><p><strong>_Te</strong> (<em>scalar</em>) – termperature, [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
 <li><p><strong>_Te_table</strong> (<em>np.double</em><em>, </em><em>array</em><em>, </em><em>(</em><em>nTemperature</em><em>,</em><em>)</em>) – corresponding termperature points in _table, [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
 <li><p><strong>_f2</strong> (<em>int</em><em>, </em><em>array</em>) – a factor needed to compute CI rate coefficient</p></li>
-<li><p><strong>_lineIndex</strong> (<em>int</em><em>, </em><em>array</em>) – correspnding line index of each continuum transition</p></li>
-<li><p><strong>_nTran</strong> (<em>int</em>) – total number of transitions including line transition and continuum transition</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -126,6 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ChangeLog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../Attention.html">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Atlas.html">Atlas</a></li>
 </ul>
 
   </div>

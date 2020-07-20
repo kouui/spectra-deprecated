@@ -109,6 +109,9 @@
 
     <span class="n">_alpha_mesh_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">_alpha_table</span><span class="p">,</span> <span class="n">_cont_mesh</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">_PI_table_list</span><span class="p">,</span> <span class="n">_continuum_mesh_list</span><span class="p">):</span>
+    <span class="c1">#for k in range(len(_continuum_mesh_list)):</span>
+    <span class="c1">#    _alpha_table = _PI_table_dict[k]</span>
+    <span class="c1">#    _cont_mesh = _continuum_mesh_list[k]</span>
         <span class="c1">#_fill_value = (_alpha_table[1,-1], 0)</span>
         <span class="n">_bsp_obj</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">_alpha_table</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">y</span><span class="o">=</span><span class="n">_alpha_table</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cubic&quot;</span><span class="p">,</span>
                             <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="s2">&quot;extrapolate&quot;</span><span class="p">)</span>
@@ -262,7 +265,7 @@
 
 <span class="sd">    Spontaneous radiative recombination rate [1]_ Equation(9.45)</span>
 
-<span class="sd">        .. math:: R_{ki}^{stim} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} (2h\nu^{3}/c^2) e^{-h\nu/kT} d\nu</span>
+<span class="sd">        .. math:: R_{ki}^{spon} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} (2h\nu^{3}/c^2) e^{-h\nu/kT} d\nu</span>
 
 <span class="sd">    References</span>
 <span class="sd">    -----------</span>
@@ -305,6 +308,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Atlas.html">Atlas</a></li>
 </ul>
 
   </div>

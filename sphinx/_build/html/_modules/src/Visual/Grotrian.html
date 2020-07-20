@@ -82,7 +82,7 @@
     <span class="c1">#-------------------------------------------------------------------------</span>
     <span class="c1"># create and count list of (conf, term)</span>
     <span class="c1">#-------------------------------------------------------------------------</span>
-    <span class="n">_conf_term</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">],</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;term&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">_conf_term</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">_atom</span><span class="o">.</span><span class="n">_Level_info</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">],</span> <span class="n">_atom</span><span class="o">.</span><span class="n">_Level_info</span><span class="p">[</span><span class="s2">&quot;term&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
     <span class="n">_count</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span> <span class="n">_conf_term</span> <span class="p">)</span>
     <span class="c1">#-------------------------------------------------------------------------</span>
 
@@ -100,11 +100,11 @@
         <span class="c1"># - remove inner shell electron configuration</span>
         <span class="c1"># - remove all &#39;.&#39; in conf</span>
         <span class="c1">#---------------------------------------------------------------------</span>
-        <span class="n">_conf</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_conf</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">_Level_info</span><span class="p">[</span><span class="s2">&quot;configuration&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
         <span class="n">_conf_clean</span> <span class="o">=</span> <span class="n">_conf</span><span class="p">[</span><span class="n">_L_prefix</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="c1">#---------------------------------------------------------------------</span>
-        <span class="n">_term</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;term&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
-        <span class="n">_J</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">Level_info</span><span class="p">[</span><span class="s2">&quot;J&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_term</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">_Level_info</span><span class="p">[</span><span class="s2">&quot;term&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_J</span> <span class="o">=</span> <span class="n">_atom</span><span class="o">.</span><span class="n">_Level_info</span><span class="p">[</span><span class="s2">&quot;J&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
         <span class="n">_L</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">L_s2i</span><span class="p">[</span> <span class="n">_term</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
 
         <span class="k">if</span> <span class="n">_count</span><span class="p">[</span> <span class="p">(</span><span class="n">_conf</span><span class="p">,</span> <span class="n">_term</span><span class="p">)</span> <span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -427,6 +427,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Atlas.html">Atlas</a></li>
 </ul>
 
   </div>

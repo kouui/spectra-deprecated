@@ -56,7 +56,47 @@
   <div class="section" id="change-log">
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
-<h2>2020/06/26<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2>2020/07/20<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p><cite>src.Uilt.Class.help()</cite> now can response to both <cite>class</cite> and <cite>recarray</cite></p></li>
+<li><p>in <cite>data/atom/Ca_II/Ca_II.Level</cite>, energies have been adjusted to fit each central wavelength</p></li>
+<li><p>quiet sun intensity atlas is now available : <cite>data/intensity/atlas/QS/atlas_QS.npy</cite></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>notebooks/Atlas/Atlas_QS.ipynb</cite> gives a naive illustration to this atlas</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="id2">
+<h2>2020/07/15<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>in <cite>src.Uilt.Class</cite>, we added functions</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>help</cite> : print all attributes and methods in the class object</p></li>
+<li><p><cite>help_method</cite> : print all methods in the class object</p></li>
+<li><p><cite>help_attribute</cite> : print all attributes in the class object</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>in <cite>src.Structure.AtomCls</cite>, in class <cite>Atom()</cite>, attribute <cite>.am</cite> has been renamed to <cite>.Mass</cite></p></li>
+<li><p>reconstructed <cite>src.Structure.AtomCls.Atom()</cite>, now we have</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>Atom().Level</cite>, <cite>Atom().Line</cite>, <cite>Atom.Cont</cite> to store information of energy level, line transition and continuum transitions, respectively.</p></li>
+<li><p><cite>src.Structure.AtomCls.Collisional_Transition()</cite> to store information of Collisional Excitation/Ionization</p></li>
+<li><p><cite>src.Structure.AtomCls.Photoionization()</cite> to store information of Photoionization</p></li>
+<li><p><cite>src.Structure.MeshCls.WavelengthMesh()</cite> to take charge of wavelength construction for Line/Continuum</p></li>
+<li><p><cite>src.Structure.RadLineCls.RadiativeLine()</cite> to take charge of radiative lines</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="id3">
+<h2>2020/06/26<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>in <cite>src.Structure.AtmosphereCls</cite>, we added <cite>AtmosphereC0d</cite></p></li>
 <li><p>dependency of numba has been changed from 0.43.0 to 0.49.1, and this will not affect code execution.</p></li>
@@ -123,8 +163,8 @@
 </ul>
 </div></blockquote>
 </div>
-<div class="section" id="id2">
-<h2>2020/06/23<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>2020/06/23<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>added documentation <cite>./index.html</cite></p></li>
 </ol>
@@ -144,11 +184,14 @@
 <li class="toctree-l1"><a class="reference internal" href="PythonCollection.html">Python Cheat Sheet</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id1">2020/06/26</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">2020/06/23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">2020/07/20</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">2020/07/15</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">2020/06/26</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">2020/06/23</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Attention.html">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Atlas.html">Atlas</a></li>
 </ul>
 
   </div>
