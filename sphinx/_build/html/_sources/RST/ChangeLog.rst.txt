@@ -1,6 +1,30 @@
 Change Log
 ======================
 
+2020/07/30
+---------------
+
+0. 1-year schedule in `notebooks/StatisticalEquilibrium/Plots_v2.ipynb`
+
+1. in `data/atom/Ca_II/Ca_II.Level`, energies have been adjusted back to NIST values
+
+  - previous problem is caused by wavelength in vacuum/air
+
+2. in `src.Atomic.BasicP`, added functions
+
+  - `refractive_index_in_air`
+
+  - `air_to_vacuum`
+
+3. now "3000-10000A" and "10000-13400A" is corresponded to wavelength in vacuum.
+
+4. added `notebooks/StatisticalEquilibrium/Lib2.py` for the sake of high level function calling
+
+  - the usage of `notebooks/StatisticalEquilibrium/Lib2.py` is illustrated in `notebooks/StatisticalEquilibrium/Plots_v2.ipynb`
+
+
+
+
 2020/07/20
 ---------------
 
@@ -11,7 +35,7 @@ Change Log
 3. quiet sun intensity atlas is now available : `data/intensity/atlas/QS/atlas_QS.npy`
 
     - `notebooks/Atlas/Atlas_QS.ipynb` gives a naive illustration to this atlas
-    
+
 
 2020/07/15
 ----------------
