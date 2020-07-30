@@ -6,6 +6,7 @@ dependencies:
   - numpy==1.15.2
   - numba==0.49.1
   - scipy==1.2.1
+  - sympy==1.6.1
   - jupyter
   - pip
   - pip:
