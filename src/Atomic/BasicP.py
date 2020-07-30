@@ -260,3 +260,27 @@ def get_damping_a(_Gamma, _dopWidth_hz):
     """
     _a = _Gamma / ( 4 * Cst.pi_ * _dopWidth_hz )
     return _a
+
+def refractive_index_in_air(w_, unit_):
+    r"""
+    J. Opt. Soc. Am. 62, 958 (1972)
+    """
+    if unit_ == "nm":
+        _f = 1E-3
+    elif unit_ == "AA":
+        _f = 1E-4
+    else:
+        _f = 1
+    sigma_ = w_ * _f # unit --> um
+    out_ = 8342.13 + 2406030 / (130-_sigma_*_sigma_) + 15997 / (38.9-_sigma_*_sigma_)
+    n_ = out_ * 1E-8 + 1
+    return n_
+
+def air_to_vacuum(w_, unit_):
+    r"""
+    https://physics.nist.gov/PhysRefData/ASD/Html/lineshelp.html#AIR
+    """
+    assert unit_ in ("nm","um","AA")
+
+    n_ = refractive_index_in_air(w_, unit_)
+    return w_ * n_

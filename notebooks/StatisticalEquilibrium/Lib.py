@@ -4,7 +4,6 @@ import numpy as np
 import sys
 sys.path.append("../../")
 
-#from src.Structure import AtomCls
 from src.Atomic import Collision, PhotoIonize
 from src.Atomic import LTELib, SEsolver, BasicP
 from src.RadiativeTransfer import Profile
