@@ -51,6 +51,9 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">Constants</span> <span class="k">as</span> <span class="n">Cst</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">..Structure</span> <span class="k">import</span> <span class="n">AtomIO</span>
+<span class="kn">from</span> <span class="nn">matplotlib.cm</span> <span class="k">import</span> <span class="n">ScalarMappable</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="k">def</span> <span class="nf">_prepare_dict</span><span class="p">(</span><span class="n">_atom</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -121,7 +124,8 @@
     <span class="c1">#-------------------------------------------------------------------------</span>
     <span class="k">return</span> <span class="n">_singlet</span><span class="p">,</span> <span class="n">_multiplet</span><span class="p">,</span> <span class="n">_Lset</span>
 
-<span class="k">def</span> <span class="nf">line_with_text</span><span class="p">(</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_lp</span><span class="p">,</span> <span class="n">_rp</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="n">_tsize</span><span class="p">,</span> <span class="n">_r</span><span class="p">,</span> <span class="n">_tangle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">line_with_text</span><span class="p">(</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_lp</span><span class="p">,</span> <span class="n">_rp</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="n">_tsize</span><span class="p">,</span> <span class="n">_r</span><span class="p">,</span> <span class="n">_tangle</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                   <span class="n">_lwidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -171,13 +175,115 @@
     <span class="c1"># {&#39;color&#39;: &#39;black&#39;, &#39;fontsize&#39;: 6, &#39;ha&#39;: &#39;center&#39;, &#39;va&#39;: &#39;center&#39;,</span>
     <span class="c1">#    &#39;bbox&#39;: dict(boxstyle=&quot;round&quot;, fc=&quot;white&quot;, ec=&quot;white&quot;, pad=0.2)}</span>
     <span class="n">_line_obj</span><span class="p">,</span> <span class="o">=</span> <span class="n">_ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">_rp</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">linestyle</span><span class="o">=</span><span class="n">_lstyle</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_lcolor</span><span class="p">)</span>
-    <span class="n">_tx</span> <span class="o">=</span> <span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">_r</span>
-    <span class="n">_ty</span> <span class="o">=</span> <span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">_r</span>
-    <span class="n">_text_obj</span> <span class="o">=</span> <span class="n">_ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span> <span class="n">_tx</span><span class="p">,</span> <span class="n">_ty</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">_tcolor</span><span class="p">,</span> <span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="n">_tsize</span><span class="p">,</span>
-                        <span class="s1">&#39;ha&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="s1">&#39;va&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span><span class="s1">&#39;rotation&#39;</span><span class="p">:</span><span class="n">_tangle</span><span class="p">,</span>
-                        <span class="s1">&#39;bbox&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)}</span> <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_tx</span> <span class="o">=</span> <span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">_r</span>
+        <span class="n">_ty</span> <span class="o">=</span> <span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">_rp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_lp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">_r</span>
+        <span class="n">_text_obj</span> <span class="o">=</span> <span class="n">_ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span> <span class="n">_tx</span><span class="p">,</span> <span class="n">_ty</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">_tcolor</span><span class="p">,</span> <span class="s1">&#39;fontsize&#39;</span><span class="p">:</span> <span class="n">_tsize</span><span class="p">,</span>
+                            <span class="s1">&#39;ha&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="s1">&#39;va&#39;</span><span class="p">:</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span><span class="s1">&#39;rotation&#39;</span><span class="p">:</span><span class="n">_tangle</span><span class="p">,</span>
+                            <span class="s1">&#39;bbox&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s2">&quot;round&quot;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">ec</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)}</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_text_obj</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">return</span> <span class="n">_line_obj</span><span class="p">,</span> <span class="n">_text_obj</span>
+
+<span class="k">def</span> <span class="nf">arrow_without_text</span><span class="p">(</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_pi</span><span class="p">,</span> <span class="n">_pj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    _ax : matlotlib.pyplot.Axe</span>
+<span class="sd">        the axe to plot a arrow</span>
+
+<span class="sd">    _pi : tuple of float/int, (x,y)</span>
+<span class="sd">        xy of point of level i</span>
+
+<span class="sd">    _pj : tuple of float/int, (x,y)</span>
+<span class="sd">        xy of point of level j</span>
+
+<span class="sd">    _direction :</span>
+<span class="sd">        &quot;Left-&gt;Right&quot;, &quot;Right-&gt;Left&quot;</span>
+
+<span class="sd">    _lwidth : float</span>
+<span class="sd">        line width, default : 2</span>
+
+<span class="sd">    _asize : float/int</span>
+<span class="sd">        arrow size, default : 10</span>
+
+<span class="sd">    _cmap :</span>
+<span class="sd">        colormap to be used</span>
+
+<span class="sd">    _norm :</span>
+<span class="sd">        normalizaiton of colormap to to used</span>
+
+<span class="sd">    _v : float</span>
+<span class="sd">        value to decide the color</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    _line_obj : matplotlib.text.Annotation</span>
+<span class="sd">        object of the arrow we plot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># {&#39;color&#39;: &#39;black&#39;, &#39;fontsize&#39;: 6, &#39;ha&#39;: &#39;center&#39;, &#39;va&#39;: &#39;center&#39;,</span>
+    <span class="c1">#    &#39;bbox&#39;: dict(boxstyle=&quot;round&quot;, fc=&quot;white&quot;, ec=&quot;white&quot;, pad=0.2)}</span>
+
+    <span class="k">assert</span> <span class="n">_direction</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;i-&gt;j&quot;</span><span class="p">,</span> <span class="s2">&quot;j-&gt;i&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_direction</span> <span class="o">==</span> <span class="s2">&quot;i-&gt;j&quot;</span><span class="p">:</span>
+        <span class="n">_xytext</span><span class="p">,</span> <span class="n">_xy</span> <span class="o">=</span> <span class="n">_pi</span><span class="p">,</span> <span class="n">_pj</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_xytext</span><span class="p">,</span> <span class="n">_xy</span> <span class="o">=</span> <span class="n">_pj</span><span class="p">,</span> <span class="n">_pi</span>
+
+    <span class="k">if</span> <span class="n">_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">elif</span> <span class="n">_v</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_xytext</span><span class="p">,</span> <span class="n">_xy</span> <span class="o">=</span> <span class="n">_xy</span><span class="p">,</span> <span class="n">_xytext</span>
+        <span class="n">_v</span> <span class="o">=</span> <span class="o">-</span><span class="n">_v</span>
+
+    <span class="n">_annotation_obj</span> <span class="o">=</span> <span class="n">_ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">_xy</span><span class="p">,</span> <span class="n">xycoords</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">,</span>
+                                   <span class="n">xytext</span><span class="o">=</span><span class="n">_xytext</span><span class="p">,</span><span class="n">textcoords</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">,</span>
+                                   <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">_cmap</span><span class="p">(</span><span class="n">_norm</span><span class="p">(</span><span class="n">_v</span><span class="p">)),</span><span class="n">width</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">,</span> <span class="n">headwidth</span><span class="o">=</span><span class="n">_asize</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">_annotation_obj</span>
+
+<span class="k">def</span> <span class="nf">read_Grotrian</span><span class="p">(</span><span class="n">_lns</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    read default line connection setup for Grotrian diagram</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_line_plot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">_i</span><span class="p">,</span> <span class="n">_ln</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_lns</span><span class="p">[:]):</span>
+
+        <span class="k">if</span> <span class="n">AtomIO</span><span class="o">.</span><span class="n">skip_line</span><span class="p">(</span><span class="n">_ln</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="n">AtomIO</span><span class="o">.</span><span class="n">check_end</span><span class="p">(</span><span class="n">_ln</span><span class="p">):</span>
+            <span class="k">break</span>
+
+        <span class="n">_words</span> <span class="o">=</span> <span class="n">_ln</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">_words</span> <span class="o">=</span> <span class="p">[</span><span class="n">_v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">_v</span> <span class="ow">in</span> <span class="n">_words</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">_words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;prefix&quot;</span> <span class="ow">and</span> <span class="n">_words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">_prefix</span> <span class="o">=</span> <span class="n">_words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">continue</span>
+
+        <span class="n">_params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># get ctj pair</span>
+        <span class="k">if</span> <span class="n">_words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span> <span class="ow">and</span> <span class="n">_prefix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+            <span class="n">_ctj_ij</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">_prefix</span><span class="o">+</span><span class="n">_words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="n">_prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_ctj_ij</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">_prefix</span><span class="o">+</span><span class="n">_words</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="n">_prefix</span><span class="o">+</span><span class="n">_words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">_words</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="p">)</span>
+
+        <span class="n">_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">_ctj_ij</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">_ctj_ij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">_words</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span><span class="n">_words</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span> <span class="p">)</span>
+        <span class="n">_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span><span class="n">_words</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span> <span class="p">)</span>
+
+        <span class="n">_line_plot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_params</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_line_plot</span>
+
 
 <div class="viewcode-block" id="Grotrian"><a class="viewcode-back" href="../../../RST/API/Visual/_Grotrian_API/src.Visual.Grotrian.Grotrian.html#src.Visual.Grotrian.Grotrian">[docs]</a><span class="k">class</span> <span class="nc">Grotrian</span><span class="p">:</span>
 
@@ -195,7 +301,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">_atom</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">_conf_prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1">#---------------------------------------------------------------------</span>
         <span class="c1"># prepare structures for plotting</span>
         <span class="c1">#---------------------------------------------------------------------</span>
@@ -251,8 +358,12 @@
         <span class="c1">#---------------------------------------------------------------------</span>
         <span class="k">for</span> <span class="n">k0</span><span class="p">,</span> <span class="n">v0</span> <span class="ow">in</span> <span class="n">singlet</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">k1</span><span class="p">,</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">v0</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">Level_ctj_table</span><span class="o">.</span><span class="n">index</span><span class="p">((</span><span class="n">v1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">k1</span><span class="p">))</span>
                 <span class="c1">#plot level</span>
-                <span class="n">xs_level</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_hw</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">_hw</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">Level</span><span class="o">.</span><span class="n">isGround</span><span class="p">[</span><span class="n">_idx</span><span class="p">]:</span>
+                    <span class="n">xs_level</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_hw</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">_hw</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">Lset</span><span class="p">[</span><span class="s2">&quot;singlet&quot;</span><span class="p">])</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">Lset</span><span class="p">[</span><span class="s2">&quot;multiplet&quot;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">xs_level</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">_hw</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">_hw</span>
                 <span class="n">ys_level</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs_level</span><span class="p">,</span> <span class="n">ys_level</span><span class="p">,</span> <span class="s2">&quot;-k&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
                 <span class="c1"># store level posiiton, (conf_origin, term, J)</span>
@@ -349,6 +460,40 @@
 
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
+    <span class="k">def</span> <span class="nf">show_Grotrian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_path</span><span class="p">,</span> <span class="n">_text_selection</span><span class="o">=</span><span class="s2">&quot;wavelength&quot;</span><span class="p">,</span> <span class="n">_hasText</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">_fLines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="n">_line_plot</span> <span class="o">=</span> <span class="n">read_Grotrian</span><span class="p">(</span><span class="n">_fLines</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span> <span class="o">=</span> <span class="n">_line_plot</span>
+
+        <span class="k">for</span> <span class="n">_ctj1</span><span class="p">,</span> <span class="n">_ctj2</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span> <span class="ow">in</span> <span class="n">_line_plot</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">_text_selection</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">_hasText</span><span class="p">:</span>
+                    <span class="n">wl</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connect_line</span><span class="p">(</span><span class="n">_cfj1</span><span class="o">=</span><span class="n">_ctj1</span><span class="p">,</span> <span class="n">_cfj2</span><span class="o">=</span><span class="n">_ctj2</span><span class="p">,</span> <span class="n">_r1</span><span class="o">=</span><span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span><span class="o">=</span><span class="n">_r2</span><span class="p">,</span> <span class="n">_c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">_text</span><span class="o">=</span><span class="n">wl</span><span class="p">,</span> <span class="n">_tsize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">_r</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">_text_selection</span> <span class="o">==</span> <span class="s2">&quot;wavelength&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">wl</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">_hasText</span><span class="p">:</span>
+                        <span class="n">wl</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">connect_line</span><span class="p">(</span><span class="n">_cfj1</span><span class="o">=</span><span class="n">_ctj1</span><span class="p">,</span> <span class="n">_cfj2</span><span class="o">=</span><span class="n">_ctj2</span><span class="p">,</span> <span class="n">_r1</span><span class="o">=</span><span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span><span class="o">=</span><span class="n">_r2</span><span class="p">,</span> <span class="n">_c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">_text</span><span class="o">=</span><span class="n">wl</span><span class="p">,</span> <span class="n">_tsize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">_r</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">wl</span> <span class="ow">in</span> <span class="n">_text_selection</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">_hasText</span><span class="p">:</span>
+                        <span class="n">wl</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">connect_line</span><span class="p">(</span><span class="n">_cfj1</span><span class="o">=</span><span class="n">_ctj1</span><span class="p">,</span> <span class="n">_cfj2</span><span class="o">=</span><span class="n">_ctj2</span><span class="p">,</span> <span class="n">_r1</span><span class="o">=</span><span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span><span class="o">=</span><span class="n">_r2</span><span class="p">,</span> <span class="n">_c</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">_text</span><span class="o">=</span><span class="n">wl</span><span class="p">,</span> <span class="n">_tsize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">_r</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_ctj1</span><span class="p">,</span> <span class="n">_ctj2</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span> <span class="ow">in</span> <span class="n">_line_plot</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wl</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_text_selection</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_fig</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="nf">connect_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_cfj1</span><span class="p">,</span> <span class="n">_cfj2</span><span class="p">,</span> <span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="n">_text</span><span class="p">,</span> <span class="n">_tsize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">_r</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 
@@ -392,6 +537,10 @@
 <span class="sd">            color of the text, default : &quot;black&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="n">_text</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+
+            <span class="n">_text</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="n">pos_lvl1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="p">[</span><span class="n">_cfj1</span><span class="p">]</span>
         <span class="n">pos_lvl2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="p">[</span><span class="n">_cfj2</span><span class="p">]</span>
 
@@ -411,7 +560,81 @@
         <span class="c1"># plot line and text</span>
         <span class="n">_ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
         <span class="n">_line_obj</span><span class="p">,</span> <span class="n">_text_obj</span> <span class="o">=</span> <span class="n">line_with_text</span><span class="p">(</span><span class="n">_ax</span><span class="o">=</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_lp</span><span class="o">=</span><span class="n">_lp</span><span class="p">,</span> <span class="n">_rp</span><span class="o">=</span><span class="n">_rp</span><span class="p">,</span> <span class="n">_text</span><span class="o">=</span><span class="n">_text</span><span class="p">,</span> <span class="n">_tsize</span><span class="o">=</span><span class="n">_tsize</span><span class="p">,</span> <span class="n">_r</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                            <span class="n">_tangle</span><span class="o">=</span><span class="n">_tangle</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="n">_lcolor</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="n">_lstyle</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="n">_tcolor</span><span class="p">)</span></div>
+                            <span class="n">_tangle</span><span class="o">=</span><span class="n">_tangle</span><span class="p">,</span> <span class="n">_lcolor</span><span class="o">=</span><span class="n">_lcolor</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">,</span> <span class="n">_lstyle</span><span class="o">=</span><span class="n">_lstyle</span><span class="p">,</span> <span class="n">_tcolor</span><span class="o">=</span><span class="n">_tcolor</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span> <span class="nf">connect_arrow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_cfj_i</span><span class="p">,</span> <span class="n">_cfj_j</span><span class="p">,</span> <span class="n">_ri</span><span class="p">,</span> <span class="n">_rj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">pos_lvl_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="p">[</span><span class="n">_cfj_i</span><span class="p">]</span>
+        <span class="n">pos_lvl_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="p">[</span><span class="n">_cfj_j</span><span class="p">]</span>
+
+        <span class="n">_pi</span> <span class="o">=</span> <span class="n">pos_lvl_i</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pos_lvl_i</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos_lvl_i</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">_ri</span> <span class="p">,</span> <span class="n">pos_lvl_i</span><span class="p">[</span><span class="s2">&quot;ys&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">_pj</span> <span class="o">=</span> <span class="n">pos_lvl_j</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">pos_lvl_j</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos_lvl_j</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">_rj</span> <span class="p">,</span> <span class="n">pos_lvl_j</span><span class="p">[</span><span class="s2">&quot;ys&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">_ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="n">_annotation_obj</span> <span class="o">=</span> <span class="n">arrow_without_text</span><span class="p">(</span><span class="n">_ax</span><span class="o">=</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_pi</span><span class="o">=</span><span class="n">_pi</span><span class="p">,</span> <span class="n">_pj</span><span class="o">=</span><span class="n">_pj</span><span class="p">,</span>
+                            <span class="n">_direction</span><span class="o">=</span><span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="o">=</span><span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="o">=</span><span class="n">_norm</span><span class="p">,</span>
+                            <span class="n">_v</span><span class="o">=</span><span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="n">_asize</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_annotation_obj</span>
+
+    <span class="k">def</span> <span class="nf">show_transition_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_idxI</span><span class="p">,</span> <span class="n">_idxJ</span><span class="p">,</span> <span class="n">_rate</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_level_ctj_without_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">_idxI</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">_idxJ</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">_rate</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_line_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span>
+
+        <span class="k">elif</span> <span class="n">_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">_fLines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+            <span class="n">_line_plot</span> <span class="o">=</span> <span class="n">read_Grotrian</span><span class="p">(</span><span class="n">_fLines</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;do not have _line_plot information to specify arrow position&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">_table</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_t</span> <span class="ow">in</span> <span class="n">_line_plot</span><span class="p">:</span>
+            <span class="n">_table</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">_t</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_idxI</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+
+            <span class="n">_cfj_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">Level_ctj_table</span><span class="p">[</span> <span class="n">_idxI</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="p">]</span>
+            <span class="n">_cfj_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="o">.</span><span class="n">Level_ctj_table</span><span class="p">[</span> <span class="n">_idxJ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">_level_ctj_without_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_level_ctj</span> <span class="o">=</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="o">+</span><span class="n">_level_ctj_without_prefix</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">_level_ctj_without_prefix</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">_level_ctj_without_prefix</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="n">_level_ctj</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">_cfj_i</span><span class="p">,</span> <span class="n">_cfj_j</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+            <span class="n">_idx</span> <span class="o">=</span> <span class="n">_table</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="p">(</span><span class="n">_cfj_i</span><span class="p">,</span><span class="n">_cfj_j</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_ri</span><span class="p">,</span> <span class="n">_rj</span> <span class="o">=</span> <span class="n">_line_plot</span><span class="p">[</span><span class="n">_idx</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span><span class="n">_line_plot</span><span class="p">[</span><span class="n">_idx</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+
+            <span class="n">_v</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+            <span class="n">_annotation_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_arrow</span><span class="p">(</span><span class="n">_cfj_i</span><span class="p">,</span> <span class="n">_cfj_j</span><span class="p">,</span> <span class="n">_ri</span><span class="p">,</span> <span class="n">_rj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span>
+                                        <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="n">_asize</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">)</span>
+
+        <span class="c1"># colorbar ax</span>
+        <span class="n">_temp</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">_temp_ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.875</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">])</span>
+        <span class="n">_img</span> <span class="o">=</span> <span class="n">_temp_ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">_temp</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">_cmap</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">_norm</span><span class="p">)</span>
+        <span class="n">_temp_ax</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">_cax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.84</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span> <span class="n">_img</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">_cax</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_fig</span><span class="p">()</span></div>
 </pre></div>
 
           </div>
@@ -428,6 +651,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Atlas.html">Atlas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Todo.html">TODO</a></li>
 </ul>
 
   </div>

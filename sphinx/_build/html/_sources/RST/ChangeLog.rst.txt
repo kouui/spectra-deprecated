@@ -1,6 +1,34 @@
 Change Log
 ======================
 
+2020/08/07
+---------------
+
+1. now the configuration string in data files are without prefix
+
+2. in `src/Visual/Grotrian`, we added
+
+  - `Grotrian.show_transition_rate()`
+
+  - `Grotrian.show_Grotrian()`
+
+3. `Grotrian` now has configuration data file like `*.Grotrian`
+
+4. in `src/Structure/AtmosphereCls`, we added
+
+  - `AtmosphereCartesian.read_BackRad_QS()`
+
+  - `AtmosphereCartesian.BackRad_int`
+
+  - `AtmosphereCartesian.BackRad_wav`
+
+  - `AtmosphereCartesian.BackRadAir_int`
+
+  - `AtmosphereCartesian.BackRadAir_wav`
+
+5. added `TODO.rst`
+
+
 2020/07/30
 ---------------
 

@@ -19,6 +19,7 @@ This code aims at understanding the atomic and radiative transfer processes in s
    RST/ChangeLog
    RST/Attention
    RST/Atlas
+   RST/Todo.rst
 
 
 Indices and tables

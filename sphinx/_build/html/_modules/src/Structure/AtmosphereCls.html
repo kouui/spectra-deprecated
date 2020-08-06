@@ -143,6 +143,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">BackRad</span> <span class="o">=</span> <span class="n">BackRad</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">BackRad</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">/=</span> <span class="mi">3</span>
 
+    <span class="k">def</span> <span class="nf">read_BackRad_QS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">BackRad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../../data/intensity/atlas/QS/atlas_QS.npy&quot;</span><span class="p">)</span>
+        <span class="n">wave_in_air</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../../data/intensity/atlas/QS/wave_in_air.npy&quot;</span><span class="p">)</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../../data/intensity/atlas/QS/wave_in_air_se.npy&quot;</span><span class="p">)</span>
+
+        <span class="c1">#BackRad_air = np.zeros( (2,wave_in_air.shape[0]), dtype=np.double )</span>
+        <span class="c1">#BackRad_air[1,:] = BackRad[1,se[0]:se[1]]</span>
+        <span class="c1">#BackRad_air[0,:] = wave_in_air[:]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">BackRad_wav</span> <span class="o">=</span> <span class="n">BackRad</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BackRad_int</span> <span class="o">=</span> <span class="n">BackRad</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BackRadAir_wav</span> <span class="o">=</span> <span class="n">wave_in_air</span><span class="p">[:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">BackRadAir_int</span> <span class="o">=</span> <span class="n">BackRad</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">se</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">se</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Mesh</span><span class="o">.</span><span class="n">shape</span>
@@ -187,7 +204,7 @@
 <span class="sd">            line of sight Doppler velocity, [:math:`cm \cdot s^{-1}`]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">recarray</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dType</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Te</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Te</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Vt</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Vt</span>
@@ -362,6 +379,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/ChangeLog.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Attention.html">Attention</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../RST/Atlas.html">Atlas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../RST/Todo.html">TODO</a></li>
 </ul>
 
   </div>
