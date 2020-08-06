@@ -94,6 +94,23 @@ class AtmosphereCartesian:
         self.BackRad = BackRad.T.copy()
         self.BackRad[1,:] /= 3
 
+    def read_BackRad_QS(self):
+        r"""
+        """
+        BackRad = np.load("../../data/intensity/atlas/QS/atlas_QS.npy")
+        wave_in_air = np.load("../../data/intensity/atlas/QS/wave_in_air.npy")
+        se = np.load("../../data/intensity/atlas/QS/wave_in_air_se.npy")
+
+        #BackRad_air = np.zeros( (2,wave_in_air.shape[0]), dtype=np.double )
+        #BackRad_air[1,:] = BackRad[1,se[0]:se[1]]
+        #BackRad_air[0,:] = wave_in_air[:]
+
+        self.BackRad_wav = BackRad[0,:]
+        self.BackRad_int = BackRad[1,:]
+        self.BackRadAir_wav = wave_in_air[:]
+        self.BackRadAir_int = BackRad[1,se[0]:se[1]]
+
+
     @property
     def shape(self):
         return self.data.Mesh.shape
@@ -138,7 +155,7 @@ class AtmosphereC0d(AtmosphereCartesian):
             line of sight Doppler velocity, [:math:`cm \cdot s^{-1}`]
         """
         super().__init__()
-        
+
         self.data = np.recarray(1, dtype=self.dType)
         self.data.Te[:] = Te
         self.data.Vt[:] = Vt

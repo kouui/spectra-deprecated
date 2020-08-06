@@ -67,6 +67,7 @@ def read_level_info(_rs, _lns, _Level_info, _erg, _g, _stage):
     """
 
     _idx = 0
+    _prefix = ''
     for _i, _ln in enumerate(_lns[_rs:]):
 
         if skip_line(_ln):
@@ -77,7 +78,15 @@ def read_level_info(_rs, _lns, _Level_info, _erg, _g, _stage):
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
-        _Level_info["configuration"].append( _words[0] )
+        if _words[0] == "prefix" and _words[1] != '-':
+            _prefix = _words[1]
+            continue
+
+        if _words[0] == '-' and _prefix[-1] == '.':
+            _Level_info["configuration"].append( _prefix[:-1] )
+        else:
+            _Level_info["configuration"].append( _prefix+_words[0] )
+
         _Level_info["term"].append( _words[1] )
         _Level_info["J"].append( _words[2] )
         _Level_info["2S+1"].append( _words[5] )
@@ -97,6 +106,7 @@ def read_line_info(_lns, _Aji, _line_ctj_table):
     read line information
     """
     #_count = 0
+    _prefix = ''
     for _i, _ln in enumerate(_lns[:]):
 
         if skip_line(_ln):
@@ -107,8 +117,12 @@ def read_line_info(_lns, _Aji, _line_ctj_table):
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
+        if _words[0] == "prefix" and _words[1] != '-':
+            _prefix = _words[1]
+            continue
+
         # get ctj pair
-        ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+        ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
 
         if ctj_ij in _line_ctj_table:
             line_index = _line_ctj_table.index( ctj_ij )
@@ -147,6 +161,7 @@ def read_CE_table(_rs, _lns, _CE_table, _idxI, _idxJ, _f1, _f2, _level_info_tabl
     read CE table for interpolation
     """
     #_count = 0
+    _prefix = ''
     for _i, _ln in enumerate(_lns[_rs:]):
 
         if skip_line(_ln):
@@ -157,8 +172,12 @@ def read_CE_table(_rs, _lns, _CE_table, _idxI, _idxJ, _f1, _f2, _level_info_tabl
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
+        if _words[0] == "prefix" and _words[1] != '-':
+            _prefix = _words[1]
+            continue
+
         # get ctj pair
-        _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+        _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
 
         if _ctj_ij in _line_ctj_table:
             line_index = _line_ctj_table.index( _ctj_ij )
@@ -202,6 +221,7 @@ def read_CI_table(_rs, _lns, _CI_table, _f2, _idxI, _idxJ, _level_info_table, _c
     read CI table for interpolation
     """
     #_count = 0
+    _prefix = ''
     for _i, _ln in enumerate(_lns[_rs:]):
 
         if skip_line(_ln):
@@ -212,8 +232,15 @@ def read_CI_table(_rs, _lns, _CI_table, _f2, _idxI, _idxJ, _level_info_table, _c
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
+        if _words[0] == "prefix" and _words[1] != '-':
+            _prefix = _words[1]
+            continue
+
         # get ctj pair
-        _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+        if _words[3] == '-' and _prefix[-1] == '.':
+            _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+        else:
+            _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
 
         if _ctj_ij in _cont_ctj_table:
             contIndex = _cont_ctj_table.index( _ctj_ij )
@@ -257,6 +284,7 @@ def read_PI_table(_rs, _lns, _PI_table_dict, _PI_coe, _level_info_table, _cont_c
     _countMesh = 0
     _readMesh = False
 
+    _prefix = ''
     for _i, _ln in enumerate(_lns[_rs:]):
 
         if skip_line(_ln):
@@ -267,9 +295,17 @@ def read_PI_table(_rs, _lns, _PI_table_dict, _PI_coe, _level_info_table, _cont_c
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
+        if _words[0] == "prefix" and _words[1] != '-':
+            _prefix = _words[1]
+            continue
+
         # get ctj pair
         if len(_words) > 2:
-            _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+
+            if _words[3] == '-' and _prefix[-1] == '.':
+                _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+            else:
+                _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
 
             if _ctj_ij in _cont_ctj_table:
                 contIndex = _cont_ctj_table.index( _ctj_ij )
@@ -325,6 +361,7 @@ def read_Mesh_Info(_rs, _lns, _Mesh_coe, _filename, _level_info_table, _line_ctj
     read CI table for interpolation
     """
     _count = 0
+    _prefix = ''
     for _i, _ln in enumerate(_lns[_rs:]):
 
         if skip_line(_ln):
@@ -335,8 +372,12 @@ def read_Mesh_Info(_rs, _lns, _Mesh_coe, _filename, _level_info_table, _line_ctj
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
+        if _words[0] == "prefix" and _words[1] != '-':
+            _prefix = _words[1]
+            continue
+
         # get ctj pair
-        _ctj_ij = ( (_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+        _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
 
         assert _ctj_ij in _line_ctj_table
 

@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from .. import Constants as Cst
 import math
+from ..Structure import AtomIO
+from matplotlib.cm import ScalarMappable
+import numpy as np
 
 def _prepare_dict(_atom, _conf_prefix):
     r"""
@@ -72,7 +75,8 @@ def _prepare_dict(_atom, _conf_prefix):
     #-------------------------------------------------------------------------
     return _singlet, _multiplet, _Lset
 
-def line_with_text(_ax, _lp, _rp, _text, _tsize, _r, _tangle=0, _lcolor="black", _lwidth=0.7, _lstyle='-', _tcolor="black"):
+def line_with_text(_ax, _lp, _rp, _text, _tsize, _r, _tangle=0, _lcolor="black",
+                   _lwidth=0.7, _lstyle='-', _tcolor="black"):
     r"""
     Parameters
     ----------
@@ -122,13 +126,115 @@ def line_with_text(_ax, _lp, _rp, _text, _tsize, _r, _tangle=0, _lcolor="black",
     # {'color': 'black', 'fontsize': 6, 'ha': 'center', 'va': 'center',
     #    'bbox': dict(boxstyle="round", fc="white", ec="white", pad=0.2)}
     _line_obj, = _ax.plot([_lp[0], _rp[0]], [_lp[1], _rp[1]], linestyle=_lstyle, linewidth=_lwidth, color=_lcolor)
-    _tx = _lp[0] + (_rp[0]-_lp[0]) * _r
-    _ty = _lp[1] + (_rp[1]-_lp[1]) * _r
-    _text_obj = _ax.text( _tx, _ty, _text, {'color': _tcolor, 'fontsize': _tsize,
-                        'ha': 'center', 'va': 'center','rotation':_tangle,
-                        'bbox': dict(boxstyle="round", fc="white", ec="white", pad=0.2)} )
+
+    if _text is not None:
+        _tx = _lp[0] + (_rp[0]-_lp[0]) * _r
+        _ty = _lp[1] + (_rp[1]-_lp[1]) * _r
+        _text_obj = _ax.text( _tx, _ty, _text, {'color': _tcolor, 'fontsize': _tsize,
+                            'ha': 'center', 'va': 'center','rotation':_tangle,
+                            'bbox': dict(boxstyle="round", fc="white", ec="white", pad=0.2)} )
+    else:
+        _text_obj = None
 
     return _line_obj, _text_obj
+
+def arrow_without_text(_ax, _pi, _pj, _direction, _cmap, _norm, _v, _asize=10, _lwidth=2):
+    r"""
+    Parameters
+    ----------
+
+    _ax : matlotlib.pyplot.Axe
+        the axe to plot a arrow
+
+    _pi : tuple of float/int, (x,y)
+        xy of point of level i
+
+    _pj : tuple of float/int, (x,y)
+        xy of point of level j
+
+    _direction :
+        "Left->Right", "Right->Left"
+
+    _lwidth : float
+        line width, default : 2
+
+    _asize : float/int
+        arrow size, default : 10
+
+    _cmap :
+        colormap to be used
+
+    _norm :
+        normalizaiton of colormap to to used
+
+    _v : float
+        value to decide the color
+
+    Returns
+    -------
+
+    _line_obj : matplotlib.text.Annotation
+        object of the arrow we plot
+    """
+    # {'color': 'black', 'fontsize': 6, 'ha': 'center', 'va': 'center',
+    #    'bbox': dict(boxstyle="round", fc="white", ec="white", pad=0.2)}
+
+    assert _direction in ("i->j", "j->i")
+
+    if _direction == "i->j":
+        _xytext, _xy = _pi, _pj
+    else:
+        _xytext, _xy = _pj, _pi
+
+    if _v == 0:
+        return None
+    elif _v < 0:
+        _xytext, _xy = _xy, _xytext
+        _v = -_v
+
+    _annotation_obj = _ax.annotate('', xy=_xy, xycoords='data',
+                                   xytext=_xytext,textcoords='data',
+                                   arrowprops=dict(color=_cmap(_norm(_v)),width=_lwidth, headwidth=_asize))
+
+    return _annotation_obj
+
+def read_Grotrian(_lns):
+    r"""
+    read default line connection setup for Grotrian diagram
+    """
+    _line_plot = []
+    _prefix = ''
+    for _i, _ln in enumerate(_lns[:]):
+
+        if AtomIO.skip_line(_ln):
+            continue
+        elif AtomIO.check_end(_ln):
+            break
+
+        _words = _ln.split()
+        _words = [_v.strip() for _v in _words]
+
+        if _words[0] == "prefix" and _words[1] != '-':
+            _prefix = _words[1]
+            continue
+
+        _params = []
+        # get ctj pair
+        if _words[3] == '-' and _prefix[-1] == '.':
+            _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+        else:
+            _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
+
+        _params.append( _ctj_ij[0] )
+        _params.append( _ctj_ij[1] )
+        _params.append( _words[6] )
+        _params.append( float(_words[7]) )
+        _params.append( float(_words[8]) )
+
+        _line_plot.append(_params)
+
+    return _line_plot
+
 
 class Grotrian:
 
@@ -146,7 +252,8 @@ class Grotrian:
 
         """
         self.atom = _atom
-
+        self.prefix = _conf_prefix
+        self.line_plot = None
         #---------------------------------------------------------------------
         # prepare structures for plotting
         #---------------------------------------------------------------------
@@ -202,8 +309,12 @@ class Grotrian:
         #---------------------------------------------------------------------
         for k0, v0 in singlet.items():
             for k1, v1 in v0.items():
+                _idx = self.atom.Level_ctj_table.index((v1[2],k0[1],k1))
                 #plot level
-                xs_level = v1[1]-_hw, v1[1]+_hw
+                if self.atom.Level.isGround[_idx]:
+                    xs_level = v1[1]-_hw, v1[1]+_hw+2*len(Lset["singlet"])+len(Lset["multiplet"])
+                else:
+                    xs_level = v1[1]-_hw, v1[1]+_hw
                 ys_level = v1[0], v1[0]
                 plt.plot(xs_level, ys_level, "-k", linewidth=1)
                 # store level posiiton, (conf_origin, term, J)
@@ -300,6 +411,40 @@ class Grotrian:
 
         plt.show()
 
+    def show_Grotrian(self, _path, _text_selection="wavelength", _hasText=True):
+        r"""
+        """
+        with open(_path, 'r') as file:
+            _fLines = file.readlines()
+
+        _line_plot = read_Grotrian(_fLines)
+        self.line_plot = _line_plot
+
+        for _ctj1, _ctj2, wl, _r1, _r2 in _line_plot:
+
+            if _text_selection == "all":
+                if not _hasText:
+                    wl = "None"
+                self.connect_line(_cfj1=_ctj1, _cfj2=_ctj2, _r1=_r1, _r2=_r2, _c="black", _text=wl, _tsize=7, _r=0.4)
+
+            elif _text_selection == "wavelength":
+                if wl != "None":
+                    if not _hasText:
+                        wl = "None"
+                    self.connect_line(_cfj1=_ctj1, _cfj2=_ctj2, _r1=_r1, _r2=_r2, _c="black", _text=wl, _tsize=7, _r=0.4)
+
+            else:
+                if wl in _text_selection:
+                    if not _hasText:
+                        wl = "None"
+                    self.connect_line(_cfj1=_ctj1, _cfj2=_ctj2, _r1=_r1, _r2=_r2, _c="black", _text=wl, _tsize=7, _r=0.4)
+
+        for _ctj1, _ctj2, wl, _r1, _r2 in _line_plot:
+            if wl not in _text_selection:
+                continue
+
+        self.show_fig()
+
     def connect_line(self, _cfj1, _cfj2, _r1, _r2, _c, _text, _tsize=7, _r=0.4, _lcolor="black", _lwidth=0.7, _lstyle='-', _tcolor="black"):
         r"""
 
@@ -343,6 +488,10 @@ class Grotrian:
             color of the text, default : "black"
         """
 
+        if _text == "None":
+
+            _text = None
+
         pos_lvl1 = self.pos_level[_cfj1]
         pos_lvl2 = self.pos_level[_cfj2]
 
@@ -363,3 +512,77 @@ class Grotrian:
         _ax = self.fig.gca()
         _line_obj, _text_obj = line_with_text(_ax=_ax, _lp=_lp, _rp=_rp, _text=_text, _tsize=_tsize, _r=0.5,
                             _tangle=_tangle, _lcolor=_lcolor, _lwidth=_lwidth, _lstyle=_lstyle, _tcolor=_tcolor)
+
+
+
+    def connect_arrow(self, _cfj_i, _cfj_j, _ri, _rj, _direction, _cmap, _norm, _v, _asize=5, _lwidth=2):
+        r"""
+        """
+
+        pos_lvl_i = self.pos_level[_cfj_i]
+        pos_lvl_j = self.pos_level[_cfj_j]
+
+        _pi = pos_lvl_i["xs"][0] + (pos_lvl_i["xs"][1] - pos_lvl_i["xs"][0])*_ri , pos_lvl_i["ys"][0]
+        _pj = pos_lvl_j["xs"][0] + (pos_lvl_j["xs"][1] - pos_lvl_j["xs"][0])*_rj , pos_lvl_j["ys"][0]
+
+        _ax = self.fig.gca()
+        _annotation_obj = arrow_without_text(_ax=_ax, _pi=_pi, _pj=_pj,
+                            _direction=_direction, _cmap=_cmap, _norm=_norm,
+                            _v=_v, _asize=_asize, _lwidth=_lwidth)
+
+        return _annotation_obj
+
+    def show_transition_rate(self, _idxI, _idxJ, _rate, _direction, _cmap, _norm, _path=None, _asize=5, _lwidth=2, _level_ctj_without_prefix=None):
+        r"""
+        """
+
+        assert _idxI.shape[0] == _idxJ.shape[0] == _rate.shape[0]
+
+        if self.line_plot is not None:
+            _line_plot = self.line_plot
+
+        elif _path is not None:
+            with open(_path, 'r') as file:
+                _fLines = file.readlines()
+
+            _line_plot = read_Grotrian(_fLines)
+
+        else:
+            print("do not have _line_plot information to specify arrow position")
+            return None
+
+        _table = []
+        for _t in _line_plot:
+            _table.append((_t[0],_t[1]))
+
+
+        for k in range(_idxI.shape[0]):
+
+            _cfj_i = self.atom.Level_ctj_table[ _idxI[k] ]
+            _cfj_j = self.atom.Level_ctj_table[ _idxJ[k] ]
+
+            if _level_ctj_without_prefix is not None:
+                _level_ctj = ( self.prefix+_level_ctj_without_prefix[0],_level_ctj_without_prefix[1],_level_ctj_without_prefix[2] )
+                if _level_ctj not in (_cfj_i, _cfj_j):
+                    continue
+
+            _idx = _table.index( (_cfj_i,_cfj_j) )
+            if _idx == -1:
+                continue
+            else:
+                _ri, _rj = _line_plot[_idx][3],_line_plot[_idx][4]
+
+            _v = _rate[k]
+
+            _annotation_obj = self.connect_arrow(_cfj_i, _cfj_j, _ri, _rj, _direction,
+                                        _cmap, _norm, _v, _asize=_asize, _lwidth=_lwidth)
+
+        # colorbar ax
+        _temp = [[1,1]]
+        _temp_ax = self.fig.add_axes([0.875, 0.2, 0.001, 0.001])
+        _img = _temp_ax.imshow(_temp, cmap=_cmap, norm=_norm)
+        _temp_ax.set_visible(False)
+        _cax = self.fig.add_axes([0.84, 0.15, 0.02, 0.7])
+        self.fig.colorbar( _img, cax=_cax, orientation='vertical')
+
+        self.show_fig()
