@@ -63,7 +63,7 @@ class WavelengthMesh:
         if self._parent.hasContinuum:
             self.Cont = [] # List()
             for k in range(self._parent.nCont):
-                mesh = Profile.makeContinuumMesh(21) # in limit wavelength unit
+                mesh = Profile.makeContinuumMesh(41) # in limit wavelength unit
                 w0 = self._parent.Cont.w0[k]
                 self.Cont.append( mesh * w0 )
 

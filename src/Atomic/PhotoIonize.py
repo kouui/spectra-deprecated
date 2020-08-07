@@ -72,7 +72,7 @@ def interpolate_PI_alpha(_PI_table_list, _continuum_mesh_list):
     return _alpha_mesh_list
 
 
-def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, ni_lte, nk_lte):
+def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, nk_by_ni_LTE):
     r"""
     Given wavelength mesh, mean intensity (as function of wavelength),
     photoionization cross section, compute
@@ -96,11 +96,8 @@ def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, ni_lte, nk_l
     Te : np.double
         Temperature, [:math:`K`]
 
-    ni_lte : np.double
-        LTE population of level i, [:math:`cm^{-3}`]
-
-    nk_lte : np.double
-        LTE population of level k, [:math:`cm^{-3}`]
+    nk_by_ni_LTE : np.double
+        population ratio in LTE, nk/ni
 
     Returns
     -------
@@ -148,12 +145,13 @@ def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, ni_lte, nk_l
 
     # factor : [ni/nk]_{LTE}
     #factor_ = ne * (gi/gk) / expo[-1] * Te**(-1.5) * Cst.saha_**(-1)
-    _factor = ni_lte / nk_lte
+    _factor = 1/nk_by_ni_LTE
 
     integrand_ki_stim = integrand_ik * expo
     Rki_stim = _factor * 4*Cst.pi_ * Integrate.Trapze(integrand_ki_stim, wave)
 
-    integrand_ki_spon = alpha/hv * (2.*Cst.h_*Cst.c_/wave**3) * expo
+    #integrand_ki_spon = alpha/hv * (2.*Cst.h_*Cst.c_/wave**3) * expo
+    integrand_ki_spon = alpha/hv * (2.*Cst.h_*Cst.c_*Cst.c_/wave**5) * expo
     Rki_spon = _factor * 4*Cst.pi_ * Integrate.Trapze(integrand_ki_spon, wave)
 
     return Rik, Rki_stim, Rki_spon

@@ -17,8 +17,42 @@ def atom_gamma_Gamma(_atom):
     BasicP.get_Line_Gamma(idxI=_atom.Line.idxI[:], idxJ=_atom.Line.idxJ[:],
                         gamma=_atom.Level.gamma[:], Gamma=_atom.Line.Gamma[:])
 
-
 def ni_nj_LTE(_atom, _Te, _Ne):
+    r"""
+    """
+    _Level = _atom.Level
+    _Line  = _atom.Line
+    _Cont  = _atom.Cont
+
+    _nj_by_ni_L = LTELib.LTE_ratio_Line(_atom.Level.g[:],
+                                        _atom.Line.idxI[:],
+                                        _atom.Line.idxJ[:],
+                                        _atom.Line.w0[:], _Te)
+    _idxI_L = _atom.Line.idxI[:]
+    _idxJ_L = _atom.Line.idxJ[:]
+
+    _stage = _atom.Level.stage[:]
+
+    if _atom.hasContinuum:
+        _nj_by_ni_C = LTELib.LTE_ratio_Cont(_atom.Level.g[:],
+                                            _atom.Cont.idxI[:],
+                                            _atom.Cont.idxJ[:],
+                                            _atom.Cont.w0[:], _Te, _Ne)
+        _idxI_C = _atom.Cont.idxI[:]
+        _idxJ_C = _atom.Cont.idxJ[:]
+    else:
+        _nj_by_ni_C = None
+        _idxI_C = None
+        _idxJ_C = None
+
+
+    _ni = Lib.convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage,
+                          _hasContinuum=_atom.hasContinuum,
+                          _nj_by_ni_C=_nj_by_ni_C, _idxI_C=_idxI_C, _idxJ_C=_idxJ_C)
+
+    return _ni, _nj_by_ni_L, _nj_by_ni_C
+
+def ni_nj_LTE_v0(_atom, _Te, _Ne):
     r"""
     """
     _Level = _atom.Level
@@ -29,7 +63,7 @@ def ni_nj_LTE(_atom, _Te, _Ne):
 
     return _n_LTE, _ni_LTE, _nj_LTE
 
-def bf_R_rate(_atom, _Te, _ni_LTE, _nj_LTE, _Tr=None):
+def bf_R_rate(_atom, _Te, _nj_by_ni_LTE, _Tr=None):
     r"""
     """
 
@@ -40,15 +74,16 @@ def bf_R_rate(_atom, _Te, _ni_LTE, _nj_LTE, _Tr=None):
         _PI_I = []
         for k in range(_atom.nCont):
             _PI_I.append( LTELib.Planck_cm(_atom.Mesh.Cont[k],_Tr) )
+        _PI_I = np.array( _PI_I )
 
     _PI_alpha = PhotoIonize.interpolate_PI_alpha(_atom.PI.alpha_table, _atom.Mesh.Cont)
 
+
     _Rik, _Rki_stim, _Rki_spon = Lib.bf_R_rate(_waveMesh=_atom.Mesh.Cont,
-                                       _Jnu=0.5*np.array(_PI_I),
+                                       _Jnu=_PI_I,
                                        _alpha=_PI_alpha,
                                        _Te=_Te,
-                                       _ni_LTE=_ni_LTE[_atom.nLine:],
-                                       _nj_LTE=_nj_LTE[_atom.nLine:])
+                                       _nj_by_ni_LTE=_nj_by_ni_LTE[:])
 
     return _Rik, _Rki_stim, _Rki_spon
 

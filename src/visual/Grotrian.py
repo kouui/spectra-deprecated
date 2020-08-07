@@ -138,7 +138,7 @@ def line_with_text(_ax, _lp, _rp, _text, _tsize, _r, _tangle=0, _lcolor="black",
 
     return _line_obj, _text_obj
 
-def arrow_without_text(_ax, _pi, _pj, _direction, _cmap, _norm, _v, _asize=10, _lwidth=2):
+def arrow_without_text(_ax, _pi, _pj, _direction, _cmap, _norm, _v, _abserr, _asize=10, _lwidth=2):
     r"""
     Parameters
     ----------
@@ -170,6 +170,9 @@ def arrow_without_text(_ax, _pi, _pj, _direction, _cmap, _norm, _v, _asize=10, _
     _v : float
         value to decide the color
 
+    _abserr : float
+        absolute error, if 0 <= _v < _abserr, skip plotting arrow
+
     Returns
     -------
 
@@ -186,7 +189,7 @@ def arrow_without_text(_ax, _pi, _pj, _direction, _cmap, _norm, _v, _asize=10, _
     else:
         _xytext, _xy = _pj, _pi
 
-    if _v == 0:
+    if 0 <= abs(_v) < _abserr:
         return None
     elif _v < 0:
         _xytext, _xy = _xy, _xytext
@@ -327,7 +330,7 @@ class Grotrian:
                 plt.text(x_text, y_text, "{} {}".format(k0[0],k0[1]), fontsize=_textsize, color="k")
 
         # a vertical line separates singlet panel and multiplet panel
-        plt.axvline(x=_b+1, linestyle="--", linewidth=0.5, color="k")
+        #plt.axvline(x=_b+1, linestyle="--", linewidth=0.5, color="k")
         #---------------------------------------------------------------------
 
         #---------------------------------------------------------------------
@@ -515,7 +518,7 @@ class Grotrian:
 
 
 
-    def connect_arrow(self, _cfj_i, _cfj_j, _ri, _rj, _direction, _cmap, _norm, _v, _asize=5, _lwidth=2):
+    def connect_arrow(self, _cfj_i, _cfj_j, _ri, _rj, _direction, _cmap, _norm, _v, _abserr, _asize=5, _lwidth=2):
         r"""
         """
 
@@ -528,11 +531,11 @@ class Grotrian:
         _ax = self.fig.gca()
         _annotation_obj = arrow_without_text(_ax=_ax, _pi=_pi, _pj=_pj,
                             _direction=_direction, _cmap=_cmap, _norm=_norm,
-                            _v=_v, _asize=_asize, _lwidth=_lwidth)
+                            _v=_v, _abserr=_abserr, _asize=_asize, _lwidth=_lwidth)
 
         return _annotation_obj
 
-    def show_transition_rate(self, _idxI, _idxJ, _rate, _direction, _cmap, _norm, _path=None, _asize=5, _lwidth=2, _level_ctj_without_prefix=None):
+    def show_transition_rate(self, _idxI, _idxJ, _rate, _direction, _cmap, _norm, _abserr=1E-4, _path=None, _asize=5, _lwidth=2, _level_ctj_without_prefix=None):
         r"""
         """
 
@@ -575,7 +578,7 @@ class Grotrian:
             _v = _rate[k]
 
             _annotation_obj = self.connect_arrow(_cfj_i, _cfj_j, _ri, _rj, _direction,
-                                        _cmap, _norm, _v, _asize=_asize, _lwidth=_lwidth)
+                                        _cmap, _norm, _v, _abserr=_abserr, _asize=_asize, _lwidth=_lwidth)
 
         # colorbar ax
         _temp = [[1,1]]

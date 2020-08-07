@@ -100,7 +100,7 @@ def interpolate_CI_fac(_table, _Te, _Te_table, _f2):
 
     return _CI_fac
 
-def Cij_to_Cji(_Cij,  _ni_LTE, _nj_LTE):
+def Cij_to_Cji(_Cij,  _nj_by_ni_LTE):
     r"""
     calculate Cji from Cij
 
@@ -110,11 +110,8 @@ def Cij_to_Cji(_Cij,  _ni_LTE, _nj_LTE):
     _Cij : np.double, np.array, (nLine); scalar
         collisional upward rate coefficient, [:math:`cm^{-3} s^{-1}`]
 
-    _ni_LTE : np.double, np.array, (nLine); scalar
-        population in lower level, [:math:`cm^{-3}`]
-
-    _nj_LTE : np.double, np.array, (nLine); scalar
-        population in upper level, [:math:`cm^{-3}`]
+    _nj_by_ni_LTE : np.double, (nLine); scalar
+        population ratio in LTE, nj/ni
 
     Returns
     -------
@@ -128,7 +125,7 @@ def Cij_to_Cji(_Cij,  _ni_LTE, _nj_LTE):
 
     """
 
-    _Cji = _Cij * _ni_LTE / _nj_LTE
+    _Cji = _Cij / _nj_by_ni_LTE
 
     return _Cji
 

@@ -53,7 +53,7 @@ def Boltzmann_distribution(_gi, _gj, _Eji, _Te):
     """
 
     _kT = Cst.k_ * _Te
-    _rt = (_gj/_gi) * np.exp(-_Eji/_kT)
+    _rt = float(_gj)/float(_gi) * np.exp(-_Eji/_kT)
 
     return _rt
 
@@ -108,9 +108,88 @@ def Saha_distribution(_gi, _gk, _chi, _ne, _Te):
     """
 
     _kT = Cst.k_ * _Te
-    _rt = Cst.saha_ * _Te**(1.5) * (_gk/_gi) * np.exp(-_chi/_kT) / _ne
+    _rt = Cst.saha_ * _Te**(1.5) * float(_gk)/float(_gi) * np.exp(-_chi/_kT) / _ne
 
     return _rt
+
+
+def LTE_ratio_Line(_g, _idxI, _idxJ, _w0, _Te):
+    r"""
+    Compute LTE population ratio nj/ni for each line transition
+
+    Parameters
+    ----------
+    _g : numpy.1darray of np.uint8
+        statistical weight, [-]
+
+    _idxI : numpy.1darray of np.uint16
+        lower level index for each line transition
+
+    _idxJ : numpy.1darray of np.uint16
+        upper level index for each line transition
+
+    _w0 : numpy.1darray of np.float64
+        wavelength of each line transition, [:math:`cm`]
+
+    _Te : np.double
+        electron temperature, [:math:`K`]
+
+    Returns
+    --------
+    _nRatio : numpy.1darray of np.double
+        population ratio. [-]
+
+    """
+    _nLine = _w0.size
+    _nRatio = np.ones(_nLine, dtype=np.double)
+    for k in range(_nLine):
+        _gi = _g[ _idxI[k] ]
+        _gj = _g[ _idxJ[k] ]
+        _chi = Cst.h_ * Cst.c_ / _w0[k]
+        _nRatio[k] = Boltzmann_distribution(_gi, _gj, _chi, _Te)
+
+    return _nRatio
+
+def LTE_ratio_Cont(_g, _idxI, _idxJ, _w0, _Te, _Ne):
+    r"""
+    Compute LTE population ratio nj/ni for each continuum transition
+
+    Parameters
+    ----------
+    _g : numpy.1darray of np.uint8
+        statistical weight, [-]
+
+    _idxI : numpy.1darray of np.uint16
+        lower level index for each continuum transition
+
+    _idxJ : numpy.1darray of np.uint16
+        upper level index for each continuum transition
+
+    _w0 : numpy.1darray of np.float64
+        wavelength of each continuum transition, [:math:`cm`]
+
+    _Te : np.double
+        electron temperature, [:math:`K`]
+
+    _Ne : np.double
+        electron density, [:math:`cm^{-3}`]
+
+    Returns
+    --------
+    _nRatio : numpy.1darray of np.double
+        population ratio. [-]
+
+    """
+    _nLine = _w0.size
+    _nRatio = np.ones(_nLine, dtype=np.double)
+    for k in range(_nLine):
+        _gi = _g[ _idxI[k] ]
+        _gk = _g[ _idxJ[k] ]
+        _chi = Cst.h_ * Cst.c_ / _w0[k]
+        _nRatio[k] = Saha_distribution(_gi, _gk, _chi, _Ne, _Te)
+
+    return _nRatio
+
 
 def get_LTE_ratio(_erg, _g, _stage, _Te, _Ne):
     r"""
@@ -211,7 +290,7 @@ def EinsteinA_to_EinsteinBs_hz(Aji, f0, gi, gj):
     """
     factor_ = 2*Cst.h_*f0**3/Cst.c_**2
     Bji = Aji / factor_
-    Bij = Bji * gj / gi
+    Bij = Bji * float(gj) / float(gi)
 
     return Bji, Bij
 
@@ -227,8 +306,8 @@ def EinsteinA_to_EinsteinBs_cm(Aji, w0, gi, gj):
 
     Aji : np.double or array-like
         Einstein A coefficient Aji, [:math:`s^{-1}`]
-    f0 : np.double or array-like
-        central frequency of corresponding line transition, [:math:`Hz`]
+    w0 : np.double or array-like
+        central wavelength of corresponding line transition, [:math:`cm`]
     gi : np.uint8 or array-like
         statistical weight of lower level, [-]
     gj : np.uint8 or array-like
@@ -256,7 +335,7 @@ def EinsteinA_to_EinsteinBs_cm(Aji, w0, gi, gj):
     """
     factor_ = 2*Cst.h_*Cst.c_**2/w0**5
     Bji = Aji / factor_
-    Bij = Bji * gj / gi
+    Bij = Bji * float(gj) / float(gi)
 
     return Bji, Bij
 
@@ -300,10 +379,10 @@ def Planck_hz(F,T):
     F_T = F / T
     if F_T > 1.04183e+13:                                        # ignore exponential part, exponential > 500
         intensity = 0
-    elif F_T > 2.08366e+12:                                      # Wien approximation, exponential > 100
-        intensity = 2.0*Cst.h_*F*F*F/Cst.c_/Cst.c_ * np.exp( -Cst.h_*F_T/(Cst.k_) )
-    elif F_T < 2.08366e+08:                                      # Rayleighâ€“Jeans approximation, exponential < 0.01
-        intensity = 2.0*F*F/Cst.c_/Cst.c_ * Cst.k_ * T
+    #elif F_T > 2.08366e+12:                                      # Wien approximation, exponential > 100
+    #    intensity = 2.0*Cst.h_*F*F*F/Cst.c_/Cst.c_ * np.exp( -Cst.h_*F_T/(Cst.k_) )
+    #elif F_T < 2.08366e+08:                                      # Rayleighâ€“Jeans approximation, exponential < 0.01
+    #    intensity = 2.0*F*F/Cst.c_/Cst.c_ * Cst.k_ * T
     else:                                                        # normal formula
         intensity = 2.0*Cst.h_*F*F*F/Cst.c_/Cst.c_ / ( np.exp( Cst.h_*F_T/(Cst.k_) ) - 1.0 )
 
@@ -346,10 +425,10 @@ def Planck_cm(W,T):
     WT = W*T
     if WT < 2.87755e-03:                                         # ignore exponential part, exponential > 500
         intensity = 0
-    elif WT < 1.43878e-02:                                       # Wien approximation, exponential > 100
-        intensity = 2.0*Cst.h_*Cst.c_*Cst.c_ /(W)**5 * np.exp( -Cst.h_*Cst.c_/(Cst.k_*WT) )
-    elif WT > 1.43878e+02:                                       # Rayleighâ€“Jeans approximation, exponential < 0.01
-        intensity = 2.0*Cst.c_*Cst.k_*T / (W)**4
+    #elif WT < 1.43878e-02:                                       # Wien approximation, exponential > 100
+    #    intensity = 2.0*Cst.h_*Cst.c_*Cst.c_ /(W)**5 * np.exp( -Cst.h_*Cst.c_/(Cst.k_*WT) )
+    #elif WT > 1.43878e+02:                                       # Rayleighâ€“Jeans approximation, exponential < 0.01
+    #    intensity = 2.0*Cst.c_*Cst.k_*T / (W)**4
     else:                                                        # normal formula
         intensity = 2.0*Cst.h_*Cst.c_*Cst.c_ /(W)**5 /  ( np.exp( Cst.h_*Cst.c_/(Cst.k_*WT) ) - 1.0 )
 

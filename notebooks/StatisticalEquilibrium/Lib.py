@@ -12,6 +12,55 @@ from src import Constants as Cst
 
 from scipy.interpolate import interp1d
 
+def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
+                      _nj_by_ni_C=None, _idxI_C=None, _idxJ_C=None):
+    r"""
+    """
+    _nLevel = _stage.shape[0]
+    _nLine  = _nj_by_ni_L.shape[0]
+    if _hasContinuum:
+        _nCont  = _nj_by_ni_C.shape[0]
+
+
+    _stage_list = []
+    for k in range(_nLevel):
+        if _stage[k] not in _stage_list:
+            _stage_list.append( _stage[k] )
+
+
+    _ni = np.ones(_nLevel, dtype=np.double)
+    _refIdx = 0
+    for _s in _stage_list:
+        # process line transition
+        for k in range(_nLine):
+
+            _si = _stage[_idxI_L[k]]
+            _sj = _stage[_idxJ_L[k]]
+
+            if _idxI_L[k] != _refIdx:
+                continue
+
+            if _si==_s and _sj==_s:
+                _ni[ _idxJ_L[k] ] = _ni[ _refIdx ] * _nj_by_ni_L[k]
+
+        # process continuum transition
+        if not _hasContinuum:
+            break
+
+        for k in range(_nCont):
+
+            _si = _stage[_idxI_C[k]]
+            _sj = _stage[_idxJ_C[k]]
+
+            if _idxI_C[k] != _refIdx:
+                continue
+
+            if _si==_s and _sj==_s+1:
+                _ni[ _idxJ_C[k] ] = _ni[ _refIdx ] * _nj_by_ni_C[k]
+                _refIdx = _idxJ_C[k]
+
+    return _ni / _ni.sum()
+
 def ni_nj_LTE(_Level, _Line, _Cont, _Te, _Ne):
     r"""
     """
@@ -33,7 +82,7 @@ def ni_nj_LTE(_Level, _Line, _Cont, _Te, _Ne):
 
     return _n_LTE, _ni_LTE, _nj_LTE
 
-def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _ni_LTE, _nj_LTE):
+def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
     r"""
     """
     _nCont = len(_waveMesh)
@@ -49,8 +98,7 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _ni_LTE, _nj_LTE):
                             J = _Jnu[k][::-1],
                             alpha = _alpha[k][::-1],
                             Te = _Te,
-                            ni_lte = _ni_LTE[k],
-                            nk_lte = _nj_LTE[k])
+                            nk_by_ni_LTE=_nj_by_ni_LTE[k])
         _Rik[k] = _res[0]
         _Rki_stim[k] = _res[1]
         _Rki_spon[k] = _res[2]
