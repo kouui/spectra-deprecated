@@ -1,14 +1,12 @@
 
 import numpy as np
 
-import sys
-sys.path.append("../../")
 
-from src.Atomic import Collision, PhotoIonize
-from src.Atomic import LTELib, SEsolver, BasicP
-from src.RadiativeTransfer import Profile
-from src.Math import Integrate
-from src import Constants as Cst
+from ...Atomic import Collision, PhotoIonize
+from ...Atomic import LTELib, SEsolver, BasicP, SEsolver
+from ...RadiativeTransfer import Profile
+from ...Math import Integrate
+from ... import Constants as Cst
 
 from scipy.interpolate import interp1d
 
@@ -174,3 +172,25 @@ def CIik_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
                                   _dEik=_Coe.dEij[:])
 
     return _CIik
+
+def solve_SE(_nLevel, _idxI, _idxJ,
+       _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne):
+    r"""
+    """
+
+    _Cmat = np.zeros((_nLevel, _nLevel), dtype=np.double)
+    SEsolver.setMatrixC(_Cmat=_Cmat[:,:],
+                        _Cji=_Cji[:],
+                        _Cij=_Cij[:],
+                        _idxI=_idxI, _idxJ=_idxJ, _Ne=_Ne)
+
+    _Rmat = np.zeros((_nLevel, _nLevel), dtype=np.double)
+    SEsolver.setMatrixR(_Rmat=_Rmat[:,:],
+                        _Rji_spon=_Rji_spon[:],
+                        _Rji_stim=_Rji_stim[:],
+                        _Rij=_Rij[:],
+                        _idxI=_idxI, _idxJ=_idxJ)
+
+    _n_SE = SEsolver.solveSE(_Rmat=_Rmat[:,:], _Cmat=_Cmat[:,:])
+
+    return _n_SE

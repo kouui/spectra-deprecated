@@ -1,13 +1,13 @@
 
 import numpy as np
 
-import sys
-sys.path.append("../../")
+#import sys
+#sys.path.append("../../")
 
-from src.Atomic import LTELib, BasicP
-from src.Atomic import PhotoIonize, Collision
+from ...Atomic import LTELib, BasicP
+from ...Atomic import PhotoIonize, Collision
 
-import Lib
+from . import LibArray
 
 def atom_gamma_Gamma(_atom):
     r"""
@@ -46,7 +46,7 @@ def ni_nj_LTE(_atom, _Te, _Ne):
         _idxJ_C = None
 
 
-    _ni = Lib.convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage,
+    _ni = LibArray.convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage,
                           _hasContinuum=_atom.hasContinuum,
                           _nj_by_ni_C=_nj_by_ni_C, _idxI_C=_idxI_C, _idxJ_C=_idxJ_C)
 
@@ -59,7 +59,7 @@ def ni_nj_LTE_v0(_atom, _Te, _Ne):
     _Line  = _atom.Line
     _Cont  = _atom.Cont
 
-    _n_LTE, _ni_LTE, _nj_LTE = Lib.ni_nj_LTE(_Level, _Line, _Cont, _Te, _Ne)
+    _n_LTE, _ni_LTE, _nj_LTE = LibArray.ni_nj_LTE(_Level, _Line, _Cont, _Te, _Ne)
 
     return _n_LTE, _ni_LTE, _nj_LTE
 
@@ -79,7 +79,7 @@ def bf_R_rate(_atom, _Te, _nj_by_ni_LTE, _Tr=None):
     _PI_alpha = PhotoIonize.interpolate_PI_alpha(_atom.PI.alpha_table, _atom.Mesh.Cont)
 
 
-    _Rik, _Rki_stim, _Rki_spon = Lib.bf_R_rate(_waveMesh=_atom.Mesh.Cont,
+    _Rik, _Rki_stim, _Rki_spon = LibArray.bf_R_rate(_waveMesh=_atom.Mesh.Cont,
                                        _Jnu=_PI_I,
                                        _alpha=_PI_alpha,
                                        _Te=_Te,
@@ -95,7 +95,7 @@ def B_Jbar(_atom, _Tr):
     _lineIndex = _atom.I_Rad.lineIndex
 
     _Jbars = LTELib.Planck_cm(_atom.Line.w0[_atom.I_Rad.lineIndex],_Tr)
-    _Bij_Jbar0, _Bji_Jbar0 = Lib.B_Jbar(_Level, _Line, _lineIndex, _Jbar=_Jbars)
+    _Bij_Jbar0, _Bji_Jbar0 = LibArray.B_Jbar(_Level, _Line, _lineIndex, _Jbar=_Jbars)
 
     _Bij_Jbar = np.zeros(_atom.Line.AJI.shape, np.double)
     _Bji_Jbar = np.zeros(_atom.Line.AJI.shape, np.double)
@@ -114,7 +114,7 @@ def CEij_rate_coe(_atom, _Te):
     _Omega_table = _atom.CE.Omega_table[:,:]
     _Te_table    = _atom.CE.Te_table[:]
     _Coe         = _atom.CE.Coe
-    _CEij = Lib.CEij_rate_coe(_Omega_table, _Te_table, _Coe, _Te)
+    _CEij = LibArray.CEij_rate_coe(_Omega_table, _Te_table, _Coe, _Te)
 
     return _CEij
 
@@ -124,7 +124,7 @@ def CIik_rate_coe(_atom, _Te):
     _Omega_table = _atom.CI.Omega_table[:,:]
     _Te_table    = _atom.CI.Te_table[:]
     _Coe         = _atom.CI.Coe
-    _CIik = Lib.CIik_rate_coe(_Omega_table, _Te_table, _Coe, _Te)
+    _CIik = LibArray.CIik_rate_coe(_Omega_table, _Te_table, _Coe, _Te)
 
     return _CIik
 
@@ -139,3 +139,19 @@ def get_Cij(_atom, _Te):
         _Cij = _CEij
 
     return _Cij
+
+def solve_SE(_atom, _Ne, _Cji, _Cij, _Bji_Jbar, _Bij_Jbar, _Rki_spon, _Rki_stim, _Rik):
+    r"""
+    """
+    _nLevel = _atom.nLevel
+
+    _idxI = np.append(_atom.Line.idxI[:], _atom.Cont.idxI[:])
+    _idxJ = np.append(_atom.Line.idxJ[:], _atom.Cont.idxJ[:])
+
+    _Rji_spon = np.append(_atom.Line.AJI[:], _Rki_spon[:])
+    _Rji_stim = np.append(_Bij_Jbar[:], _Rki_stim[:])
+    _Rij = np.append(_Bij_Jbar[:], _Rik[:])
+
+    _n_SE = LibArray.solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne)
+
+    return _n_SE

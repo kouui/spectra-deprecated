@@ -121,7 +121,7 @@
     <span class="k">return</span> <span class="n">_alpha_mesh_list</span></div>
 
 
-<div class="viewcode-block" id="bound_free_radiative_transition_coefficient"><a class="viewcode-back" href="../../../RST/API/Atomic/_PhotoIonize_API/src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient.html#src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient">[docs]</a><span class="k">def</span> <span class="nf">bound_free_radiative_transition_coefficient</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">Te</span><span class="p">,</span> <span class="n">ni_lte</span><span class="p">,</span> <span class="n">nk_lte</span><span class="p">):</span>
+<div class="viewcode-block" id="bound_free_radiative_transition_coefficient"><a class="viewcode-back" href="../../../RST/API/Atomic/_PhotoIonize_API/src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient.html#src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient">[docs]</a><span class="k">def</span> <span class="nf">bound_free_radiative_transition_coefficient</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">Te</span><span class="p">,</span> <span class="n">nk_by_ni_LTE</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given wavelength mesh, mean intensity (as function of wavelength),</span>
 <span class="sd">    photoionization cross section, compute</span>
@@ -145,11 +145,8 @@
 <span class="sd">    Te : np.double</span>
 <span class="sd">        Temperature, [:math:`K`]</span>
 
-<span class="sd">    ni_lte : np.double</span>
-<span class="sd">        LTE population of level i, [:math:`cm^{-3}`]</span>
-
-<span class="sd">    nk_lte : np.double</span>
-<span class="sd">        LTE population of level k, [:math:`cm^{-3}`]</span>
+<span class="sd">    nk_by_ni_LTE : np.double</span>
+<span class="sd">        population ratio in LTE, nk/ni</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -197,102 +194,16 @@
 
     <span class="c1"># factor : [ni/nk]_{LTE}</span>
     <span class="c1">#factor_ = ne * (gi/gk) / expo[-1] * Te**(-1.5) * Cst.saha_**(-1)</span>
-    <span class="n">_factor</span> <span class="o">=</span> <span class="n">ni_lte</span> <span class="o">/</span> <span class="n">nk_lte</span>
+    <span class="n">_factor</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">nk_by_ni_LTE</span>
 
     <span class="n">integrand_ki_stim</span> <span class="o">=</span> <span class="n">integrand_ik</span> <span class="o">*</span> <span class="n">expo</span>
     <span class="n">Rki_stim</span> <span class="o">=</span> <span class="n">_factor</span> <span class="o">*</span> <span class="mi">4</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">pi_</span> <span class="o">*</span> <span class="n">Integrate</span><span class="o">.</span><span class="n">Trapze</span><span class="p">(</span><span class="n">integrand_ki_stim</span><span class="p">,</span> <span class="n">wave</span><span class="p">)</span>
 
-    <span class="n">integrand_ki_spon</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">/</span><span class="n">hv</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">wave</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">expo</span>
+    <span class="c1">#integrand_ki_spon = alpha/hv * (2.*Cst.h_*Cst.c_/wave**3) * expo</span>
+    <span class="n">integrand_ki_spon</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">/</span><span class="n">hv</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">wave</span><span class="o">**</span><span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="n">expo</span>
     <span class="n">Rki_spon</span> <span class="o">=</span> <span class="n">_factor</span> <span class="o">*</span> <span class="mi">4</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">pi_</span> <span class="o">*</span> <span class="n">Integrate</span><span class="o">.</span><span class="n">Trapze</span><span class="p">(</span><span class="n">integrand_ki_spon</span><span class="p">,</span> <span class="n">wave</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Rik</span><span class="p">,</span> <span class="n">Rki_stim</span><span class="p">,</span> <span class="n">Rki_spon</span></div>
-
-<span class="k">def</span> <span class="nf">bound_free_radiative_transition_coefficient_v0</span><span class="p">(</span><span class="n">wave</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">Te</span><span class="p">,</span><span class="n">gi</span><span class="p">,</span><span class="n">gk</span><span class="p">,</span><span class="n">ne</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Given wavelength mesh, mean intensity (as function of wavelength),</span>
-<span class="sd">    photoionization cross section, compute</span>
-<span class="sd">    radiative ionization rate,</span>
-<span class="sd">    stimulated radiative recombination rate,</span>
-<span class="sd">    spontaneous radiative recombination rate.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-
-<span class="sd">    wave : array-like of np.double</span>
-<span class="sd">        wavelength mesh, [:math:`cm`]</span>
-
-<span class="sd">    J : array-like of np.double</span>
-<span class="sd">        mean intensity as function of wavelength, [:math:`erg/cm^2/Sr/cm/s`]</span>
-
-<span class="sd">    alpha : array-like of np.double</span>
-<span class="sd">        photoionization cross section as function of wavelength, [:math:`cm^{2}`]</span>
-
-<span class="sd">    Te : np.double</span>
-<span class="sd">        Temperature, [:math:`K`]</span>
-
-<span class="sd">    gi : np.uint8</span>
-<span class="sd">        statistical weight of lower level i, [-]</span>
-
-<span class="sd">    gj : np.uint8</span>
-<span class="sd">        statistical weight of upper level j, [-]</span>
-
-<span class="sd">    ne : np.double</span>
-<span class="sd">        electron density, [:math:`cm^{-3}`]</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-
-<span class="sd">    Rik : np.double</span>
-<span class="sd">        Radiative ionization rate, [:math:`s^{-1} \cdot cm^{-3}`]</span>
-
-<span class="sd">    Rki_stim : np.double</span>
-<span class="sd">        Stimulated Radiative ionization rate, [:math:`s^{-1} \cdot cm^{-3}`]</span>
-
-<span class="sd">    Rki_spon : np.double</span>
-<span class="sd">        Spontaneous Radiative ionization rate, [:math:`s^{-1} \cdot cm^{-3}`]</span>
-
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-
-<span class="sd">    Radiative ionization rate [1]_ Equation(9.43),</span>
-
-<span class="sd">        .. math:: R_{ik} = 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} J(\nu) d\nu</span>
-
-<span class="sd">    Stimulated radiative recombination rate [1]_ Equation(9.47),</span>
-
-<span class="sd">        .. math:: R_{ki}^{stim} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} J(\nu) e^{-h\nu/kT} d\nu</span>
-
-<span class="sd">    Spontaneous radiative recombination rate [1]_ Equation(9.45)</span>
-
-<span class="sd">        .. math:: R_{ki}^{spon} = \frac{n_i^{LTE}}{n_k^{LTE}} 4\pi \int_{\nu_0}^{\infty} \alpha_{ik}(\nu) (h\nu)^{-1} (2h\nu^{3}/c^2) e^{-h\nu/kT} d\nu</span>
-
-<span class="sd">    References</span>
-<span class="sd">    -----------</span>
-
-<span class="sd">    .. [1] Ivan Hubeny, Dimitri Mihalas, &quot;Theory of Stellar Atmosphere:</span>
-<span class="sd">        An Introduction to Astrophysical Non-equilibrium</span>
-<span class="sd">        Quantitative Spectroscopic Analysis&quot;,</span>
-<span class="sd">        Princeton University Press, pp. 273, 2015.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># factor : h\nu</span>
-    <span class="n">hv</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span> <span class="o">*</span> <span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="n">wave</span>
-
-    <span class="n">expo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">hv</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">Te</span><span class="p">))</span>
-
-    <span class="n">integrand_ik</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">J</span><span class="o">/</span><span class="n">hv</span>
-    <span class="n">Rik</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">pi_</span> <span class="o">*</span> <span class="n">Integrate</span><span class="o">.</span><span class="n">Trapze</span><span class="p">(</span><span class="n">integrand_ik</span><span class="p">,</span> <span class="n">wave</span><span class="p">)</span>
-
-    <span class="c1"># factor : [ni/nk]_{LTE}</span>
-    <span class="n">factor_</span> <span class="o">=</span> <span class="n">ne</span> <span class="o">*</span> <span class="p">(</span><span class="n">gi</span><span class="o">/</span><span class="n">gk</span><span class="p">)</span> <span class="o">/</span> <span class="n">expo</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">Te</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">Cst</span><span class="o">.</span><span class="n">saha_</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">integrand_ki_stim</span> <span class="o">=</span> <span class="n">integrand_ik</span> <span class="o">*</span> <span class="n">expo</span>
-    <span class="n">Rki_stim</span> <span class="o">=</span> <span class="n">factor_</span> <span class="o">*</span> <span class="mi">4</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">pi_</span> <span class="o">*</span> <span class="n">Integrate</span><span class="o">.</span><span class="n">Trapze</span><span class="p">(</span><span class="n">integrand_ki_stim</span><span class="p">,</span> <span class="n">wave</span><span class="p">)</span>
-
-    <span class="n">integrand_ki_spon</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">/</span><span class="n">hv</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">wave</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">expo</span>
-    <span class="n">Rki_spon</span> <span class="o">=</span> <span class="n">factor_</span> <span class="o">*</span> <span class="mi">4</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">pi_</span> <span class="o">*</span> <span class="n">Integrate</span><span class="o">.</span><span class="n">Trapze</span><span class="p">(</span><span class="n">integrand_ki_spon</span><span class="p">,</span> <span class="n">wave</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">Rik</span><span class="p">,</span> <span class="n">Rki_stim</span><span class="p">,</span> <span class="n">Rki_spon</span>
 </pre></div>
 
           </div>

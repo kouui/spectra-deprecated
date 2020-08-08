@@ -187,7 +187,7 @@
 
     <span class="k">return</span> <span class="n">_line_obj</span><span class="p">,</span> <span class="n">_text_obj</span>
 
-<span class="k">def</span> <span class="nf">arrow_without_text</span><span class="p">(</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_pi</span><span class="p">,</span> <span class="n">_pj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">arrow_without_text</span><span class="p">(</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_pi</span><span class="p">,</span> <span class="n">_pj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_abserr</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -219,6 +219,9 @@
 <span class="sd">    _v : float</span>
 <span class="sd">        value to decide the color</span>
 
+<span class="sd">    _abserr : float</span>
+<span class="sd">        absolute error, if 0 &lt;= _v &lt; _abserr, skip plotting arrow</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 
@@ -235,7 +238,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">_xytext</span><span class="p">,</span> <span class="n">_xy</span> <span class="o">=</span> <span class="n">_pj</span><span class="p">,</span> <span class="n">_pi</span>
 
-    <span class="k">if</span> <span class="n">_v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">_abserr</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">elif</span> <span class="n">_v</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">_xytext</span><span class="p">,</span> <span class="n">_xy</span> <span class="o">=</span> <span class="n">_xy</span><span class="p">,</span> <span class="n">_xytext</span>
@@ -282,12 +285,12 @@
 
         <span class="n">_line_plot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_params</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_line_plot</span>
+    <span class="k">return</span> <span class="n">_line_plot</span><span class="p">,</span> <span class="n">_prefix</span>
 
 
 <div class="viewcode-block" id="Grotrian"><a class="viewcode-back" href="../../../RST/API/Visual/_Grotrian_API/src.Visual.Grotrian.Grotrian.html#src.Visual.Grotrian.Grotrian">[docs]</a><span class="k">class</span> <span class="nc">Grotrian</span><span class="p">:</span>
 
-<div class="viewcode-block" id="Grotrian.__init__"><a class="viewcode-back" href="../../../RST/API/Visual/_Grotrian_API/src.Visual.Grotrian.Grotrian.html#src.Visual.Grotrian.Grotrian.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_atom</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="p">):</span>
+<div class="viewcode-block" id="Grotrian.__init__"><a class="viewcode-back" href="../../../RST/API/Visual/_Grotrian_API/src.Visual.Grotrian.Grotrian.html#src.Visual.Grotrian.Grotrian.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_atom</span><span class="p">,</span> <span class="n">_path</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Parameters</span>
@@ -296,17 +299,26 @@
 <span class="sd">        _atom : AtomCls.Atom</span>
 <span class="sd">            object of the atomic model</span>
 
+<span class="sd">        _path : str</span>
+<span class="sd">            a path to the *.Grotrian configuration file</span>
+
 <span class="sd">        _conf_prefix : str</span>
 <span class="sd">            common configuration string of the inner shell</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="n">_atom</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">_conf_prefix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">_path</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">_fLines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span>  <span class="o">=</span> <span class="n">read_Grotrian</span><span class="p">(</span><span class="n">_fLines</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_conf_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">_conf_prefix</span>
         <span class="c1">#---------------------------------------------------------------------</span>
         <span class="c1"># prepare structures for plotting</span>
         <span class="c1">#---------------------------------------------------------------------</span>
-        <span class="n">singlet</span><span class="p">,</span> <span class="n">multiplet</span><span class="p">,</span> <span class="n">Lset</span> <span class="o">=</span> <span class="n">_prepare_dict</span><span class="p">(</span><span class="n">_atom</span><span class="o">=</span><span class="n">_atom</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="o">=</span><span class="n">_conf_prefix</span><span class="p">)</span>
+        <span class="n">singlet</span><span class="p">,</span> <span class="n">multiplet</span><span class="p">,</span> <span class="n">Lset</span> <span class="o">=</span> <span class="n">_prepare_dict</span><span class="p">(</span><span class="n">_atom</span><span class="o">=</span><span class="n">_atom</span><span class="p">,</span> <span class="n">_conf_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">singlet</span> <span class="o">=</span> <span class="n">singlet</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">multiplet</span> <span class="o">=</span> <span class="n">multiplet</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lset</span> <span class="o">=</span> <span class="n">Lset</span>
@@ -376,7 +388,7 @@
                 <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x_text</span><span class="p">,</span> <span class="n">y_text</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">k0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">_textsize</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
 
         <span class="c1"># a vertical line separates singlet panel and multiplet panel</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">_b</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+        <span class="c1">#plt.axvline(x=_b+1, linestyle=&quot;--&quot;, linewidth=0.5, color=&quot;k&quot;)</span>
         <span class="c1">#---------------------------------------------------------------------</span>
 
         <span class="c1">#---------------------------------------------------------------------</span>
@@ -460,14 +472,11 @@
 
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">show_Grotrian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_path</span><span class="p">,</span> <span class="n">_text_selection</span><span class="o">=</span><span class="s2">&quot;wavelength&quot;</span><span class="p">,</span> <span class="n">_hasText</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">plot_transitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_text_selection</span><span class="o">=</span><span class="s2">&quot;wavelength&quot;</span><span class="p">,</span> <span class="n">_hasText</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-            <span class="n">_fLines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
 
-        <span class="n">_line_plot</span> <span class="o">=</span> <span class="n">read_Grotrian</span><span class="p">(</span><span class="n">_fLines</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span> <span class="o">=</span> <span class="n">_line_plot</span>
+        <span class="n">_line_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span>
 
         <span class="k">for</span> <span class="n">_ctj1</span><span class="p">,</span> <span class="n">_ctj2</span><span class="p">,</span> <span class="n">wl</span><span class="p">,</span> <span class="n">_r1</span><span class="p">,</span> <span class="n">_r2</span> <span class="ow">in</span> <span class="n">_line_plot</span><span class="p">:</span>
 
@@ -564,7 +573,7 @@
 
 
 
-    <span class="k">def</span> <span class="nf">connect_arrow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_cfj_i</span><span class="p">,</span> <span class="n">_cfj_j</span><span class="p">,</span> <span class="n">_ri</span><span class="p">,</span> <span class="n">_rj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">connect_arrow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_cfj_i</span><span class="p">,</span> <span class="n">_cfj_j</span><span class="p">,</span> <span class="n">_ri</span><span class="p">,</span> <span class="n">_rj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_abserr</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -577,28 +586,17 @@
         <span class="n">_ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
         <span class="n">_annotation_obj</span> <span class="o">=</span> <span class="n">arrow_without_text</span><span class="p">(</span><span class="n">_ax</span><span class="o">=</span><span class="n">_ax</span><span class="p">,</span> <span class="n">_pi</span><span class="o">=</span><span class="n">_pi</span><span class="p">,</span> <span class="n">_pj</span><span class="o">=</span><span class="n">_pj</span><span class="p">,</span>
                             <span class="n">_direction</span><span class="o">=</span><span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="o">=</span><span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="o">=</span><span class="n">_norm</span><span class="p">,</span>
-                            <span class="n">_v</span><span class="o">=</span><span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="n">_asize</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">)</span>
+                            <span class="n">_v</span><span class="o">=</span><span class="n">_v</span><span class="p">,</span> <span class="n">_abserr</span><span class="o">=</span><span class="n">_abserr</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="n">_asize</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_annotation_obj</span>
 
-    <span class="k">def</span> <span class="nf">show_transition_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_idxI</span><span class="p">,</span> <span class="n">_idxJ</span><span class="p">,</span> <span class="n">_rate</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_level_ctj_without_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">plot_transition_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_idxI</span><span class="p">,</span> <span class="n">_idxJ</span><span class="p">,</span> <span class="n">_rate</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span> <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_abserr</span><span class="o">=</span><span class="mf">1E-5</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">_level_ctj_without_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="n">_idxI</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">_idxJ</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">_rate</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_line_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span>
-
-        <span class="k">elif</span> <span class="n">_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-                <span class="n">_fLines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-
-            <span class="n">_line_plot</span> <span class="o">=</span> <span class="n">read_Grotrian</span><span class="p">(</span><span class="n">_fLines</span><span class="p">)</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;do not have _line_plot information to specify arrow position&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">_line_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_plot</span>
 
         <span class="n">_table</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">_t</span> <span class="ow">in</span> <span class="n">_line_plot</span><span class="p">:</span>
@@ -624,7 +622,7 @@
             <span class="n">_v</span> <span class="o">=</span> <span class="n">_rate</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
 
             <span class="n">_annotation_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connect_arrow</span><span class="p">(</span><span class="n">_cfj_i</span><span class="p">,</span> <span class="n">_cfj_j</span><span class="p">,</span> <span class="n">_ri</span><span class="p">,</span> <span class="n">_rj</span><span class="p">,</span> <span class="n">_direction</span><span class="p">,</span>
-                                        <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="n">_asize</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">)</span>
+                                        <span class="n">_cmap</span><span class="p">,</span> <span class="n">_norm</span><span class="p">,</span> <span class="n">_v</span><span class="p">,</span> <span class="n">_abserr</span><span class="o">=</span><span class="n">_abserr</span><span class="p">,</span> <span class="n">_asize</span><span class="o">=</span><span class="n">_asize</span><span class="p">,</span> <span class="n">_lwidth</span><span class="o">=</span><span class="n">_lwidth</span><span class="p">)</span>
 
         <span class="c1"># colorbar ax</span>
         <span class="n">_temp</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>

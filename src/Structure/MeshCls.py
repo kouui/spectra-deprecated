@@ -6,9 +6,10 @@ from ..RadiativeTransfer import Profile
 
 class WavelengthMesh:
 
-    def __init__(self, _parent):
+    def __init__(self, _parent, _isPrint=False):
         r"""
         """
+        self.isPrint = _isPrint
         self._parent = _parent
 
     def make_Line_Mesh(self, _path):
@@ -53,7 +54,8 @@ class WavelengthMesh:
 
             self.RadLine.append( mesh )
 
-        print("line mesh prepared.")
+        if self.isPrint:
+            print("line mesh prepared.")
 
     def make_Cont_Mesh(self):
         r"""
@@ -67,4 +69,5 @@ class WavelengthMesh:
                 w0 = self._parent.Cont.w0[k]
                 self.Cont.append( mesh * w0 )
 
-            print("continuum mesh prepared.")
+            if self.isPrint:
+                print("continuum mesh prepared.")

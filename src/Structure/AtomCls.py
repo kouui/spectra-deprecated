@@ -13,7 +13,7 @@ from collections import OrderedDict
 class Atom:
 
 
-    def __init__(self, _filepath, _file_Aji=None, _file_CEe=None, _file_CEp=None):
+    def __init__(self, _filepath, _file_Aji=None, _file_CEe=None, _file_CEp=None, _isPrint=False):
         r"""
         initial method of class Atom.
 
@@ -32,6 +32,9 @@ class Atom:
         _file_CEp : str
             path (and filename) to Proton impact Effective Collisional Strength data file *.Proton, default: None
         """
+
+        self.isPrint = _isPrint
+
         self.filepath_dict = {
             "config" : _filepath,
 
@@ -223,8 +226,9 @@ class Atom:
             path to *.Aji data file
         """
 
-        print("Reading Einstein Aji coefficient from : \n", _path)
-        print("...")
+        if self.isPrint:
+            print("Reading Einstein Aji coefficient from : \n", _path)
+            print("...")
 
         self.filepath_dict["Aji"] = _path
         with open(_path, 'r') as file:
@@ -260,9 +264,9 @@ class Atom:
 
         self.Line.Gamma[:] = 0
 
-
-        print("Finished.")
-        print()
+        if self.isPrint:
+            print("Finished.")
+            print()
 
     def read_CE(self, _path_electron, _path_proton=None):
         r"""
@@ -279,7 +283,7 @@ class Atom:
             path to *.proton
         """
 
-        self.CE = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CE")
+        self.CE = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CE", _isPrint=self.isPrint)
 
     def read_CI(self, _path_electron, _path_proton=None):
         r"""
@@ -295,7 +299,7 @@ class Atom:
             path to *.proton
         """
 
-        self.CI = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CI")
+        self.CI = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CI", _isPrint=self.isPrint)
 
     def read_PI(self, _path_alpha):
         r"""
@@ -309,10 +313,11 @@ class Atom:
 
         """
 
-        print("Reading Photoionization cross section from : \n", _path_alpha)
+        if self.isPrint:
+            print("Reading Photoionization cross section from : \n", _path_alpha)
 
         self.filepath_dict["Photoionization"] = _path_alpha
-        self.PI = Photoionization(_parent=self, _path_alpha=_path_alpha)
+        self.PI = Photoionization(_parent=self, _path_alpha=_path_alpha, _isPrint=self.isPrint)
 
     def read_RadiativeLine_and_make_Line_Mesh(self, _path):
         r"""
@@ -327,9 +332,11 @@ class Atom:
 
         """
 
-        print("Reading Radiative Line information from : \n", _path)
+        if self.isPrint:
+            print("Reading Radiative Line information from : \n", _path)
+
         self.filepath_dict["RadiativeLine"] = _path
-        self.Mesh = MeshCls.WavelengthMesh(_parent=self)
+        self.Mesh = MeshCls.WavelengthMesh(_parent=self, _isPrint=self.isPrint)
         self.Mesh.make_Line_Mesh(_path=_path)
 
     def make_Cont_Mesh(self):
@@ -475,7 +482,9 @@ class Atom:
 class Collisional_Transition:
 
 
-    def __init__(self, _parent, _path_electron, _path_proton=None, _type=""):
+    def __init__(self, _parent, _path_electron, _path_proton=None, _type="", _isPrint=False):
+
+        self.isPrint = _isPrint
 
         assert _type in ("CE", "CI")
         self._parent = _parent
@@ -484,11 +493,13 @@ class Collisional_Transition:
         # read Electron impact data
         #---------------------------------------------------------------------
         if _type == "CE":
-            print("Reading Electron impact Effective Collisional Strength from : \n", _path_electron)
+            if self.isPrint:
+                print("Reading Electron impact Effective Collisional Strength from : \n", _path_electron)
             _parent.filepath_dict["CE_electron"] = _path_electron
             N = _parent.nLine
         elif _type == "CI":
-            print("Reading Electron impact Collisional Ionization coefficient from : \n", _path_electron)
+            if self.isPrint:
+                print("Reading Electron impact Collisional Ionization coefficient from : \n", _path_electron)
             _parent.filepath_dict["CI_electron"] = _path_electron
             N = _parent.nCont
 
@@ -534,8 +545,9 @@ class Collisional_Transition:
             self.Coe.gj[k] = _parent.Level.g[self.Coe.idxJ[k]]
             self.Coe.dEij[k] = _parent.Level.erg[self.Coe.idxJ[k]] - _parent.Level.erg[self.Coe.idxI[k]]
 
-        print("Finished.")
-        print()
+        if self.isPrint:
+            print("Finished.")
+            print()
 
         #---------------------------------------------------------------------
         # read Proton impact data (not yet imported)
@@ -555,9 +567,11 @@ class Collisional_Transition:
 
 class Photoionization:
 
-    def __init__(self, _parent, _path_alpha):
+    def __init__(self, _parent, _path_alpha, _isPrint=False):
         r"""
         """
+
+        self.isPrint = _isPrint
 
         with open(_path_alpha, 'r') as file:
             fLines = file.readlines()
@@ -605,5 +619,6 @@ class Photoionization:
             #self.PI_table[k,:self.PI_coe.nLambda[k],0] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table[k,0,0]
             self.alpha_table[k][0,:] += _parent.Cont.w0[k] - self.alpha_table[k][0,0]
 
-        print("Finished.")
-        print()
+        if self.isPrint:
+            print("Finished.")
+            print()

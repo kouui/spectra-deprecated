@@ -60,7 +60,7 @@
 <h1>src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient<a class="headerlink" href="#src-atomic-photoionize-bound-free-radiative-transition-coefficient" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient">
-<code class="descclassname">src.Atomic.PhotoIonize.</code><code class="descname">bound_free_radiative_transition_coefficient</code><span class="sig-paren">(</span><em>wave</em>, <em>J</em>, <em>alpha</em>, <em>Te</em>, <em>ni_lte</em>, <em>nk_lte</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/PhotoIonize.html#bound_free_radiative_transition_coefficient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.Atomic.PhotoIonize.</code><code class="descname">bound_free_radiative_transition_coefficient</code><span class="sig-paren">(</span><em>wave</em>, <em>J</em>, <em>alpha</em>, <em>Te</em>, <em>nk_by_ni_LTE</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/PhotoIonize.html#bound_free_radiative_transition_coefficient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given wavelength mesh, mean intensity (as function of wavelength),
 photoionization cross section, compute</p>
 <ul class="simple">
@@ -75,8 +75,7 @@ photoionization cross section, compute</p>
 <li><p><strong>J</strong> (<em>array-like of np.double</em>) – mean intensity as function of wavelength, [<span class="math notranslate nohighlight">\(erg/cm^2/Sr/cm/s\)</span>]</p></li>
 <li><p><strong>alpha</strong> (<em>array-like of np.double</em>) – photoionization cross section as function of wavelength, [<span class="math notranslate nohighlight">\(cm^{2}\)</span>]</p></li>
 <li><p><strong>Te</strong> (<em>np.double</em>) – Temperature, [<span class="math notranslate nohighlight">\(K\)</span>]</p></li>
-<li><p><strong>ni_lte</strong> (<em>np.double</em>) – LTE population of level i, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
-<li><p><strong>nk_lte</strong> (<em>np.double</em>) – LTE population of level k, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
+<li><p><strong>nk_by_ni_LTE</strong> (<em>np.double</em>) – population ratio in LTE, nk/ni</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

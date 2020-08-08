@@ -102,7 +102,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_kT</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">k_</span> <span class="o">*</span> <span class="n">_Te</span>
-    <span class="n">_rt</span> <span class="o">=</span> <span class="p">(</span><span class="n">_gj</span><span class="o">/</span><span class="n">_gi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">_Eji</span><span class="o">/</span><span class="n">_kT</span><span class="p">)</span>
+    <span class="n">_rt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_gj</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">_gi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">_Eji</span><span class="o">/</span><span class="n">_kT</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_rt</span></div>
 
@@ -157,9 +157,88 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_kT</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">k_</span> <span class="o">*</span> <span class="n">_Te</span>
-    <span class="n">_rt</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">saha_</span> <span class="o">*</span> <span class="n">_Te</span><span class="o">**</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">_gk</span><span class="o">/</span><span class="n">_gi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">_chi</span><span class="o">/</span><span class="n">_kT</span><span class="p">)</span> <span class="o">/</span> <span class="n">_ne</span>
+    <span class="n">_rt</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">saha_</span> <span class="o">*</span> <span class="n">_Te</span><span class="o">**</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">_gk</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">_gi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">_chi</span><span class="o">/</span><span class="n">_kT</span><span class="p">)</span> <span class="o">/</span> <span class="n">_ne</span>
 
     <span class="k">return</span> <span class="n">_rt</span></div>
+
+
+<span class="k">def</span> <span class="nf">LTE_ratio_Line</span><span class="p">(</span><span class="n">_g</span><span class="p">,</span> <span class="n">_idxI</span><span class="p">,</span> <span class="n">_idxJ</span><span class="p">,</span> <span class="n">_w0</span><span class="p">,</span> <span class="n">_Te</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute LTE population ratio nj/ni for each line transition</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _g : numpy.1darray of np.uint8</span>
+<span class="sd">        statistical weight, [-]</span>
+
+<span class="sd">    _idxI : numpy.1darray of np.uint16</span>
+<span class="sd">        lower level index for each line transition</span>
+
+<span class="sd">    _idxJ : numpy.1darray of np.uint16</span>
+<span class="sd">        upper level index for each line transition</span>
+
+<span class="sd">    _w0 : numpy.1darray of np.float64</span>
+<span class="sd">        wavelength of each line transition, [:math:`cm`]</span>
+
+<span class="sd">    _Te : np.double</span>
+<span class="sd">        electron temperature, [:math:`K`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    _nRatio : numpy.1darray of np.double</span>
+<span class="sd">        population ratio. [-]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_nLine</span> <span class="o">=</span> <span class="n">_w0</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">_nRatio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">_nLine</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nLine</span><span class="p">):</span>
+        <span class="n">_gi</span> <span class="o">=</span> <span class="n">_g</span><span class="p">[</span> <span class="n">_idxI</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">_gj</span> <span class="o">=</span> <span class="n">_g</span><span class="p">[</span> <span class="n">_idxJ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">_chi</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span> <span class="o">*</span> <span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="n">_w0</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_nRatio</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Boltzmann_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gj</span><span class="p">,</span> <span class="n">_chi</span><span class="p">,</span> <span class="n">_Te</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_nRatio</span>
+
+<span class="k">def</span> <span class="nf">LTE_ratio_Cont</span><span class="p">(</span><span class="n">_g</span><span class="p">,</span> <span class="n">_idxI</span><span class="p">,</span> <span class="n">_idxJ</span><span class="p">,</span> <span class="n">_w0</span><span class="p">,</span> <span class="n">_Te</span><span class="p">,</span> <span class="n">_Ne</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute LTE population ratio nj/ni for each continuum transition</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    _g : numpy.1darray of np.uint8</span>
+<span class="sd">        statistical weight, [-]</span>
+
+<span class="sd">    _idxI : numpy.1darray of np.uint16</span>
+<span class="sd">        lower level index for each continuum transition</span>
+
+<span class="sd">    _idxJ : numpy.1darray of np.uint16</span>
+<span class="sd">        upper level index for each continuum transition</span>
+
+<span class="sd">    _w0 : numpy.1darray of np.float64</span>
+<span class="sd">        wavelength of each continuum transition, [:math:`cm`]</span>
+
+<span class="sd">    _Te : np.double</span>
+<span class="sd">        electron temperature, [:math:`K`]</span>
+
+<span class="sd">    _Ne : np.double</span>
+<span class="sd">        electron density, [:math:`cm^{-3}`]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    _nRatio : numpy.1darray of np.double</span>
+<span class="sd">        population ratio. [-]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_nLine</span> <span class="o">=</span> <span class="n">_w0</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">_nRatio</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">_nLine</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_nLine</span><span class="p">):</span>
+        <span class="n">_gi</span> <span class="o">=</span> <span class="n">_g</span><span class="p">[</span> <span class="n">_idxI</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">_gk</span> <span class="o">=</span> <span class="n">_g</span><span class="p">[</span> <span class="n">_idxJ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">_chi</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span> <span class="o">*</span> <span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="n">_w0</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">_nRatio</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Saha_distribution</span><span class="p">(</span><span class="n">_gi</span><span class="p">,</span> <span class="n">_gk</span><span class="p">,</span> <span class="n">_chi</span><span class="p">,</span> <span class="n">_Ne</span><span class="p">,</span> <span class="n">_Te</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_nRatio</span>
+
 
 <div class="viewcode-block" id="get_LTE_ratio"><a class="viewcode-back" href="../../../RST/API/Atomic/_LTELib_API/src.Atomic.LTELib.get_LTE_ratio.html#src.Atomic.LTELib.get_LTE_ratio">[docs]</a><span class="k">def</span> <span class="nf">get_LTE_ratio</span><span class="p">(</span><span class="n">_erg</span><span class="p">,</span> <span class="n">_g</span><span class="p">,</span> <span class="n">_stage</span><span class="p">,</span> <span class="n">_Te</span><span class="p">,</span> <span class="n">_Ne</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -260,7 +339,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">factor_</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">f0</span><span class="o">**</span><span class="mi">3</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">**</span><span class="mi">2</span>
     <span class="n">Bji</span> <span class="o">=</span> <span class="n">Aji</span> <span class="o">/</span> <span class="n">factor_</span>
-    <span class="n">Bij</span> <span class="o">=</span> <span class="n">Bji</span> <span class="o">*</span> <span class="n">gj</span> <span class="o">/</span> <span class="n">gi</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">Bji</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">gj</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">gi</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Bji</span><span class="p">,</span> <span class="n">Bij</span></div>
 
@@ -276,8 +355,8 @@
 
 <span class="sd">    Aji : np.double or array-like</span>
 <span class="sd">        Einstein A coefficient Aji, [:math:`s^{-1}`]</span>
-<span class="sd">    f0 : np.double or array-like</span>
-<span class="sd">        central frequency of corresponding line transition, [:math:`Hz`]</span>
+<span class="sd">    w0 : np.double or array-like</span>
+<span class="sd">        central wavelength of corresponding line transition, [:math:`cm`]</span>
 <span class="sd">    gi : np.uint8 or array-like</span>
 <span class="sd">        statistical weight of lower level, [-]</span>
 <span class="sd">    gj : np.uint8 or array-like</span>
@@ -305,7 +384,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">factor_</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">w0</span><span class="o">**</span><span class="mi">5</span>
     <span class="n">Bji</span> <span class="o">=</span> <span class="n">Aji</span> <span class="o">/</span> <span class="n">factor_</span>
-    <span class="n">Bij</span> <span class="o">=</span> <span class="n">Bji</span> <span class="o">*</span> <span class="n">gj</span> <span class="o">/</span> <span class="n">gi</span>
+    <span class="n">Bij</span> <span class="o">=</span> <span class="n">Bji</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">gj</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">gi</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Bji</span><span class="p">,</span> <span class="n">Bij</span></div>
 
@@ -349,10 +428,10 @@
     <span class="n">F_T</span> <span class="o">=</span> <span class="n">F</span> <span class="o">/</span> <span class="n">T</span>
     <span class="k">if</span> <span class="n">F_T</span> <span class="o">&gt;</span> <span class="mf">1.04183e+13</span><span class="p">:</span>                                        <span class="c1"># ignore exponential part, exponential &gt; 500</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">elif</span> <span class="n">F_T</span> <span class="o">&gt;</span> <span class="mf">2.08366e+12</span><span class="p">:</span>                                      <span class="c1"># Wien approximation, exponential &gt; 100</span>
-        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="o">-</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F_T</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="p">)</span> <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">F_T</span> <span class="o">&lt;</span> <span class="mf">2.08366e+08</span><span class="p">:</span>                                      <span class="c1"># Rayleighâ€“Jeans approximation, exponential &lt; 0.01</span>
-        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">*</span> <span class="n">Cst</span><span class="o">.</span><span class="n">k_</span> <span class="o">*</span> <span class="n">T</span>
+    <span class="c1">#elif F_T &gt; 2.08366e+12:                                      # Wien approximation, exponential &gt; 100</span>
+    <span class="c1">#    intensity = 2.0*Cst.h_*F*F*F/Cst.c_/Cst.c_ * np.exp( -Cst.h_*F_T/(Cst.k_) )</span>
+    <span class="c1">#elif F_T &lt; 2.08366e+08:                                      # Rayleighâ€“Jeans approximation, exponential &lt; 0.01</span>
+    <span class="c1">#    intensity = 2.0*F*F/Cst.c_/Cst.c_ * Cst.k_ * T</span>
     <span class="k">else</span><span class="p">:</span>                                                        <span class="c1"># normal formula</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">F_T</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="p">)</span>
 
@@ -395,10 +474,10 @@
     <span class="n">WT</span> <span class="o">=</span> <span class="n">W</span><span class="o">*</span><span class="n">T</span>
     <span class="k">if</span> <span class="n">WT</span> <span class="o">&lt;</span> <span class="mf">2.87755e-03</span><span class="p">:</span>                                         <span class="c1"># ignore exponential part, exponential &gt; 500</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">elif</span> <span class="n">WT</span> <span class="o">&lt;</span> <span class="mf">1.43878e-02</span><span class="p">:</span>                                       <span class="c1"># Wien approximation, exponential &gt; 100</span>
-        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span><span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">**</span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="o">-</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">WT</span><span class="p">)</span> <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">WT</span> <span class="o">&gt;</span> <span class="mf">1.43878e+02</span><span class="p">:</span>                                       <span class="c1"># Rayleighâ€“Jeans approximation, exponential &lt; 0.01</span>
-        <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">T</span> <span class="o">/</span> <span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span>
+    <span class="c1">#elif WT &lt; 1.43878e-02:                                       # Wien approximation, exponential &gt; 100</span>
+    <span class="c1">#    intensity = 2.0*Cst.h_*Cst.c_*Cst.c_ /(W)**5 * np.exp( -Cst.h_*Cst.c_/(Cst.k_*WT) )</span>
+    <span class="c1">#elif WT &gt; 1.43878e+02:                                       # Rayleighâ€“Jeans approximation, exponential &lt; 0.01</span>
+    <span class="c1">#    intensity = 2.0*Cst.c_*Cst.k_*T / (W)**4</span>
     <span class="k">else</span><span class="p">:</span>                                                        <span class="c1"># normal formula</span>
         <span class="n">intensity</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span> <span class="o">/</span><span class="p">(</span><span class="n">W</span><span class="p">)</span><span class="o">**</span><span class="mi">5</span> <span class="o">/</span>  <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="n">Cst</span><span class="o">.</span><span class="n">h_</span><span class="o">*</span><span class="n">Cst</span><span class="o">.</span><span class="n">c_</span><span class="o">/</span><span class="p">(</span><span class="n">Cst</span><span class="o">.</span><span class="n">k_</span><span class="o">*</span><span class="n">WT</span><span class="p">)</span> <span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span> <span class="p">)</span>
 

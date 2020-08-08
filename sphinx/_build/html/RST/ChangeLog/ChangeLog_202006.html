@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Change Log 2020/06~ &#8212; Spectra  documentation</title>
+    <link rel="stylesheet" href="../../_static/p_sphinx_theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/local_fonts.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../../_static/p_sphinx_theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Attention" href="../Attention.html" />
+    <link rel="prev" title="Change Log" href="../ChangeLog.html" /> 
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head><body>
+      <div class="relbar-top">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="../Attention.html" title="Attention"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="../ChangeLog.html" title="Change Log"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+      <li><a href="../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../ChangeLog.html" accesskey="U">Change Log</a> &#187;</li> 
+      </ul>
+    </div>
+      </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="change-log-2020-06">
+<h1>Change Log 2020/06~<a class="headerlink" href="#change-log-2020-06" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>2020/08/08<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>modified <cite>src.Atomic.PhotoIonize.bound_free_radiative_transition_coefficient</cite> to have correct <cite>Rki_spon</cite> (in wavelength unit)</p></li>
+<li><p>in <cite>src/Visual/Grotrian</cite>, we renamed</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>Grotrian.show_transition_rate()</cite> -&gt; <cite>Grotrian.plot_transition_rate()</cite></p></li>
+<li><p><cite>Grotrian.show_Grotrian()</cite> -&gt; <cite>Grotrian.plot_transitions()</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>modified <cite>gj/gi</cite> to <cite>float(gi)/float(gi)</cite> since they give different accuracy because <cite>gi</cite> and <cite>gj</cite> are integers</p></li>
+<li><p>moved <cite>notebooks/StatisticalEquilibrium/Lib.py</cite> to <cite>src/Function/StatisticalEquilibrium/LibArray.py</cite></p></li>
+<li><p>moved <cite>notebooks/StatisticalEquilibrium/Lib.2py</cite> to <cite>src/Function/StatisticalEquilibrium/LibClass.py</cite></p></li>
+</ol>
+</div>
+<div class="section" id="id2">
+<h2>2020/08/07<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>now the configuration string in data files are without prefix</p></li>
+<li><p>in <cite>src/Visual/Grotrian</cite>, we added</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>Grotrian.show_transition_rate()</cite></p></li>
+<li><p><cite>Grotrian.show_Grotrian()</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p><cite>Grotrian</cite> now has configuration data file like <cite>*.Grotrian</cite></p></li>
+<li><p>in <cite>src/Structure/AtmosphereCls</cite>, we added</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>AtmosphereCartesian.read_BackRad_QS()</cite></p></li>
+<li><p><cite>AtmosphereCartesian.BackRad_int</cite></p></li>
+<li><p><cite>AtmosphereCartesian.BackRad_wav</cite></p></li>
+<li><p><cite>AtmosphereCartesian.BackRadAir_int</cite></p></li>
+<li><p><cite>AtmosphereCartesian.BackRadAir_wav</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>added <cite>TODO.rst</cite></p></li>
+</ol>
+</div>
+<div class="section" id="id3">
+<h2>2020/07/30<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple" start="0">
+<li><p>1-year schedule in <cite>notebooks/StatisticalEquilibrium/Plots_v2.ipynb</cite></p></li>
+<li><p>in <cite>data/atom/Ca_II/Ca_II.Level</cite>, energies have been adjusted back to NIST values</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>previous problem is caused by wavelength in vacuum/air</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>in <cite>src.Atomic.BasicP</cite>, added functions</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>refractive_index_in_air</cite></p></li>
+<li><p><cite>air_to_vacuum</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>now “3000-10000A” and “10000-13400A” is corresponded to wavelength in vacuum.</p></li>
+<li><p>added <cite>notebooks/StatisticalEquilibrium/Lib2.py</cite> for the sake of high level function calling</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>the usage of <cite>notebooks/StatisticalEquilibrium/Lib2.py</cite> is illustrated in <cite>notebooks/StatisticalEquilibrium/Plots_v2.ipynb</cite></p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="id4">
+<h2>2020/07/20<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p><cite>src.Uilt.Class.help()</cite> now can response to both <cite>class</cite> and <cite>recarray</cite></p></li>
+<li><p>in <cite>data/atom/Ca_II/Ca_II.Level</cite>, energies have been adjusted to fit each central wavelength</p></li>
+<li><p>quiet sun intensity atlas is now available : <cite>data/intensity/atlas/QS/atlas_QS.npy</cite></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>notebooks/Atlas/Atlas_QS.ipynb</cite> gives a naive illustration to this atlas</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="id5">
+<h2>2020/07/15<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>in <cite>src.Uilt.Class</cite>, we added functions</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>help</cite> : print all attributes and methods in the class object</p></li>
+<li><p><cite>help_method</cite> : print all methods in the class object</p></li>
+<li><p><cite>help_attribute</cite> : print all attributes in the class object</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>in <cite>src.Structure.AtomCls</cite>, in class <cite>Atom()</cite>, attribute <cite>.am</cite> has been renamed to <cite>.Mass</cite></p></li>
+<li><p>reconstructed <cite>src.Structure.AtomCls.Atom()</cite>, now we have</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>Atom().Level</cite>, <cite>Atom().Line</cite>, <cite>Atom.Cont</cite> to store information of energy level, line transition and continuum transitions, respectively.</p></li>
+<li><p><cite>src.Structure.AtomCls.Collisional_Transition()</cite> to store information of Collisional Excitation/Ionization</p></li>
+<li><p><cite>src.Structure.AtomCls.Photoionization()</cite> to store information of Photoionization</p></li>
+<li><p><cite>src.Structure.MeshCls.WavelengthMesh()</cite> to take charge of wavelength construction for Line/Continuum</p></li>
+<li><p><cite>src.Structure.RadLineCls.RadiativeLine()</cite> to take charge of radiative lines</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="id6">
+<h2>2020/06/26<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>in <cite>src.Structure.AtmosphereCls</cite>, we added <cite>AtmosphereC0d</cite></p></li>
+<li><p>dependency of numba has been changed from 0.43.0 to 0.49.1, and this will not affect code execution.</p></li>
+<li><p>in <cite>src.Structure.AtomCls</cite>, <cite>Atom.PI_table</cite> has been changed to <cite>Atom.PI_table_list</cite>. all the list attributes in <cite>Atom()</cite> are created by</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span> <span class="o">=</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+<p>however, in the future, this will be changed to</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numba.typed</span> <span class="k">import</span> <span class="n">List</span>
+<span class="o">...</span> <span class="o">=</span> <span class="n">List</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>module <cite>src.Atomic.PhotoIonize</cite> has been created for functions related to photoionization/recombination.</p></li>
+<li><p>in <cite>src.Atomic.PhotoIonize</cite>, we added</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>interpolate_PI_intensity</cite></p></li>
+<li><p><cite>interpolate_PI_alpha</cite></p></li>
+<li><p><cite>bound_free_radiative_transition_coefficient</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="6">
+<li><p>in <cite>src.Atomic.BasicP</cite>, we added</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>get_Level_gamma</cite></p></li>
+<li><p><cite>get_Line_Gamma</cite></p></li>
+<li><p><cite>get_damping_a</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="7">
+<li><p>in <cite>src.RadiativeTransfer.Profile</cite>, we added</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>half_to_full</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="8">
+<li><p><cite>src.Atomic.ColExcite</cite> has been reconstructed to <cite>src.Atomic.Collision</cite>, including functions for both collisional (de)excitation and collisional ionization/recombination. Functions includes</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>interpolate_CE_fac</cite>, input argument changed</p></li>
+<li><p><cite>interpolate_CI_fac</cite></p></li>
+<li><p><cite>Cij_to_Cji</cite></p></li>
+<li><p><cite>get_CE_rate_coe</cite></p></li>
+<li><p><cite>get_CI_rate_coe</cite></p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="9">
+<li><p><cite>notebooks/Demo_FullStatisticalEquilirbium_v1.ipynb</cite> created. Demo of full statistical equilibrium at single depth using Ca_II is completed(?).</p></li>
+<li><p><cite>Attention.rst</cite> has been added to the main page of documentation website. Currently, it includes</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>Convention of wavelength-frequency conversion</cite> : related to wavelength/frequency mesh. intensity unit and input argument of Voigt function.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="id7">
+<h2>2020/06/23<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>added documentation <cite>./index.html</cite></p></li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../../index.html">Page contents</a></h3>
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../Documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../NumpyCollection.html">Numpy Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../PythonCollection.html">Python Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ChangeLog.html">Change Log</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Change Log 2020/06~</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">2020/08/08</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">2020/08/07</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">2020/07/30</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">2020/07/20</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">2020/07/15</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">2020/06/26</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">2020/06/23</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../Attention.html">Attention</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Atlas.html">Atlas</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Todo.html">TODO</a></li>
+</ul>
+
+  </div>
+
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/RST/ChangeLog/ChangeLog_202006.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+      <div class="relbar-bottom">
+            
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="../Attention.html" title="Attention"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="../ChangeLog.html" title="Change Log"
+             >previous</a> &nbsp; &nbsp;</li>
+      <li><a href="../../index.html">Spectra  documentation</a> &#187;</li>
+
+          <li class="nav-item nav-item-1"><a href="../ChangeLog.html" >Change Log</a> &#187;</li> 
+      </ul>
+    </div>
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, kouui.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+      <!-- PSphinxTheme -->
+  </body>
+</html>

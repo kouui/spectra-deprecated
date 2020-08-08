@@ -20,7 +20,7 @@
     <script type="text/javascript" src="../_static/p_sphinx_theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Attention" href="Attention.html" />
+    <link rel="next" title="Change Log 2020/06~" href="ChangeLog/ChangeLog_202006.html" />
     <link rel="prev" title="RST Cheat Sheet" href="rst-cheatsheet/rst-cheatsheet.html" /> 
             <meta name="viewport" content="width=device-width, initial-scale=1">
   </head><body>
@@ -36,7 +36,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> &nbsp; &nbsp;</li>
         <li class="right" >
-          <a href="Attention.html" title="Attention"
+          <a href="ChangeLog/ChangeLog_202006.html" title="Change Log 2020/06~"
              accesskey="N">next</a> &nbsp; &nbsp;</li>
         <li class="right" >
           <a href="rst-cheatsheet/rst-cheatsheet.html" title="RST Cheat Sheet"
@@ -55,178 +55,10 @@
             
   <div class="section" id="change-log">
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="id1">
-<h2>2020/08/07<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>now the configuration string in data files are without prefix</p></li>
-<li><p>in <cite>src/Visual/Grotrian</cite>, we added</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>Grotrian.show_transition_rate()</cite></p></li>
-<li><p><cite>Grotrian.show_Grotrian()</cite></p></li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ChangeLog/ChangeLog_202006.html">Change Log 2020/06~</a></li>
 </ul>
-</div></blockquote>
-<ol class="arabic simple" start="3">
-<li><p><cite>Grotrian</cite> now has configuration data file like <cite>*.Grotrian</cite></p></li>
-<li><p>in <cite>src/Structure/AtmosphereCls</cite>, we added</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>AtmosphereCartesian.read_BackRad_QS()</cite></p></li>
-<li><p><cite>AtmosphereCartesian.BackRad_int</cite></p></li>
-<li><p><cite>AtmosphereCartesian.BackRad_wav</cite></p></li>
-<li><p><cite>AtmosphereCartesian.BackRadAir_int</cite></p></li>
-<li><p><cite>AtmosphereCartesian.BackRadAir_wav</cite></p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="5">
-<li><p>added <cite>TODO.rst</cite></p></li>
-</ol>
-</div>
-<div class="section" id="id2">
-<h2>2020/07/30<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple" start="0">
-<li><p>1-year schedule in <cite>notebooks/StatisticalEquilibrium/Plots_v2.ipynb</cite></p></li>
-<li><p>in <cite>data/atom/Ca_II/Ca_II.Level</cite>, energies have been adjusted back to NIST values</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p>previous problem is caused by wavelength in vacuum/air</p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>in <cite>src.Atomic.BasicP</cite>, added functions</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>refractive_index_in_air</cite></p></li>
-<li><p><cite>air_to_vacuum</cite></p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="3">
-<li><p>now “3000-10000A” and “10000-13400A” is corresponded to wavelength in vacuum.</p></li>
-<li><p>added <cite>notebooks/StatisticalEquilibrium/Lib2.py</cite> for the sake of high level function calling</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p>the usage of <cite>notebooks/StatisticalEquilibrium/Lib2.py</cite> is illustrated in <cite>notebooks/StatisticalEquilibrium/Plots_v2.ipynb</cite></p></li>
-</ul>
-</div></blockquote>
-</div>
-<div class="section" id="id3">
-<h2>2020/07/20<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic">
-<li><p><cite>src.Uilt.Class.help()</cite> now can response to both <cite>class</cite> and <cite>recarray</cite></p></li>
-<li><p>in <cite>data/atom/Ca_II/Ca_II.Level</cite>, energies have been adjusted to fit each central wavelength</p></li>
-<li><p>quiet sun intensity atlas is now available : <cite>data/intensity/atlas/QS/atlas_QS.npy</cite></p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>notebooks/Atlas/Atlas_QS.ipynb</cite> gives a naive illustration to this atlas</p></li>
-</ul>
-</div></blockquote>
-</li>
-</ol>
-</div>
-<div class="section" id="id4">
-<h2>2020/07/15<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>in <cite>src.Uilt.Class</cite>, we added functions</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>help</cite> : print all attributes and methods in the class object</p></li>
-<li><p><cite>help_method</cite> : print all methods in the class object</p></li>
-<li><p><cite>help_attribute</cite> : print all attributes in the class object</p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="2">
-<li><p>in <cite>src.Structure.AtomCls</cite>, in class <cite>Atom()</cite>, attribute <cite>.am</cite> has been renamed to <cite>.Mass</cite></p></li>
-<li><p>reconstructed <cite>src.Structure.AtomCls.Atom()</cite>, now we have</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>Atom().Level</cite>, <cite>Atom().Line</cite>, <cite>Atom.Cont</cite> to store information of energy level, line transition and continuum transitions, respectively.</p></li>
-<li><p><cite>src.Structure.AtomCls.Collisional_Transition()</cite> to store information of Collisional Excitation/Ionization</p></li>
-<li><p><cite>src.Structure.AtomCls.Photoionization()</cite> to store information of Photoionization</p></li>
-<li><p><cite>src.Structure.MeshCls.WavelengthMesh()</cite> to take charge of wavelength construction for Line/Continuum</p></li>
-<li><p><cite>src.Structure.RadLineCls.RadiativeLine()</cite> to take charge of radiative lines</p></li>
-</ul>
-</div></blockquote>
-</div>
-<div class="section" id="id5">
-<h2>2020/06/26<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>in <cite>src.Structure.AtmosphereCls</cite>, we added <cite>AtmosphereC0d</cite></p></li>
-<li><p>dependency of numba has been changed from 0.43.0 to 0.49.1, and this will not affect code execution.</p></li>
-<li><p>in <cite>src.Structure.AtomCls</cite>, <cite>Atom.PI_table</cite> has been changed to <cite>Atom.PI_table_list</cite>. all the list attributes in <cite>Atom()</cite> are created by</p></li>
-</ol>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span> <span class="o">=</span> <span class="o">=</span> <span class="p">[]</span>
-</pre></div>
-</div>
-<p>however, in the future, this will be changed to</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numba.typed</span> <span class="k">import</span> <span class="n">List</span>
-<span class="o">...</span> <span class="o">=</span> <span class="n">List</span><span class="p">()</span>
-</pre></div>
-</div>
-</div></blockquote>
-<ol class="arabic simple" start="4">
-<li><p>module <cite>src.Atomic.PhotoIonize</cite> has been created for functions related to photoionization/recombination.</p></li>
-<li><p>in <cite>src.Atomic.PhotoIonize</cite>, we added</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>interpolate_PI_intensity</cite></p></li>
-<li><p><cite>interpolate_PI_alpha</cite></p></li>
-<li><p><cite>bound_free_radiative_transition_coefficient</cite></p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="6">
-<li><p>in <cite>src.Atomic.BasicP</cite>, we added</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>get_Level_gamma</cite></p></li>
-<li><p><cite>get_Line_Gamma</cite></p></li>
-<li><p><cite>get_damping_a</cite></p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="7">
-<li><p>in <cite>src.RadiativeTransfer.Profile</cite>, we added</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>half_to_full</cite></p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="8">
-<li><p><cite>src.Atomic.ColExcite</cite> has been reconstructed to <cite>src.Atomic.Collision</cite>, including functions for both collisional (de)excitation and collisional ionization/recombination. Functions includes</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>interpolate_CE_fac</cite>, input argument changed</p></li>
-<li><p><cite>interpolate_CI_fac</cite></p></li>
-<li><p><cite>Cij_to_Cji</cite></p></li>
-<li><p><cite>get_CE_rate_coe</cite></p></li>
-<li><p><cite>get_CI_rate_coe</cite></p></li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="9">
-<li><p><cite>notebooks/Demo_FullStatisticalEquilirbium_v1.ipynb</cite> created. Demo of full statistical equilibrium at single depth using Ca_II is completed(?).</p></li>
-<li><p><cite>Attention.rst</cite> has been added to the main page of documentation website. Currently, it includes</p></li>
-</ol>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>Convention of wavelength-frequency conversion</cite> : related to wavelength/frequency mesh. intensity unit and input argument of Voigt function.</p></li>
-</ul>
-</div></blockquote>
-</div>
-<div class="section" id="id6">
-<h2>2020/06/23<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>added documentation <cite>./index.html</cite></p></li>
-</ol>
 </div>
 </div>
 
@@ -243,12 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="PythonCollection.html">Python Cheat Sheet</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rst-cheatsheet/rst-cheatsheet.html">RST Cheat Sheet</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id1">2020/08/07</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">2020/07/30</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">2020/07/20</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id4">2020/07/15</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id5">2020/06/26</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id6">2020/06/23</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ChangeLog/ChangeLog_202006.html">Change Log 2020/06~</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Attention.html">Attention</a></li>
@@ -292,7 +119,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> &nbsp; &nbsp;</li>
         <li class="right" >
-          <a href="Attention.html" title="Attention"
+          <a href="ChangeLog/ChangeLog_202006.html" title="Change Log 2020/06~"
              >next</a> &nbsp; &nbsp;</li>
         <li class="right" >
           <a href="rst-cheatsheet/rst-cheatsheet.html" title="RST Cheat Sheet"

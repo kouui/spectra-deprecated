@@ -167,6 +167,8 @@ def get_CE_rate_coe(_CE_fac, _Te, _gi, _dEij):
     .. [1] John T. Mariska, "The Solar Transition Region",
         Cambridge University Press, pp. 22, 1992
     """
+    #Cst.pi_ * Cst.a0_**2 * (8*Cst.k_/Cst.pi_/Cst.me_)**0.5 * Cst.E_Rydberg_ / Cst.k_
+    #=8.629140599482176e-06 [in CGS unit]
 
     _kT = Cst.k_ * _Te
     _CEij = (8.63E-06 * _CE_fac) / (_gi * _Te**0.5) * np.exp( - _dEij / _kT )

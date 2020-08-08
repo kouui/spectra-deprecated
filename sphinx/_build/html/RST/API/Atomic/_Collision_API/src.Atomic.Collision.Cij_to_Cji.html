@@ -60,14 +60,13 @@
 <h1>src.Atomic.Collision.Cij_to_Cji<a class="headerlink" href="#src-atomic-collision-cij-to-cji" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="src.Atomic.Collision.Cij_to_Cji">
-<code class="descclassname">src.Atomic.Collision.</code><code class="descname">Cij_to_Cji</code><span class="sig-paren">(</span><em>_Cij</em>, <em>_ni_LTE</em>, <em>_nj_LTE</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/Collision.html#Cij_to_Cji"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.Collision.Cij_to_Cji" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">src.Atomic.Collision.</code><code class="descname">Cij_to_Cji</code><span class="sig-paren">(</span><em>_Cij</em>, <em>_nj_by_ni_LTE</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/src/Atomic/Collision.html#Cij_to_Cji"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.Atomic.Collision.Cij_to_Cji" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculate Cji from Cij</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>_Cij</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLine</em><em>)</em><em>; scalar</em>) – collisional upward rate coefficient, [<span class="math notranslate nohighlight">\(cm^{-3} s^{-1}\)</span>]</p></li>
-<li><p><strong>_ni_LTE</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLine</em><em>)</em><em>; scalar</em>) – population in lower level, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
-<li><p><strong>_nj_LTE</strong> (<em>np.double</em><em>, </em><em>np.array</em><em>, </em><em>(</em><em>nLine</em><em>)</em><em>; scalar</em>) – population in upper level, [<span class="math notranslate nohighlight">\(cm^{-3}\)</span>]</p></li>
+<li><p><strong>_nj_by_ni_LTE</strong> (<em>np.double</em><em>, </em><em>(</em><em>nLine</em><em>)</em><em>; scalar</em>) – population ratio in LTE, nj/ni</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

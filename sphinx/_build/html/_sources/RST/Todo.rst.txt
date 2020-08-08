@@ -29,3 +29,9 @@ Extra :
   1. Lienard-Wiechart potential
 
   2. [clear, 2020/08/07] wavelength in air
+
+Issues :
+
+  1. [clear, 2020/08/07] Detail Balanced does not hold under LTE?
+
+  2. insignificant Collisional transition rate in Ca_II model?

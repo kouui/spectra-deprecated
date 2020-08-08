@@ -149,7 +149,7 @@
 
     <span class="k">return</span> <span class="n">_CI_fac</span></div>
 
-<div class="viewcode-block" id="Cij_to_Cji"><a class="viewcode-back" href="../../../RST/API/Atomic/_Collision_API/src.Atomic.Collision.Cij_to_Cji.html#src.Atomic.Collision.Cij_to_Cji">[docs]</a><span class="k">def</span> <span class="nf">Cij_to_Cji</span><span class="p">(</span><span class="n">_Cij</span><span class="p">,</span>  <span class="n">_ni_LTE</span><span class="p">,</span> <span class="n">_nj_LTE</span><span class="p">):</span>
+<div class="viewcode-block" id="Cij_to_Cji"><a class="viewcode-back" href="../../../RST/API/Atomic/_Collision_API/src.Atomic.Collision.Cij_to_Cji.html#src.Atomic.Collision.Cij_to_Cji">[docs]</a><span class="k">def</span> <span class="nf">Cij_to_Cji</span><span class="p">(</span><span class="n">_Cij</span><span class="p">,</span>  <span class="n">_nj_by_ni_LTE</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculate Cji from Cij</span>
 
@@ -159,11 +159,8 @@
 <span class="sd">    _Cij : np.double, np.array, (nLine); scalar</span>
 <span class="sd">        collisional upward rate coefficient, [:math:`cm^{-3} s^{-1}`]</span>
 
-<span class="sd">    _ni_LTE : np.double, np.array, (nLine); scalar</span>
-<span class="sd">        population in lower level, [:math:`cm^{-3}`]</span>
-
-<span class="sd">    _nj_LTE : np.double, np.array, (nLine); scalar</span>
-<span class="sd">        population in upper level, [:math:`cm^{-3}`]</span>
+<span class="sd">    _nj_by_ni_LTE : np.double, (nLine); scalar</span>
+<span class="sd">        population ratio in LTE, nj/ni</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -177,7 +174,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_Cji</span> <span class="o">=</span> <span class="n">_Cij</span> <span class="o">*</span> <span class="n">_ni_LTE</span> <span class="o">/</span> <span class="n">_nj_LTE</span>
+    <span class="n">_Cji</span> <span class="o">=</span> <span class="n">_Cij</span> <span class="o">/</span> <span class="n">_nj_by_ni_LTE</span>
 
     <span class="k">return</span> <span class="n">_Cji</span></div>
 
@@ -219,6 +216,8 @@
 <span class="sd">    .. [1] John T. Mariska, &quot;The Solar Transition Region&quot;,</span>
 <span class="sd">        Cambridge University Press, pp. 22, 1992</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Cst.pi_ * Cst.a0_**2 * (8*Cst.k_/Cst.pi_/Cst.me_)**0.5 * Cst.E_Rydberg_ / Cst.k_</span>
+    <span class="c1">#=8.629140599482176e-06 [in CGS unit]</span>
 
     <span class="n">_kT</span> <span class="o">=</span> <span class="n">Cst</span><span class="o">.</span><span class="n">k_</span> <span class="o">*</span> <span class="n">_Te</span>
     <span class="n">_CEij</span> <span class="o">=</span> <span class="p">(</span><span class="mf">8.63E-06</span> <span class="o">*</span> <span class="n">_CE_fac</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">_gi</span> <span class="o">*</span> <span class="n">_Te</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="o">-</span> <span class="n">_dEij</span> <span class="o">/</span> <span class="n">_kT</span> <span class="p">)</span>
