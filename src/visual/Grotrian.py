@@ -236,12 +236,12 @@ def read_Grotrian(_lns):
 
         _line_plot.append(_params)
 
-    return _line_plot
+    return _line_plot, _prefix
 
 
 class Grotrian:
 
-    def __init__(self, _atom, _conf_prefix):
+    def __init__(self, _atom, _path, _conf_prefix=None):
         r"""
 
         Parameters
@@ -250,17 +250,26 @@ class Grotrian:
         _atom : AtomCls.Atom
             object of the atomic model
 
+        _path : str
+            a path to the *.Grotrian configuration file
+
         _conf_prefix : str
             common configuration string of the inner shell
 
         """
         self.atom = _atom
-        self.prefix = _conf_prefix
-        self.line_plot = None
+        self._path = _path
+
+        with open(_path, 'r') as file:
+            _fLines = file.readlines()
+        self.line_plot, self.prefix  = read_Grotrian(_fLines)
+
+        if _conf_prefix is not None:
+            self.prefix = _conf_prefix
         #---------------------------------------------------------------------
         # prepare structures for plotting
         #---------------------------------------------------------------------
-        singlet, multiplet, Lset = _prepare_dict(_atom=_atom, _conf_prefix=_conf_prefix)
+        singlet, multiplet, Lset = _prepare_dict(_atom=_atom, _conf_prefix=self.prefix)
         self.singlet = singlet
         self.multiplet = multiplet
         self.Lset = Lset
@@ -414,14 +423,11 @@ class Grotrian:
 
         plt.show()
 
-    def show_Grotrian(self, _path, _text_selection="wavelength", _hasText=True):
+    def plot_transitions(self, _text_selection="wavelength", _hasText=True):
         r"""
         """
-        with open(_path, 'r') as file:
-            _fLines = file.readlines()
 
-        _line_plot = read_Grotrian(_fLines)
-        self.line_plot = _line_plot
+        _line_plot = self.line_plot
 
         for _ctj1, _ctj2, wl, _r1, _r2 in _line_plot:
 
@@ -535,24 +541,13 @@ class Grotrian:
 
         return _annotation_obj
 
-    def show_transition_rate(self, _idxI, _idxJ, _rate, _direction, _cmap, _norm, _abserr=1E-4, _path=None, _asize=5, _lwidth=2, _level_ctj_without_prefix=None):
+    def plot_transition_rate(self, _idxI, _idxJ, _rate, _direction, _cmap, _norm, _abserr=1E-5, _asize=5, _lwidth=2, _level_ctj_without_prefix=None):
         r"""
         """
 
         assert _idxI.shape[0] == _idxJ.shape[0] == _rate.shape[0]
 
-        if self.line_plot is not None:
-            _line_plot = self.line_plot
-
-        elif _path is not None:
-            with open(_path, 'r') as file:
-                _fLines = file.readlines()
-
-            _line_plot = read_Grotrian(_fLines)
-
-        else:
-            print("do not have _line_plot information to specify arrow position")
-            return None
+        _line_plot = self.line_plot
 
         _table = []
         for _t in _line_plot:
