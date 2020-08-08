@@ -622,3 +622,53 @@ class Photoionization:
         if self.isPrint:
             print("Finished.")
             print()
+
+
+def InitAtom(_conf):
+    r"""
+    """
+    _path_dict = {
+        "folder"           : None,
+        "conf"             : None,
+        "Level"            : None,
+        "Aji"              : None,
+        "CEe"              : None,
+        "CIe"              : None,
+        "PI"               : None,
+        "RadiativeLine"    : None,
+        "Grotrian"         : None,
+    }
+
+    #_i = _conf.rfind('/')
+    #_folder = _conf[:_i+1]
+    #_path_dict["folder"] = _folder
+    _path_dict["conf"] = _conf
+
+    with open(_conf, "r") as _f:
+        _lines = _f.readlines()
+
+    for _ln in _lines:
+        _words =_ln.split()
+        _words = [_v.strip() for _v in _words]
+
+        assert _words[0] in _path_dict.keys()
+
+        if _words[0] == "folder":
+            _path_dict[_words[0]] = _words[1]
+        else:
+            assert _path_dict["folder"] is not None
+            _path_dict[_words[0]] = _path_dict["folder"] + _words[1]
+
+    _atom = Atom(_path_dict["Level"], _file_Aji=_path_dict["Aji"], _file_CEe=_path_dict["CEe"])
+
+    if _path_dict["CIe"] is not None:
+        _atom.read_CI(_path_electron=_path_dict["CIe"])
+    if _path_dict["PI"] is not None:
+        _atom.read_PI(_path_alpha=_path_dict["PI"])
+    if _path_dict["RadiativeLine"] is not None:
+        _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
+        _atom.make_Cont_Mesh()
+
+        #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
+
+    return _atom, _path_dict

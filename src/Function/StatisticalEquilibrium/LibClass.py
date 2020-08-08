@@ -92,9 +92,10 @@ def B_Jbar(_atom, _Tr):
     """
     _Level = _atom.Level
     _Line  = _atom.Line
-    _lineIndex = _atom.I_Rad.lineIndex
+    #_lineIndex = _atom.I_Rad.lineIndex
+    _lineIndex = _atom.Mesh.Coe.lineIndex[:]
 
-    _Jbars = LTELib.Planck_cm(_atom.Line.w0[_atom.I_Rad.lineIndex],_Tr)
+    _Jbars = LTELib.Planck_cm(_atom.Line.w0[_lineIndex],_Tr)
     _Bij_Jbar0, _Bji_Jbar0 = LibArray.B_Jbar(_Level, _Line, _lineIndex, _Jbar=_Jbars)
 
     _Bij_Jbar = np.zeros(_atom.Line.AJI.shape, np.double)

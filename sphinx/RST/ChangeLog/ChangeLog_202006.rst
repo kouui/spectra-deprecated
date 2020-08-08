@@ -18,6 +18,8 @@ Change Log 2020/06~
 
 5. moved `notebooks/StatisticalEquilibrium/Lib.2py` to `src/Function/StatisticalEquilibrium/LibClass.py`
 
+6. in `src/Structure/AtomCls`, we added function `InitAtom()`, which takes `/path/to/*.conf` file as an input and returns a `Atom` object
+
 2020/08/07
 ---------------
 
