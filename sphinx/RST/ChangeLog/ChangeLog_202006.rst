@@ -1,6 +1,11 @@
 Change Log 2020/06~
 ============================
 
+2020/08/10
+-----------
+
+1. added visualization module `src/Visual/DragLine2D` for interactive 1D radiative transfer
+
 2020/08/08
 -----------
 
