@@ -128,3 +128,6 @@ dmypy.json
 
 # mac
 .DS_Store
+
+# third-party modules
+external/modules

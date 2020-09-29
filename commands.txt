@@ -54,6 +54,10 @@ git
 
   $ git fetch --prune
 
+11. to update local branch to a remote branch
+
+  $ git pull origin <branch-name>
+
 
 sphinx
 -------
@@ -63,3 +67,11 @@ sphinx
   $ cd sphinx
   $ make clean
   $ make html
+
+others
+------
+
+1. to check whether the external modules are up-to-date
+
+  $ cd external
+  $ python check_modules_uptodate.py
