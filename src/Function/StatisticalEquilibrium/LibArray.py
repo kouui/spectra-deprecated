@@ -10,6 +10,20 @@ from ... import Constants as Cst
 
 from scipy.interpolate import interp1d
 
+def convert_ni_to_nj_by_ni(_ni, _idxI, _idxJ):
+    r"""
+    """
+    #_nLevel = _ni.shape[0]
+    _nLine = _idxI.shape[0]
+    _nj_by_ni = np.zeros_like(_idxI)
+
+    for _k in range(_nLine):
+        _i = _idxI[_k]
+        _j = _idxJ[_k]
+        _nj_by_ni[_k] = _ni[_j] / _ni[_i]
+
+    return _nj_by_ni
+
 def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
                       _nj_by_ni_C=None, _idxI_C=None, _idxJ_C=None):
     r"""

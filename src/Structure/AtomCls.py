@@ -6,6 +6,7 @@ from . import MeshCls
 from . import RadLineCls
 
 from collections import OrderedDict
+import os
 
 #from numba.typed import List
 
@@ -624,7 +625,7 @@ class Photoionization:
             print()
 
 
-def InitAtom(_conf):
+def InitAtom(_conf_path):
     r"""
     """
     _path_dict = {
@@ -639,12 +640,11 @@ def InitAtom(_conf):
         "Grotrian"         : None,
     }
 
-    #_i = _conf.rfind('/')
-    #_folder = _conf[:_i+1]
-    #_path_dict["folder"] = _folder
-    _path_dict["conf"] = _conf
+    _i = _conf_path.rfind('/')
+    _folder = _conf_path[:_i+1]
+    _path_dict["conf"] = os.path.abspath( _conf_path )
 
-    with open(_conf, "r") as _f:
+    with open(_conf_path, "r") as _f:
         _lines = _f.readlines()
 
     for _ln in _lines:
@@ -654,10 +654,10 @@ def InitAtom(_conf):
         assert _words[0] in _path_dict.keys()
 
         if _words[0] == "folder":
-            _path_dict[_words[0]] = _words[1]
+            _path_dict[_words[0]] = os.path.abspath( _folder + _words[1] )
         else:
             assert _path_dict["folder"] is not None
-            _path_dict[_words[0]] = _path_dict["folder"] + _words[1]
+            _path_dict[_words[0]] = os.path.join( _path_dict["folder"], _words[1] )
 
     _atom = Atom(_path_dict["Level"], _file_Aji=_path_dict["Aji"], _file_CEe=_path_dict["CEe"])
 

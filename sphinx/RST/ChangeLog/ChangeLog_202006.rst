@@ -1,6 +1,26 @@
 Change Log 2020/06~
 ============================
 
+
+2020/08/18
+-----------
+
+1. folder in `*.conf` is changed to relative path
+
+2. in `src/Function/StatisticalEquilibrium/LibArray.py`, added function
+
+  - `convert_ni_to_nj_by_ni`
+
+3. modified `rate` in `notebooks/StatisticalEquilibrium/SE_Plots.ipynb`
+
+4. completed `notebooks/StatisticalEquilibrium/SE_Plots.ipynb`
+
+  - net rate
+
+  - markdown equations
+
+
+
 2020/08/10
 -----------
 

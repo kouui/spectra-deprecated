@@ -17,6 +17,7 @@ def atom_gamma_Gamma(_atom):
     BasicP.get_Line_Gamma(idxI=_atom.Line.idxI[:], idxJ=_atom.Line.idxJ[:],
                         gamma=_atom.Level.gamma[:], Gamma=_atom.Line.Gamma[:])
 
+
 def ni_nj_LTE(_atom, _Te, _Ne):
     r"""
     """

@@ -11,3 +11,4 @@ dependencies:
   - pip
   - pip:
     - matplotlib==2.2.4
+    - PyQt5==5.12.3
