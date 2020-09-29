@@ -14,6 +14,8 @@ TODO
 
   - radiative v.s. collisional
 
+  - add equations to SE_Plots.ipynb
+
 6. SE : with real solar spectrum (point)
 
 7. Slab model (Ca II) --> calculate intensity profile of Ca II H/K, IR triplet

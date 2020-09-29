@@ -1,0 +1,65 @@
+
+git
+-----
+
+1. to start a new branch
+
+  $ git branch <branch-name>
+
+2. to move to another branch
+
+  $ git checkout <branch-name>
+
+3. to untrack a file
+
+  $ git rm <file>
+
+4. to track/update a file
+
+  $ git add <file>
+
+  or
+
+  $ git add .
+
+5. to commit the change
+
+  $ git commit -m "your comment here"
+
+  or
+
+  $ git commit
+
+  (vi mode : i to insert mode; esc to control mode; :w to write in control mode; :x to quit in control mode)
+
+6. to merge branch-A into branch-B
+
+  $ git checkout branch-B
+
+  $ git merge branch-A
+
+7. to show all (local and remote) branchs
+
+  $ git branch --all
+
+8. to delete a local branch
+
+  $ git branch --delete <branch-name>
+
+9. to delete a remote/origin branch (and the branch in github)
+
+  $ git push --delete origin <branch-name>
+
+10. to delete a remote/origin branch which is not in github
+
+  $ git fetch --prune
+
+
+sphinx
+-------
+
+1. to update the homepage (with conda environment `base`)
+
+  $ cd sphinx
+  $ make clean
+  $ make html

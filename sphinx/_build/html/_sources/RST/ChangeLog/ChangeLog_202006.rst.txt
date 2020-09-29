@@ -1,6 +1,41 @@
 Change Log 2020/06~
 ============================
 
+2020/09/29
+----------
+
+1. updated homepage
+
+2. git branch :
+
+  - local : master
+
+  - remote : origin/master
+
+2020/08/18
+-----------
+
+1. folder in `*.conf` is changed to relative path
+
+2. in `src/Function/StatisticalEquilibrium/LibArray.py`, added function
+
+  - `convert_ni_to_nj_by_ni`
+
+3. modified `rate` in `notebooks/StatisticalEquilibrium/SE_Plots.ipynb`
+
+4. completed `notebooks/StatisticalEquilibrium/SE_Plots.ipynb`
+
+  - net rate
+
+  - markdown equations
+
+
+
+2020/08/10
+-----------
+
+1. added visualization module `src/Visual/DragLine2D` for interactive 1D radiative transfer
+
 2020/08/08
 -----------
 
@@ -17,6 +52,8 @@ Change Log 2020/06~
 4. moved `notebooks/StatisticalEquilibrium/Lib.py` to `src/Function/StatisticalEquilibrium/LibArray.py`
 
 5. moved `notebooks/StatisticalEquilibrium/Lib.2py` to `src/Function/StatisticalEquilibrium/LibClass.py`
+
+6. in `src/Structure/AtomCls`, we added function `InitAtom()`, which takes `/path/to/*.conf` file as an input and returns a `Atom` object
 
 2020/08/07
 ---------------

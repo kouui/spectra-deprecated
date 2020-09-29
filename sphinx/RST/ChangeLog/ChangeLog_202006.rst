@@ -1,6 +1,16 @@
 Change Log 2020/06~
 ============================
 
+2020/09/29
+----------
+
+1. updated homepage
+
+2. git branch :
+
+  - local : master
+
+  - remote : origin/master
 
 2020/08/18
 -----------
