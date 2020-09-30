@@ -88,6 +88,11 @@ romanNumeralPattern = re.compile("""
     $                   # end of string
     """, re.VERBOSE)
 
+def nextRoman(s):
+
+    n = fromRoman(s) + 1
+    return toRoman( n )
+
 
 def fromRoman(s):
     """convert Roman numeral to integer"""

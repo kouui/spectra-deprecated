@@ -23,3 +23,6 @@ class MyLogger:
     def warning(self, *args, **kargs):
         if self.verbose:
             logger.warning(*args, **kargs)
+
+    def logfile(self, *args, **kargs):
+        logger.logfile(*args, **kargs)
