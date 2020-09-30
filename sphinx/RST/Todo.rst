@@ -8,9 +8,9 @@ TODO
 
 3. [clear, 2020/08/07] transition rate plot (total/radiative/collisional) with Grotrian diagram
 
-4. inward/outward transition percentage respect to a specific level
+4. [clear, 2020/08/25] inward/outward transition percentage respect to a specific level
 
-5. SE : single Te and Ne --> Te, Tr, Ne (point)
+5. [clear, 2020/08/25] SE : single Te and Ne --> Te, Tr, Ne (point)
 
   - radiative v.s. collisional
 
