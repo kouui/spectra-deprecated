@@ -110,6 +110,19 @@ def _preprocess_term(s):
         s = s.split(' ')[-1]
     return s
 
+def _preprocess_J(s):
+
+    if s == '':
+        return [s,]
+    if 'or' in s:
+        return [item.strip() for item in s.split('or')]
+    if ',' in s:
+        return [item.strip() for item in s.split(',')]
+    if s[-1] == '?':
+        return [s[:-1],]
+    else:
+        return [s,]
+
 def _preprocess_energy(s):
 
     if s[-2] == '+':
@@ -133,19 +146,6 @@ def _preprocess_energy(s):
             return float(s)
         else:
             assert False, f"bad level energy value : {s}"
-
-def _preprocess_J(s):
-
-    if s == '':
-        return [s,]
-    if 'or' in s:
-        return [item.strip() for item in s.split('or')]
-    if ',' in s:
-        return [item.strip() for item in s.split(',')]
-    if s[-1] == '?':
-        return [s[:-1],]
-    else:
-        return [s,]
 
 
 
@@ -292,11 +292,13 @@ class LevelQuery:
 
         response = requests.get(full_URL)
         root = BeautifulSoup(response.content, 'html.parser')
-        text_table = root.find('pre').getText().strip()
+        content = root.find('pre')
 
-        data_dict = read_text_table( text_table )
-
-        self.data_dict = data_dict
+        if content is None:
+            data_dict = None
+        else:
+            text_table = content.getText().strip()
+            data_dict = read_text_table(text_table)
 
         return data_dict
 
@@ -408,17 +410,17 @@ class ElementQuery:
                 dataframe = myIO._load_pickle( file_path )
                 self.logger.info(f"dataframe for '{element}' has been loaded from : {file_path}")
 
-                if False: # modify pickle data
-                    dataframe["term"] = dataframe["term"].map( _remove_space )
-                    _postprocess_dataframe( dataframe )
-                    myIO._dump_pickle(_data=dataframe, _fname=file_path)
+                #if False: # modify pickle data
+                #    dataframe["term"] = dataframe["term"].map( _remove_space )
+                #    self._postprocess_dataframe( dataframe )
+                #    myIO._dump_pickle(_data=dataframe, _fname=file_path)
 
             else:
                 dataframe = self._query_all_ions(unique_notations)
                 myIO._dump_pickle(_data=dataframe, _fname=file_path)
                 self.logger.info(f"dataframe for '{element}' has been saved as : {file_path}")
 
-                _postprocess_dataframe( dataframe )
+            self._postprocess_dataframe( dataframe )
 
         self.dataframe = dataframe
         return dataframe
@@ -426,10 +428,13 @@ class ElementQuery:
     def _query_all_ions(self, unique_notations : list):
 
         energy_bias = 0
-        nIon = len(unique_notations)
+        data_dict_element = None
         for i, spectrum in enumerate( unique_notations ):
 
             data_dict_spectrum = self.levelQ.query( spectrum )
+            if data_dict_spectrum is None:
+                self.logger.info(f"stored 0 Levels for '{spectrum}'")
+                continue
 
             nL = len(data_dict_spectrum["configuration"])
             data_dict_spectrum["E[eV]"] = [ val+energy_bias for val in data_dict_spectrum["E[eV]"] ]
@@ -437,7 +442,7 @@ class ElementQuery:
             data_dict_spectrum['stage'] = [stage,] * nL
             self.logger.info(f"stored {nL} Levels for '{spectrum}'")
 
-            if i == 0:
+            if data_dict_element is None:
                 data_dict_element = data_dict_spectrum
             else:
                 for key in data_dict_element.keys():
@@ -454,6 +459,10 @@ class ElementQuery:
 
         return dataframe
 
+    def _postprocess_dataframe(self, dataframe : pd.DataFrame ):
+
+        _postprocess_dataframe(dataframe)
+
     def _prepare_data_directory(self, data_directory : str):
 
         self.logger.info(f"will load/save data from/into {data_directory}")
@@ -465,28 +474,16 @@ class ElementQuery:
         dataframe = self.dataframe
         file_path = os.path.join( self.data_directory, f"{self.element}.csv" ) if self.data_directory is not None else None
         if file_path is not None:
-            columns=("configuration", "term", "J", "g", "E[eV]", "stage", "origin_configuration","origin_term","origin_J")
+            self._set_csv_columns()
+            columns= self.csv_columns
             df1 = dataframe[dataframe['status']==True].reset_index()
-            df1.to_csv(file_path, columns=columns)
+            df1.to_csv(file_path, columns=columns, float_format='%1.6E')
             self.logger.info(f"dataframe for '{self.element}' has been saved as : {file_path}")
+
+    def _set_csv_columns(self):
+
+        self.csv_columns = ("configuration", "term", "J", "g", "E[eV]", "stage", "origin_configuration","origin_term","origin_J")
 
 
 
 #-----------------------------------------------------------------------------
-if __name__ == "__main__":
-    pass
-
-    #_levelQ = LevelQuery()
-
-    #_element = "H"
-    #_stage = "I"
-    #_spectrum = ' '.join([_element, _stage])
-
-    #_df = _levelQ.query(_spectrum, 1)
-    #for _col in _df.columns:
-    #    print(_col, ': ',_df[_col].dtype)
-
-    #_conf_ground = get_ground_configuration(_df)
-    #_conf_full = get_full_configuration(_spectrum)
-    #_conf_prefix = get_configuration_prefix(_conf_ground, _conf_full)
-    #print(mendeleev.element(_element).get_ionization_energy( roman.fromRoman(_stage) ))
