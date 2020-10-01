@@ -148,7 +148,7 @@ def _nist_df_to_content(df : pd.DataFrame, element : str):
                 s += f"prefix    {conf_prefix}\n"
 
         s += f"    {_conf:<12s}  {_term:<6s}  {_J:<9s}  {_n:<2s}  {_L:<2s}  "
-        s += f"{_2Sp1:<4s}  {_g:<6d}  {_stage:<5s}  {_E:1.7E}"
+        s += f"{_2Sp1:<4s}  {_g:<6d}  {roman.fromRoman(_stage):<5d}  {_E:1.7E}"
 
 
         if k != n_row-1:

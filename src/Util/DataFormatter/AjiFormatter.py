@@ -113,7 +113,7 @@ def _nist_df_to_content(df : pd.DataFrame, element : str, ground_conf : dict):
 
         s += f"    {_conf_i:<12s}  {_term_i:<6s}  {_J_i:<9s}  "
         s += f"{_conf_j:<12s}  {_term_j:<6s}  {_J_j:<9s}"
-        s += f"{_Aji:1.3E}  {_wave:1.5E}     {_stage:5s}"
+        s += f"{_Aji:1.3E}  {_wave:1.5E}     {roman.fromRoman(_stage):5d}"
 
 
         if k != n_row-1:

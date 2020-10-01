@@ -82,8 +82,13 @@ def read_level_info(_rs, _lns, _Level_info, _erg, _g, _stage):
             _prefix = _words[1] if _words[1] != '-' else ''
             continue
 
-        if _words[0] == '-' and _prefix[-1] == '.':
-            _Level_info["configuration"].append( _prefix[:-1] )
+        if _words[0] == '-' :
+            if _prefix == '':
+                _Level_info["configuration"].append( '-' )
+            elif _prefix[-1] == '.':
+                _Level_info["configuration"].append( _prefix[:-1] )
+            else:
+                assert False
         else:
             _Level_info["configuration"].append( _prefix+_words[0] )
 
@@ -237,8 +242,13 @@ def read_CI_table(_rs, _lns, _CI_table, _f2, _idxI, _idxJ, _level_info_table, _c
             continue
 
         # get ctj pair
-        if _words[3] == '-' and _prefix[-1] == '.':
-            _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+        if _words[3] == '-':
+            if _prefix == '':
+                _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+            elif _prefix[-1] == '.':
+                _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+            else:
+                assert False
         else:
             _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
 
@@ -302,8 +312,13 @@ def read_PI_table(_rs, _lns, _PI_table_dict, _PI_coe, _level_info_table, _cont_c
         # get ctj pair
         if len(_words) > 2:
 
-            if _words[3] == '-' and _prefix[-1] == '.':
-                _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+            if _words[3] == '-':
+                if _prefix == '':
+                    _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+                elif _prefix[-1] == '.':
+                    _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+                else:
+                    assert False
             else:
                 _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
 
