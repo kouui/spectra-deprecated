@@ -117,7 +117,59 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
 
     return _Rik, _Rki_stim, _Rki_spon
 
-def B_Jbar(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_Vd=None,
+def B_Jbar(_Level, _Line, _MeshCoe=None, _Te=None, _Vt=None,_Vd=None, _Mass=None, _Tr=None):
+    r"""
+    """
+
+    _nLine = _Line.AJI.shape[0]
+    _Bij_Jbar = np.zeros(_nLine, np.double)
+    _Bji_Jbar = np.zeros(_nLine, np.double)
+
+    for k in range(_nLine):
+
+        if _Line.AJI[ k ] < 1.E-3:
+            continue
+
+        _w0 = _Line.w0[ k ]
+        _gi = _Level.g[ _Line.idxI[ k ] ]
+        _gj = _Level.g[ _Line.idxJ[ k ] ]
+        _Aji = _Line.AJI[ k ]
+        _Bji, _Bij = LTELib.EinsteinA_to_EinsteinBs_cm(_Aji, _w0, _gi, _gj)
+
+        if _Tr is not None: # radiation temperature
+            _Jbar0 = LTELib.Planck_cm(_Line.w0[ k ], _Tr)
+
+        else:               # background radiation
+            _dopWidth_cm = BasicP.get_Doppler_width(p0=_w0, Te=_Te, Vt=_Vt, am=_Mass)
+            _a = BasicP.get_damping_a(_Gamma=_Line.Gamma[ k ], _dopWidth_hz=_dopWidth_cm*_f0/_w0 )
+
+            # calculate mesh
+            if k in _MeshCoe.lineIndex[:]:
+                _nLambda = _MeshCoe.nLambda[ k ]
+                _qcore = _MeshCoe.qcore[ k ]
+                _qwing = _MeshCoe.qwing[ k ]
+            else:
+                _nLambda = 21
+                _qcore = 2.5
+                _qwing = 10
+            _wave_mesh = Profile.makeLineMesh_Full(_nLambda, _qcore, _qwing) # in Doppler width unit
+
+            ## shift wavelength mesh
+            _wave_mesh_shifted = _wave_mesh - (_w0*_Vd/Cst.c_)/_dopWidth_cm
+            _wave_mesh_cm = _wave_mesh_shifted[:] * _dopWidth_cm
+            _absorb_mesh_cm = Profile.Voigt(_a, _wave_mesh[:]) / _dopWidth_cm
+
+            _I_cm_interp = MAKE_INTERPOLATION_HERE
+            _integrand = 0.5 * _I_cm_interp[:] * _absorb_mesh_cm
+            _Jbar0 = Integrate.Trapze(integrand=_integrand, x=_wave_mesh_cm)
+
+        _Bji_Jbar[k] = _Bji * _Jbar0
+        _Bij_Jbar[k] = _Bij * _Jbar0
+
+    return _Bij_Jbar, _Bji_Jbar
+
+
+def B_Jbar_v0(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_Vd=None,
                 _Mass=None, _I_cm=None, _Jbar=None):
     r"""
     """

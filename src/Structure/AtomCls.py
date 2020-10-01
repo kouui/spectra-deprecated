@@ -48,12 +48,10 @@ class Atom:
             self.make_Cont()
 
         # whether to read *.Aji file at __init__
-        if _file_Aji is not None:
-            self.read_Aji(_file_Aji)
+        self.read_Aji(_file_Aji)
 
         # whether to read *.Electron and *.Proton files at __init__
-        if _file_CEe is not None:
-            self.read_CE(_file_CEe, _file_CEp)
+        self.read_CE(_file_CEe, _file_CEp)
 
     def read_Level(self):
         r"""
@@ -231,10 +229,6 @@ class Atom:
             print("Reading Einstein Aji coefficient from : \n", _path)
             print("...")
 
-        self.filepath_dict["Aji"] = _path
-        with open(_path, 'r') as file:
-            fLines = file.readlines()
-
         #--- read line info
         dtype = np.dtype([('idxI',np.uint16),           #: level index, the Level index of lower level
                            ('idxJ',np.uint16),          #: level index, the Level index of lower level
@@ -253,7 +247,13 @@ class Atom:
 
         self.Line.AJI[:] = 0
 
-        AtomIO.read_line_info(_lns=fLines, _Aji=self.Line.AJI[:], _line_ctj_table=self.Line_ctj_table)
+        if _path is not None: # normal case
+            self.filepath_dict["Aji"] = _path
+            with open(_path, 'r') as file:
+                fLines = file.readlines()
+            AtomIO.read_line_info(_lns=fLines, _Aji=self.Line.AJI[:], _line_ctj_table=self.Line_ctj_table)
+        else: # in case of we want to calculate Aji numerically
+            pass
 
         # calculate f0, w0, w0_AA
         for k in range(self.nLine):
@@ -283,8 +283,10 @@ class Atom:
         _path_proton : str
             path to *.proton
         """
-
-        self.CE = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CE", _isPrint=self.isPrint)
+        if _path_electron is None:
+            self.CE = None
+        else:
+            self.CE = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CE", _isPrint=self.isPrint)
 
     def read_CI(self, _path_electron, _path_proton=None):
         r"""
@@ -299,8 +301,10 @@ class Atom:
         _path_proton : str
             path to *.proton
         """
-
-        self.CI = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CI", _isPrint=self.isPrint)
+        if _path_electron is None:
+            self.CI = None
+        else:
+            self.CI = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CI", _isPrint=self.isPrint)
 
     def read_PI(self, _path_alpha):
         r"""
@@ -318,7 +322,10 @@ class Atom:
             print("Reading Photoionization cross section from : \n", _path_alpha)
 
         self.filepath_dict["Photoionization"] = _path_alpha
-        self.PI = Photoionization(_parent=self, _path_alpha=_path_alpha, _isPrint=self.isPrint)
+        if _path_alpha is None:
+            self.PI = None
+        else:
+            self.PI = Photoionization(_parent=self, _path_alpha=_path_alpha, _isPrint=self.isPrint)
 
     def read_RadiativeLine_and_make_Line_Mesh(self, _path):
         r"""
@@ -661,13 +668,12 @@ def InitAtom(_conf_path):
 
     _atom = Atom(_path_dict["Level"], _file_Aji=_path_dict["Aji"], _file_CEe=_path_dict["CEe"])
 
-    if _path_dict["CIe"] is not None:
-        _atom.read_CI(_path_electron=_path_dict["CIe"])
-    if _path_dict["PI"] is not None:
-        _atom.read_PI(_path_alpha=_path_dict["PI"])
-    if _path_dict["RadiativeLine"] is not None:
-        _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
-        _atom.make_Cont_Mesh()
+    _atom.read_CI(_path_electron=_path_dict["CIe"])
+
+    _atom.read_PI(_path_alpha=_path_dict["PI"])
+
+    _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
+    _atom.make_Cont_Mesh()
 
         #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
 

@@ -18,12 +18,6 @@ class WavelengthMesh:
 
         _parent = self._parent
 
-        with open(_path, 'r') as file:
-            fLines = file.readlines()
-
-        self.nRadiativeLine, rs = AtomIO.read_Radiative_Line_Number(_lns=fLines)
-        _parent.nRadiativeLine = self.nRadiativeLine
-
         dtype  = np.dtype([
                           ('idxI',np.uint8),      #: level index, the Level index of lower level
                           ('idxJ',np.uint8),      #: level index, the Level index of upper level
@@ -33,26 +27,36 @@ class WavelengthMesh:
                           ('qwing', np.double),
                           ('nLambda', np.uint16), #: number of meaningful wavelength mesh point
                           ])
+        if _path is None:
+            self.nRadiativeLine = 0
+            self.Coe = np.recarray(self.nRadiativeLine, dtype=dtype)
+        else:
+            with open(_path, 'r') as file:
+                fLines = file.readlines()
 
-        self.Coe = np.recarray(self.nRadiativeLine, dtype=dtype)
-        self.RadLine_filenames = []
+            self.nRadiativeLine, rs = AtomIO.read_Radiative_Line_Number(_lns=fLines)
 
-        AtomIO.read_Mesh_Info(_rs=rs, _lns=fLines,
-                        _Mesh_coe = self.Coe,
-                        _filename = self.RadLine_filenames,
-                        _level_info_table=_parent._Level_info_table,
-                        _line_ctj_table=_parent.Line_ctj_table)
+            self.Coe = np.recarray(self.nRadiativeLine, dtype=dtype)
+
+            self.RadLine_filenames = []
+            AtomIO.read_Mesh_Info(_rs=rs, _lns=fLines,
+                            _Mesh_coe = self.Coe,
+                            _filename = self.RadLine_filenames,
+                            _level_info_table=_parent._Level_info_table,
+                            _line_ctj_table=_parent.Line_ctj_table)
+
+
+        _parent.nRadiativeLine = self.nRadiativeLine
+
 
         #--- make line mesh
-        self.RadLine = [] # List()
-
-        for k in range(self.nRadiativeLine):
-            nLambda = self.Coe.nLambda[k]
-            qcore = self.Coe.qcore[k]
-            qwing = self.Coe.qwing[k]
-            mesh = Profile.makeLineMesh_Full(nLambda, qcore, qwing) # in Doppler width unit
-
-            self.RadLine.append( mesh )
+        ##self.RadLine = [] # List()
+        ##for k in range(self.nRadiativeLine):
+        ##    nLambda = self.Coe.nLambda[k]
+        ##    qcore = self.Coe.qcore[k]
+        ##    qwing = self.Coe.qwing[k]
+        ##    mesh = Profile.makeLineMesh_Full(nLambda, qcore, qwing) # in Doppler width unit
+        ##    self.RadLine.append( mesh )
 
         if self.isPrint:
             print("line mesh prepared.")

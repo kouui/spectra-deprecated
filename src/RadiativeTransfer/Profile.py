@@ -170,7 +170,7 @@ def makeLineMesh_Half(nLambda, qcore, qwing, q):
     for i in range(0, nLhalf):
         q[i] = a * (i + (np.exp(b*i)-1.))
 
-def makeLineMesh_Full(nLambda, qcore, qwing):
+def makeLineMesh_Full(nLambda, qcore=2.5, qwing=10):
     r"""
     Construct Full line mesh.
     Calls inner function `makeLineMesh_Half` to construct half part
@@ -272,6 +272,6 @@ def half_to_full(_arr_half, _isMinus=False):
 ################################################################################
 # whether to compile them using numba's LLVM
 ################################################################################
-
+Voigt = nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)( Voigt )
 if Cst.isJIT == True:
-    Voigt = nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)( Voigt )
+    pass

@@ -131,3 +131,6 @@ dmypy.json
 
 # third-party modules
 external/modules
+
+# temp
+notebooks/StatisticalEquilibrium/SE_Plots-Copy1.ipynb

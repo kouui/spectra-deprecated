@@ -88,7 +88,7 @@ def bf_R_rate(_atom, _Te, _nj_by_ni_LTE, _Tr=None):
 
     return _Rik, _Rki_stim, _Rki_spon
 
-def B_Jbar(_atom, _Tr):
+def B_Jbar_v0(_atom, _Tr):
     r"""
     """
     _Level = _atom.Level
@@ -97,7 +97,7 @@ def B_Jbar(_atom, _Tr):
     _lineIndex = _atom.Mesh.Coe.lineIndex[:]
 
     _Jbars = LTELib.Planck_cm(_atom.Line.w0[_lineIndex],_Tr)
-    _Bij_Jbar0, _Bji_Jbar0 = LibArray.B_Jbar(_Level, _Line, _lineIndex, _Jbar=_Jbars)
+    _Bij_Jbar0, _Bji_Jbar0 = LibArray.B_Jbar_v0(_Level, _Line, _lineIndex, _Jbar=_Jbars)
 
     _Bij_Jbar = np.zeros(_atom.Line.AJI.shape, np.double)
     _Bji_Jbar = np.zeros(_atom.Line.AJI.shape, np.double)
@@ -105,6 +105,16 @@ def B_Jbar(_atom, _Tr):
     for k in range(_Bij_Jbar0.shape[0]):
         _Bij_Jbar[_lineIndex[k]] = _Bij_Jbar0[k]
         _Bji_Jbar[_lineIndex[k]] = _Bji_Jbar0[k]
+
+    return _Bij_Jbar, _Bji_Jbar
+
+def B_Jbar(_atom, _Tr):
+    r"""
+    """
+    _Level = _atom.Level
+    _Line  = _atom.Line
+
+    _Bij_Jbar, _Bji_Jbar = LibArray.B_Jbar(_Level, _Line, _Tr=_Tr)
 
     return _Bij_Jbar, _Bji_Jbar
 
