@@ -73,23 +73,23 @@ def _preprocess_J(s):
 
 def write_data(data_dict, item_list):
 
-    data_dict["configuration_upper"].append( LevelQuery._preprocess_configuration( item_list[6] ) )
-    data_dict["term_upper"].append( LevelQuery._preprocess_term( item_list[7] ) )
-    data_dict["J_upper"].append( _preprocess_J( item_list[8] ) )
-    data_dict["configuration_lower"].append( LevelQuery._preprocess_configuration( item_list[9] ) )
-    data_dict["term_lower"].append( LevelQuery._preprocess_term( item_list[10] ) )
-    data_dict["J_lower"].append( _preprocess_J( item_list[11] ) )
+    data_dict["configuration_lower"].append( LevelQuery._preprocess_configuration( item_list[6] ) )
+    data_dict["term_lower"].append( LevelQuery._preprocess_term( item_list[7] ) )
+    data_dict["J_lower"].append( _preprocess_J( item_list[8] ) )
+    data_dict["configuration_upper"].append( LevelQuery._preprocess_configuration( item_list[9] ) )
+    data_dict["term_upper"].append( LevelQuery._preprocess_term( item_list[10] ) )
+    data_dict["J_upper"].append( _preprocess_J( item_list[11] ) )
 
     data_dict["Aji[/s]"].append( _preprocess_Aji( item_list[3] ) )
     data_dict["ritz_wavelength[A]"].append( _preprocess_ritzw( item_list[1] ) )
     data_dict["type"].append( item_list[12] )
 
-    data_dict["origin_configuration_upper"].append(  item_list[6] )
-    data_dict["origin_term_upper"].append(  item_list[7] )
-    data_dict["origin_J_upper"].append(  item_list[8] )
-    data_dict["origin_configuration_lower"].append(  item_list[9] )
-    data_dict["origin_term_lower"].append(  item_list[10] )
-    data_dict["origin_J_lower"].append(  item_list[11] )
+    data_dict["origin_configuration_lower"].append(  item_list[6] )
+    data_dict["origin_term_lower"].append(  item_list[7] )
+    data_dict["origin_J_lower"].append(  item_list[8] )
+    data_dict["origin_configuration_upper"].append(  item_list[9] )
+    data_dict["origin_term_upper"].append(  item_list[10] )
+    data_dict["origin_J_upper"].append(  item_list[11] )
 
 
 
