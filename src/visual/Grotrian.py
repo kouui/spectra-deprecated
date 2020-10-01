@@ -206,7 +206,7 @@ def read_Grotrian(_lns):
     read default line connection setup for Grotrian diagram
     """
     _line_plot = []
-    _prefix = ''
+    #_prefix = ''
     for _i, _ln in enumerate(_lns[:]):
 
         if AtomIO.skip_line(_ln):
@@ -217,8 +217,8 @@ def read_Grotrian(_lns):
         _words = _ln.split()
         _words = [_v.strip() for _v in _words]
 
-        if _words[0] == "prefix" and _words[1] != '-':
-            _prefix = _words[1]
+        if _words[0] == "prefix":
+            _prefix = _words[1] if _words[1] != '-' else ''
             continue
 
         _params = []
