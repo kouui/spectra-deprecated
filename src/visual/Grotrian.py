@@ -6,7 +6,7 @@ from ..Structure import AtomIO
 from matplotlib.cm import ScalarMappable
 import numpy as np
 
-def _prepare_dict(_atom, _conf_prefix):
+def _prepare_dict(_atom, _conf_prefix, _scaleFunc):
     r"""
     separate singlet and multiplet
 
@@ -59,7 +59,10 @@ def _prepare_dict(_atom, _conf_prefix):
         #---------------------------------------------------------------------
         _term = _atom._Level_info["term"][k]
         _J = _atom._Level_info["J"][k]
-        _L = Cst.L_s2i[ _term[-1] ]
+        try:
+            _L = Cst.L_s2i[ _term[-1] ]
+        except:
+            _L = 0
 
         if _count[ (_conf, _term) ] == 1:
             _d = _singlet
@@ -71,7 +74,14 @@ def _prepare_dict(_atom, _conf_prefix):
         _key = (_conf_clean ,_term)
         if _key not in _d.keys():
             _d[_key] = {}
-        _d[_key][_J] = ( _atom.Level.erg[k] / Cst.eV2erg_, _L, _conf )
+
+        if _scaleFunc is not None:
+            _y = _atom.Level.erg[k] / _atom.Level.erg[:].max()
+            _y = _scaleFunc(_y)
+        else:
+            _y = _atom.Level.erg[k] / Cst.eV2erg_
+
+        _d[_key][_J] = ( _y, _L, _conf )
     #-------------------------------------------------------------------------
     return _singlet, _multiplet, _Lset
 
@@ -205,8 +215,11 @@ def read_Grotrian(_lns):
     r"""
     read default line connection setup for Grotrian diagram
     """
-    _line_plot = []
+    _line_plot = None
+    _position = None
     #_prefix = ''
+    _isPosition = False
+    _isLineplot = False
     for _i, _ln in enumerate(_lns[:]):
 
         if AtomIO.skip_line(_ln):
@@ -220,28 +233,65 @@ def read_Grotrian(_lns):
         if _words[0] == "prefix":
             _prefix = _words[1] if _words[1] != '-' else ''
             continue
+        elif _words[0] == 'position':
+            _isPosition = True
+            print("read position")
+            _position = {}
+            _isLineplot = False
+            continue
+        elif _words[0] == 'lineplot':
+            _isPosition = False
+            _isLineplot = True
+            _line_plot = []
+            continue
 
-        _params = []
-        # get ctj pair
-        if _words[3] == '-' and _prefix[-1] == '.':
-            _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
-        else:
-            _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
+        if _isPosition:
 
-        _params.append( _ctj_ij[0] )
-        _params.append( _ctj_ij[1] )
-        _params.append( _words[6] )
-        _params.append( float(_words[7]) )
-        _params.append( float(_words[8]) )
+            if _words[0] == '-':
+                if _prefix == '':
+                    _ctj = (_words[0],_words[1],_words[2])
+                elif _prefix[-1] == '.':
+                    _ctj = (_prefix[:-1],_words[1],_words[2])
+                else:
+                    assert False
+            else:
+                _ctj = (_prefix+_words[0],_words[1],_words[2])
 
-        _line_plot.append(_params)
+            _position[_ctj] = float(_words[3])
 
-    return _line_plot, _prefix
+
+        if _isLineplot:
+            _params = []
+            # get ctj pair
+            if _words[3] == '-':
+                if _prefix == '':
+                    _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_words[3],_words[4],_words[5]) )
+                elif _prefix[-1] == '.':
+                    _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix[:-1],_words[4],_words[5]) )
+                else:
+                    assert False
+            else:
+                _ctj_ij = ( (_prefix+_words[0],_words[1],_words[2]), (_prefix+_words[3],_words[4],_words[5]) )
+
+            _params.append( _ctj_ij[0] )
+            _params.append( _ctj_ij[1] )
+            _params.append( _words[6] )
+            _params.append( float(_words[7]) )
+            _params.append( float(_words[8]) )
+
+            _line_plot.append(_params)
+
+    return _line_plot, _prefix, _position
+
+def _filter_term(_term):
+
+    _term = '' if _term == '-' else _term
+    return _term
 
 
 class Grotrian:
 
-    def __init__(self, _atom, _path, _conf_prefix=None):
+    def __init__(self, _atom, _path, _conf_prefix=None, _scaleFunc=None, _scaleFunc_inv=None):
         r"""
 
         Parameters
@@ -259,17 +309,25 @@ class Grotrian:
         """
         self.atom = _atom
         self._path = _path
+        self._scaleFunc = _scaleFunc
+        self._scaleFunc_inv = _scaleFunc_inv
 
-        with open(_path, 'r') as file:
-            _fLines = file.readlines()
-        self.line_plot, self.prefix  = read_Grotrian(_fLines)
+        if _path is None:
+            self.line_plot = None
+            self.prefix = ''
+            self.position = None
+        else:
+            with open(_path, 'r') as file:
+                _fLines = file.readlines()
+            self.line_plot, self.prefix, self.position  = read_Grotrian(_fLines)
 
         if _conf_prefix is not None:
             self.prefix = _conf_prefix
+
         #---------------------------------------------------------------------
         # prepare structures for plotting
         #---------------------------------------------------------------------
-        singlet, multiplet, Lset = _prepare_dict(_atom=_atom, _conf_prefix=self.prefix)
+        singlet, multiplet, Lset = _prepare_dict(_atom=_atom, _conf_prefix=self.prefix, _scaleFunc=_scaleFunc)
         self.singlet = singlet
         self.multiplet = multiplet
         self.Lset = Lset
@@ -281,7 +339,7 @@ class Grotrian:
         self.pos_level = {}
         #---------------------------------------------------------------------
 
-    def make_fig(self, _figsize=(6,8), _dpi=120, _f=200):
+    def make_fig(self, _figsize=(6,8), _dpi=120, _f=200, _forward=None, _inverse=None):
         r"""
 
         Parameters
@@ -321,12 +379,14 @@ class Grotrian:
         #---------------------------------------------------------------------
         for k0, v0 in singlet.items():
             for k1, v1 in v0.items():
-                _idx = self.atom.Level_ctj_table.index((v1[2],k0[1],k1))
+                _ctj_ = (v1[2],k0[1],k1)
+                _idx = self.atom.Level_ctj_table.index(_ctj_)
                 #plot level
+                _x_mid = self.position[ _ctj_ ] if self.position is not None else v1[1]
                 if self.atom.Level.isGround[_idx]:
-                    xs_level = v1[1]-_hw, v1[1]+_hw+2*len(Lset["singlet"])+len(Lset["multiplet"])
+                    xs_level = _x_mid-_hw, _x_mid+_hw+2*len(Lset["singlet"])+len(Lset["multiplet"])
                 else:
-                    xs_level = v1[1]-_hw, v1[1]+_hw
+                    xs_level = _x_mid-_hw, _x_mid+_hw
                 ys_level = v1[0], v1[0]
                 plt.plot(xs_level, ys_level, "-k", linewidth=1)
                 # store level posiiton, (conf_origin, term, J)
@@ -336,7 +396,7 @@ class Grotrian:
                 # plot text
                 x_text = xs_level[1] + _st
                 y_text = ys_level[0]
-                plt.text(x_text, y_text, "{} {}".format(k0[0],k0[1]), fontsize=_textsize, color="k")
+                plt.text(x_text, y_text, "{} {}".format(k0[0],_filter_term(k0[1])), fontsize=_textsize, color="k")
 
         # a vertical line separates singlet panel and multiplet panel
         #plt.axvline(x=_b+1, linestyle="--", linewidth=0.5, color="k")
@@ -372,7 +432,7 @@ class Grotrian:
                 plt.text(xs_level[0]-2*_st, y_pos, k1, fontsize=_Jsize, color="k")
             # plot text of term
             x_pos_text = xs_level[1]+_sf + _st
-            plt.text(x_pos_text, y_mean, "{} {}".format(k0[0],k0[1]), fontsize=_textsize, color="k")
+            plt.text(x_pos_text, y_mean, "{} {}".format(k0[0],_filter_term(k0[1])), fontsize=_textsize, color="k")
         #---------------------------------------------------------------------
 
         #---------------------------------------------------------------------
@@ -389,12 +449,31 @@ class Grotrian:
         plt.xticks( xtick1 + xtick2, xticklabel1 + xticklabel2, fontsize=_fontsize )
 
         #--- x,y label; title
-        plt.xlabel("L", fontsize=_fontsize)
+        if self.position is None:
+            plt.xlabel("L", fontsize=_fontsize)
         plt.ylabel("E [eV]", fontsize=_fontsize, rotation=90)
         plt.title(self.atom.Title, fontsize=_fontsize, y=1)
 
         #--- change x limit
-        plt.xlim(-1, xtick2[-1]+2)
+        if len(xtick2) > 0:
+            plt.xlim(-1, xtick2[-1]+2)
+
+        #--- change y scale
+        #if _forward is not None and _inverse is not None:
+        ax = plt.gca()
+        #def _forward(x):
+        #    return x
+        #def _inverse(x):
+        #    return x
+        #ax.set_yscale('function', functions=(_forward, _inverse))
+        #ax.set_yscale("logit")
+
+        #--- y ticklabel
+        if self._scaleFunc is not None and self._scaleFunc_inv is not None:
+            yticks = ax.get_yticks()
+            yticks = [tick for tick in yticks if 1>=tick >=0]
+            ax.set_yticks(yticks)
+            ax.set_yticklabels( [ f"{self.atom.Level.erg[:].max()/Cst.eV2erg_*self._scaleFunc_inv(tick):.2f}" for tick in yticks  ] )
         #---------------------------------------------------------------------
 
         ylim = self.fig.gca().get_ylim()

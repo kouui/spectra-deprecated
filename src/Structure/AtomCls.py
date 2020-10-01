@@ -362,6 +362,9 @@ class Atom:
         """
         self.I_Rad = RadLineCls.RadiativeLine(_parent=self, _folder=_folder)
 
+    def set_hydrogen(self, _isHydrogen=False):
+        self.isHydrogen = _isHydrogen
+
 
 
 
@@ -632,7 +635,7 @@ class Photoionization:
             print()
 
 
-def InitAtom(_conf_path):
+def InitAtom(_conf_path, isHydrogen=False):
     r"""
     """
     _path_dict = {
@@ -675,6 +678,8 @@ def InitAtom(_conf_path):
     _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
     _atom.make_Cont_Mesh()
 
-        #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
+    _atom.set_hydrogen(isHydrogen)
+
+    #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
 
     return _atom, _path_dict
