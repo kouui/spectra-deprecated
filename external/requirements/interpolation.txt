@@ -1,0 +1,16 @@
+# `cython` and `tempita` is unnecessary if we only do
+#>>> from interpolation import interp
+#>>> import numpy as np
+#
+#>>> x = np.linspace(0,1,100)**2 # non-uniform points
+#>>> y = np.linspace(0,1,100)    # values
+#
+# #interpolate at one point:
+#>>> interp(x,y,0.5)
+#
+# # or at many points:
+#>>> u = np.linspace(0,1,1000)   # points
+#>>> interp(x,y,u)
+
+cython
+tempita
