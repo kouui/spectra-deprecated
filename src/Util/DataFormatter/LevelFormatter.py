@@ -21,13 +21,6 @@ Log = Logger.MyLogger(verbose=True)
 
 #-----------------------------------------------------------------------------
 
-##"level_info" : {
-##    "I" : {
-##        "highest" : ('8', '-', '-'),
-##        'has_continuum' : True
-##    }
-##}
-
 def _read_nist_csv(csv_path : str):
     r""" """
     dtype = {
@@ -83,12 +76,13 @@ def _nist_csv_to_df( csv_path : str, level_info : dict ):
         Log.info(f"added {k} Levels from ionization stage {stage}")
 
         if i==n_stage-1 and roman.nextRoman(stage) not in level_info.keys():
-            stage_cont = roman.nextRoman(stage)
-            df_cont = PandasUtil.get_sub_df( df, 'stage', stage_cont, _sort_key='E[eV]', _as=True )
-            df_cont = df_cont.iloc[0]
-            df_all = df_all.append( df_cont )
-            count += 1
-            Log.info( f"added comtinuum from {stage_cont}" )
+            if level_info[stage]["has_continuum"]:
+                stage_cont = roman.nextRoman(stage)
+                df_cont = PandasUtil.get_sub_df( df, 'stage', stage_cont, _sort_key='E[eV]', _as=True )
+                df_cont = df_cont.iloc[0]
+                df_all = df_all.append( df_cont )
+                count += 1
+                Log.info( f"added comtinuum from {stage_cont}" )
 
     df_all.reset_index( inplace=True )
     df_all["E[eV]"] -= df_all["E[eV]"].iloc[0]
@@ -149,8 +143,6 @@ def _nist_df_to_content(df : pd.DataFrame, element : str):
         if k == 0:
             conf_prefix = _get_conf_prefix(_stage, element, _conf)
             s += f"prefix    {conf_prefix}\n"
-        elif k == n_row-1:
-            pass
         else:
             conf_prefix = _precess_conf_prefix(df["stage"].iloc[k-1], _stage, element, _conf)
             if conf_prefix is not None:
@@ -167,11 +159,7 @@ def _nist_df_to_content(df : pd.DataFrame, element : str):
 
 
 def from_nist_csv( template_path, context ):
-    r"""
-    'csv_path'
-    'symbol'
-    'level_info'
-    """
+    r""" """
 
     context = collections.OrderedDict( context )
 
@@ -184,15 +172,11 @@ def from_nist_csv( template_path, context ):
     content = _nist_df_to_content(df, element)
 
 
-    # need to assign prefix to each row
-    conf_prefix = '-'
-
     context_out = {
         "title" : context["title"],
         "atomic_number" : f"{mendeleev.element(element).atomic_number}",
         "element_symbol" : element,
         'n_level' : f"{count}",
-        'configuration_prefix' : conf_prefix,
         'table_content' : content,
     }
     output = template.substitute( context_out )

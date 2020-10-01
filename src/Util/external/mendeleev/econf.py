@@ -377,7 +377,9 @@ class ElectronicConfiguration(object):
                     string = string[:i] + '!'
         string = string.replace('!','')
         """
-        if string[-1]=='1':
+        if string == '':
+            return string
+        elif string[-1]=='1':
             return string[:-1]
         else:
             return string

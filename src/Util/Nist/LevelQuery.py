@@ -309,7 +309,7 @@ def get_ground_configuration(data_frame : pd.DataFrame):
 def get_configuration_prefix(conf_ground : str, conf_full : str):
 
     idx = conf_full.rfind( conf_ground )
-    conf_prefix = '-' if idx==0 else conf_full[:idx]
+    conf_prefix = '-' if idx<=0 else conf_full[:idx]
     return conf_prefix
 
 def get_full_configuration(spec : str):
