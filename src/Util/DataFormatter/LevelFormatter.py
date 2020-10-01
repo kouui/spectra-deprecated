@@ -37,7 +37,6 @@ def _read_nist_csv(csv_path : str):
     df = pd.read_csv(csv_path, index_col=0, dtype=dtype, na_values="").fillna('-')
     Log.info( f"loaded Level table from {csv_path}" )
 
-
     return df
 
 def _get_topk_df(df : pd.DataFrame, kk : int):
