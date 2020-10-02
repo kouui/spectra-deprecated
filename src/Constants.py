@@ -51,6 +51,10 @@ saha_ = 2 * (2*pi_*me_*k_/h_/h_)**(1.5)
 """a constant factor in Saha's equation, :math:`2(2 \pi m_e k /h^2)^{3/2}`, [:math:`g^{3/2} \cdot erg^{-3/2} \cdot k^{-3/2} \cdot s^{-3}`]
 """
 
+C0_ = 5.465366   * 1.E-11
+"""a constant factor in collisional excitation rate coefficient, :math:`\pi^a_{0}^{2}(8k/m\pi)^{1/2}`, [:math:`cm^{3}s^{-1}K^{-1/2}`]
+"""
+
 ################################################################################
 # constants for notations
 ################################################################################

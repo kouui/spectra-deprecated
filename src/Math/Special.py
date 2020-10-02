@@ -21,6 +21,9 @@ a53 = np.array([-0.57721566,  0.99999193, -0.24991055,
 a56 = np.array([8.5733287401, 18.0590169730, 8.6347608925,  0.2677737343],dtype=np.double)
 b56 = np.array([9.5733223454, 25.6329561486,21.0996530827,  3.9584969228],dtype=np.double)
 
+def E0(x):
+    return np.exp(-x) / x
+
 def E1(x):
     r"""
     Approximated formula for Exponential integral :math:`E_1(x)`.
@@ -39,7 +42,7 @@ def E1(x):
     Returns
     -------
 
-    E1 : np.double or array-like
+    E1_ : np.double or array-like
          1st order Exponential integral of x
 
     Notes
@@ -54,16 +57,16 @@ def E1(x):
 
     """
     assert 0 < x <= 80.0, "argument x should be a positive number smaller than 80.0"
-    E1 = 0.0
+    E1_ = 0.0
 
     if x <= 1.0:
-        E1 = -np.log(x) + a53[0] + x*(a53[1] + x*(a53[2] + x*(a53[3] + x*(a53[4] + x*a53[5]))))
+        E1_ = -np.log(x) + a53[0] + x*(a53[1] + x*(a53[2] + x*(a53[3] + x*(a53[4] + x*a53[5]))))
     else:
-        E1  = a56[3]/x +  a56[2] + x*(a56[1] + x*(a56[0] + x))
-        E1 /= b56[3] + x*(b56[2] + x*(b56[1] + x*(b56[0] + x)))
-        E1 *= np.exp(-x)
+        E1_  = a56[3]/x +  a56[2] + x*(a56[1] + x*(a56[0] + x))
+        E1_ /= b56[3] + x*(b56[2] + x*(b56[1] + x*(b56[0] + x)))
+        E1_ *= np.exp(-x)
 
-    return E1
+    return E1_
 
 
 def E2(x):
@@ -79,7 +82,7 @@ def E2(x):
     Returns
     -------
 
-    E2 : np.double or array-like
+    E2_ : np.double or array-like
          2nd order Exponential integral of x
 
     Notes
@@ -95,13 +98,14 @@ def E2(x):
         Quantitative Spectroscopic Analysis",
         Princeton University Press, pp. 365, 2015.
     """
-    E2 = np.exp(-x) - x*E1(x)
-    return E2
+    E2_ = np.exp(-x) - x*E1(x)
+    return E2_
 
 ################################################################################
 # whether to compile them using numba's LLVM
 ################################################################################
 
 if Cst.isJIT == True :
+    E0 = nb.jit( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E0 )
     E1 = nb.vectorize( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E1 )
     E2 = nb.vectorize( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E2 )

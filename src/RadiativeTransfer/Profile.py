@@ -16,7 +16,7 @@ from ..Math import BasicM
 #    - Voigt
 #    - Gaussian
 ################################################################################
-
+@nb.vectorize( [nb.float64(nb.float_,nb.float_)],nopython=True)
 def Voigt(a,x):
     r"""
     Calculate Doppler width normalized voigt function using polynomial fitting formula.
@@ -272,6 +272,5 @@ def half_to_full(_arr_half, _isMinus=False):
 ################################################################################
 # whether to compile them using numba's LLVM
 ################################################################################
-Voigt = nb.vectorize( [nb.float64(nb.float64,nb.float64)],nopython=True)( Voigt )
 if Cst.isJIT == True:
     pass
