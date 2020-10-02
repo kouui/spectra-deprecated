@@ -45,6 +45,7 @@ R_sun_ = 6.957 * 1.E+10                 #: Solar radius, [:math:`cm`]
 ################################################################################
 
 sqrtPi_ = 1.7724538509055159            #: square root of pi, [-]
+sqrt3_ = 1.73205080757                  #: sqrt(3), [-]
 
 saha_ = 2 * (2*pi_*me_*k_/h_/h_)**(1.5)
 """a constant factor in Saha's equation, :math:`2(2 \pi m_e k /h^2)^{3/2}`, [:math:`g^{3/2} \cdot erg^{-3/2} \cdot k^{-3/2} \cdot s^{-3}`]
