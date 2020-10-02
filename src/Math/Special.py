@@ -101,6 +101,9 @@ def E2(x):
     E2_ = np.exp(-x) - x*E1(x)
     return E2_
 
+def E3(x):
+    return 1/2 * ( np.exp(-x) - x*E2(x) )
+
 ################################################################################
 # whether to compile them using numba's LLVM
 ################################################################################
@@ -109,3 +112,4 @@ if Cst.isJIT == True :
     E0 = nb.jit( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E0 )
     E1 = nb.vectorize( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E1 )
     E2 = nb.vectorize( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E2 )
+    E3 = nb.vectorize( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E3 )

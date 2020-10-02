@@ -4,10 +4,101 @@ import numba as nb
 from .. import Constants as Cst
 from ..Math import Special
 
+
+#-----------------------------------------------------------------------------
+# Gaunt factor
+#-----------------------------------------------------------------------------
+@nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
+def Gaunt_factor_Gingerich_cm(ni, w):
+    r"""
+    Gaunt factor
+
+    Parameters
+    -----------
+    ni : int, [:math:`-`]
+        principal quantum number of lower level
+
+    w : float, [:math:`cm`]
+        wavelength
+
+    Returns
+    --------
+    g : float, [:math:`-`]
+        Gaunt factor
+
+    References
+    ------------
+    .. [1] Gingerich, March 1964
+    """
+    # wavelength in ?
+    w_um = w * 1E5
+
+    if ni == 1:
+        C1, C2, C3 = 0.9916, 9.068E-3, -0.2524
+    elif ni == 2:
+        C1, C2, C3 = 1.105, -7.922E-2, 4.536E-3
+    elif ni == 3:
+        C1, C2, C3 = 1.101, -3.290E-2, 1.152E-3
+    elif ni == 4:
+        C1, C2, C3 = 1.101, -1.923E-2, 5.110E-4
+    elif ni == 5:
+        C1, C2, C3 = 1.102, -0.01304, 2.638E-4
+    elif ni == 6:
+        C1, C2, C3 = 1.0986, -0.00902, 1.367E-4
+    else:
+        C1, C2, C3 = 1., 0., 0.
+
+    g = C1 + ( C2 + C3 * w_um ) * w_um
+    return g
+
+
+@nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
+def Gaunt_factor_Gingerich(ni, x):
+    r"""
+    Gaunt factor
+
+    Parameters
+    -----------
+    ni : int, [:math:`-`]
+        principal quantum number of lower level
+
+    x : float, [:math:`-`]
+        ratio of the transition energy to the ionization energy of the lower level.
+
+    Returns
+    --------
+    g : float, [:math:`-`]
+        Gaunt factor
+
+    Notes
+    ------
+    refer to [1]_.
+
+    `x` is the ratio of the transition energy to the ionization energy.
+
+    ionization energy is `Cst.E_Rydberg_ * (1/ni**2)`
+
+    transition and `hc/w` for bound-free transition where `w` wavelength.
+
+    References
+    ------------
+    .. [1] Gingerich, March 1964
+    """
+    # ionization energy
+    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    # transition energy
+    E_tran = x * Eik
+    # wavelength
+    w = Cst.h_ * Cst.c_ / E_tran
+
+    g = Gaunt_factor_Gingerich_cm(ni, w)
+    return g
+
+
 @nb.vectorize([nb.float64(nb.int64, nb.int64)], nopython=True)
 def Gaunt_factor_coe(i, ni):
     r"""
-    coefficients to calculate usual Gaunt factor for bound-free transitions
+    coefficients to calculate Gaunt factor
 
     Parameters
     -----------
@@ -51,7 +142,7 @@ def Gaunt_factor_coe(i, ni):
 @nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
 def Gaunt_factor(ni, x):
     r"""
-    usual Gaunt factor for bound-free transitions
+    Gaunt factor
 
     Parameters
     -----------
@@ -59,7 +150,8 @@ def Gaunt_factor(ni, x):
         principal quantum number of lower level
 
     x : float, [:math:`-`]
-        ratio of the transition energy to the ionization energy of the lower level
+        ratio of the transition energy to the ionization energy of the lower level.
+
 
     Returns
     --------
@@ -69,6 +161,15 @@ def Gaunt_factor(ni, x):
     Notes
     ------
     refer to [1]_ Eq(4).
+
+    `x` is the ratio of the transition energy to the ionization energy.
+
+    ionization energy is `Cst.E_Rydberg_ * (1/ni**2)`
+
+    transition energy is `Cst.E_Rydberg_ * (1/ni**2 - 1/nj**2)` for bound-bound
+    transition and `hc/w` for bound-free transition where `w` wavelength
+
+
 
 
     References
@@ -99,6 +200,10 @@ def Gaunt_factor(ni, x):
     g = g0 + ( g1 + g2 / x ) / x
 
     return g
+
+#-----------------------------------------------------------------------------
+# Einstein Aji coefficient
+#-----------------------------------------------------------------------------
 
 @nb.vectorize( [nb.float64(nb.int64,nb.int64)] , nopython=True)
 def absorption_oscillator_strength(ni, nj):
@@ -197,6 +302,10 @@ def Einstein_A_coefficient(ni, nj):
 
     return Aji
 
+#-----------------------------------------------------------------------------
+# Collisional Excitation rate coefficient
+#-----------------------------------------------------------------------------
+
 @nb.vectorize( [nb.float64(nb.int64,nb.int64, nb.float64)] , nopython=True)
 def CE_rate_coe(ni, nj, Te):
     r"""
@@ -287,6 +396,10 @@ def CE_rate_coe(ni, nj, Te):
 
     return qij
 
+#-----------------------------------------------------------------------------
+# Collisional Ionization rate coefficient
+#-----------------------------------------------------------------------------
+
 @nb.vectorize( [nb.float64(nb.int64, nb.float64)] , nopython=True)
 def CI_rate_coe(ni, Te):
     r"""
@@ -375,7 +488,7 @@ def CI_rate_coe(ni, Te):
     return qik
 
 @nb.vectorize( [nb.float64(nb.int64, nb.float64)] , nopython=True)
-def CI_rate_coe_clark(ni, Te):
+def CI_rate_coe_Clark(ni, Te):
     r"""
     Collisional ionization rate coefficient qik for the hydrogen atom
 
@@ -405,8 +518,8 @@ def CI_rate_coe_clark(ni, Te):
 
     References
     -----------
-    .. [1] L. C. Johnson, "Integral and differential cross
-           sections for electron impact ionization",
+    .. [1] Clark, Abdallah & Mann, "Integral and differential
+           cross sections for electron impact ionization",
            Astrophysical Journal, vol. 381, 597-600, Nov 1972.
            1991ApJ...381...597C
 
@@ -450,3 +563,146 @@ def CI_rate_coe_clark(ni, Te):
 
     qik = C_y
     return qik
+
+#-----------------------------------------------------------------------------
+# Photoionization cross section
+#-----------------------------------------------------------------------------
+@nb.vectorize( [nb.float64(nb.int64, nb.float64, nb.int64)] , nopython=True)
+def PI_cross_section_cm(ni, w, Z):
+    r"""
+    Photoionization cross-section for hydrogen from lower level ni at wavelength w.
+
+    Parameters
+    ------------
+    ni : int,  [:math:`-`]
+        principal quantum number of lower level
+
+    w : float, [:math:`cm`]
+        wavelength
+
+    Z : int, [:math:`-`]
+        net charge
+    Returns
+    ---------
+    alpha : float, [:math:`cm^{2}`]
+        photoionization cross section
+
+    Notes
+    -------
+
+    refer to [1]_ page 187, Eq(7.84)
+
+
+    References
+    -----------
+
+    .. [1] Ivan Hubeny, Dimitri Mihalas, "Theory of Stellar Atmosphere:
+        An Introduction to Astrophysical Non-equilibrium
+        Quantitative Spectroscopic Analysis",
+        Princeton University Press, 2015.
+    """
+    # ionization energy
+    Eik = Cst.E_Rydberg_ * (1./ni**2)
+
+    # frequency
+    v = Cst.c_ / w
+    # ratio of transition energy to ionization energy
+    x = Cst.h_ * v / Eik
+
+
+    alpha = 2.815E29 * Z**4  / (v**3 * ni**5) * Gaunt_factor(ni, x)
+    return alpha
+
+@nb.vectorize( [nb.float64(nb.int64, nb.float64, nb.int64)] , nopython=True)
+def PI_cross_section(ni, x, Z):
+    r"""
+    Photoionization cross-section for hydrogen from lower level ni at wavelength w.
+
+    Parameters
+    ------------
+    ni : int,  [:math:`-`]
+        principal quantum number of lower level
+
+    x : float, [:math:`-`]
+        ratio of the transition energy to ioniozation energy
+
+    Z : int, [:math:`-`]
+        net charge
+    Returns
+    ---------
+    alpha : float, [:math:`cm^{2}`]
+        photoionization cross section
+
+    Notes
+    -------
+
+    refer to [1]_ page 187, Eq(7.84)
+
+
+    References
+    -----------
+
+    .. [1] Ivan Hubeny, Dimitri Mihalas, "Theory of Stellar Atmosphere:
+        An Introduction to Astrophysical Non-equilibrium
+        Quantitative Spectroscopic Analysis",
+        Princeton University Press, 2015.
+    """
+    # ionization energy
+    Eik = Cst.E_Rydberg_ * (1./ni**2)
+
+    # frequency
+    v = x * Eik / Cst.h_
+
+    # frequency
+
+    alpha = 2.815E29 * Z**4  / (v**3 * ni**5) * Gaunt_factor(ni, x)
+    return alpha
+
+#-----------------------------------------------------------------------------
+# spontaneous radiative recombination
+#-----------------------------------------------------------------------------
+@nb.vectorize( [nb.float64(nb.int64, nb.float64)] , nopython=True)
+def Rki_spon_rate_coe(ni, Te):
+    r"""
+    Parameters
+    ------------
+    ni : int,  [:math:`-`]
+        principal quantum number of lower level
+
+    Te : float,  [:math:`K`]
+        electron temperature
+
+    Returns
+    ---------
+    RCki : float, [:math:`cm^{3}s^{-1}`]
+        spontaneous radiative recombination rate coefficient
+
+    Notes
+    ------
+    refer to [1]_ Eq(7)
+
+    with
+
+    .. math:: n_{k} R_{ki}^{spon} = n_{k} n_{e} {RC}_{ki}
+
+    References
+    -----------
+    .. [1] L. C. Johnson, "Approximations for collisional and
+           radiative transition rates in atomic hydrogen",
+           Astrophysical Journal, vol. 174, p.227, May 1972.
+           1972ApJ...174..227J
+    """
+    kT = Cst.k_ * Te
+    # ionization energy
+    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    #
+    r = Eik / kT
+
+    summation  = Gaunt_factor_coe(0,ni) * Special.E1(1)
+    summation += Gaunt_factor_coe(1,ni) * Special.E2(r)
+    summation += Gaunt_factor_coe(2,ni) * Special.E3(r)
+
+    Ski = 5.197E-14 * r**(1.5) * np.exp(r) * summation
+
+    RCki = Ski
+    return RCki
