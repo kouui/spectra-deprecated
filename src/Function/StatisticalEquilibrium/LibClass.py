@@ -14,6 +14,13 @@ from ... import Constants as Cst
 from . import LibArray
 from ..Hydrogen import LevelN
 
+#-----------------------------------------------------------------------------
+# if the spatial matrix is too large, then create temperal multi-dimensional
+# matrix to store transition rates values (transition,x,y,z) could be very
+# expensive. (50, 50, 50, 50) ~50MB for float64 might be a proper size.
+#-----------------------------------------------------------------------------
+
+
 def atom_gamma_Gamma(_atom):
     r""" """
     BasicP.get_Level_gamma(Aji=_atom.Line.AJI[:],idxJ=_atom.Line.idxJ[:],
@@ -28,11 +35,7 @@ def ni_nj_LTE(_atom, _Te, _Ne):
     _Line  = _atom.Line
     _Cont  = _atom.Cont
 
-
-    #_nj_by_ni_L = LTELib.LTE_ratio_Line(_atom.Level.g[:],
-    #                                    _atom.Line.idxI[:],
-    #                                    _atom.Line.idxJ[:],
-    #                                    _atom.Line.w0[:], _Te)
+    ## ! could be optimized to Te-Ne-array
     _nj_by_ni_L = LTELib.Boltzmann_distribution(_Line['gi'][:], _Line['gj'][:], Cst.h_ * Cst.c_ / _Line['w0'][:], _Te)
     _idxI_L = _atom.Line['idxI'][:]
     _idxJ_L = _atom.Line['idxJ'][:]
@@ -40,10 +43,7 @@ def ni_nj_LTE(_atom, _Te, _Ne):
     _stage = _atom.Level['stage'][:]
 
     if _atom.hasContinuum:
-        #_nj_by_ni_C = LTELib.LTE_ratio_Cont(_atom.Level.g[:],
-        #                                    _atom.Cont.idxI[:],
-        #                                    _atom.Cont.idxJ[:],
-        #                                    _atom.Cont.w0[:], _Te, _Ne)
+        ## ! could be optimized to Te-Ne-array
         _nj_by_ni_C = LTELib.Saha_distribution(_Cont['gi'][:], _Cont['gj'][:], Cst.h_ * Cst.c_ / _Cont['w0'][:], _Ne, _Te)
         _idxI_C = _Cont['idxI'][:]
         _idxJ_C = _Cont['idxJ'][:]
@@ -52,23 +52,13 @@ def ni_nj_LTE(_atom, _Te, _Ne):
         _idxI_C = None
         _idxJ_C = None
 
-
+    ## ! could be optimized to Te-Ne-array
     _ni = LibArray.convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage,
                           _hasContinuum=_atom.hasContinuum,
                           _nj_by_ni_C=_nj_by_ni_C, _idxI_C=_idxI_C, _idxJ_C=_idxJ_C)
 
     return _ni, _nj_by_ni_L, _nj_by_ni_C
 
-def ni_nj_LTE_v0(_atom, _Te, _Ne):
-    r"""
-    """
-    _Level = _atom.Level
-    _Line  = _atom.Line
-    _Cont  = _atom.Cont
-
-    _n_LTE, _ni_LTE, _nj_LTE = LibArray.ni_nj_LTE(_Level, _Line, _Cont, _Te, _Ne)
-
-    return _n_LTE, _ni_LTE, _nj_LTE
 
 def bf_R_rate(_atom, _Te, _nj_by_ni_LTE, _Tr=None):
     r""" """
@@ -91,15 +81,7 @@ def bf_R_rate(_atom, _Te, _nj_by_ni_LTE, _Tr=None):
 
     _PI_alpha = _atom.PI_alpha[:,:]
 
-    #### use interpolation table
-    ##if _atom.ATOM_DATA_TYPES.PI == T_DATA.INTERPOLATE:
-    ##    _PI_alpha = PhotoIonize.interpolate_PI_alpha(_atom.PI.alpha_table, _atom.Mesh.Cont)
-    #### calculated by functions
-    ##elif _atom.ATOM_DATA_TYPES.PI == T_DATA.CALCULATE:
-    ##    _PI_alpha = _atom.PI_alpha[:,:]
-    ##else:
-    ##    assert False
-
+    ## ! could not be optimized to Te-Ne-array
     _Rik, _Rki_stim, _Rki_spon = LibArray.bf_R_rate(_waveMesh=_atom.Mesh.Cont,
                                        _Jnu=_PI_I,
                                        _alpha=_PI_alpha,
@@ -134,8 +116,11 @@ def B_Jbar(_atom, _Tr=None):
     _MeshCoe = _atom.Mesh.Coe
 
     if _Tr is None:
+        ## ! could not be optimized to Te-Ne-array
+        ## ! need to loop over Te-Be-array
         assert False, "not yet with background radiation"
     else:
+        ## ! could be optimized to Te-Ne-array
         _Bij_Jbar, _Bji_Jbar = LibArray.B_Jbar_Tr(_Line["AJI"][:], _Line["BJI"][:], _Line["BIJ"][:], _Line["w0"][:], _Tr)
 
     return _Bij_Jbar, _Bji_Jbar
@@ -145,19 +130,24 @@ def B_Jbar(_atom, _Tr=None):
 def CEij_rate_coe(_atom, _Te):
     r""" """
 
+    #print()
     if _atom.ATOM_DATA_TYPES.CE == T_DATA.INTERPOLATE:
 
         _Omega_table = _atom.CE.Omega_table[:,:]
         _Te_table    = _atom.CE.Te_table[:]
         _Coe         = _atom.CE.Coe
+        ## ! could/better to be optimized to Te-Ne-array
         _CEij = LibArray.CEij_rate_coe(_Omega_table, _Te_table, _Coe, _Te)
 
     elif _atom.ATOM_DATA_TYPES.CE == T_DATA.CALCULATE:
 
         _Line  = _atom.Line
-        _ni = _Line['ni'][:]
-        _nj = _Line['nj'][:]
-        _CEij = LibArray.CEij_rate_coe_calculate(_Te, _ni, _nj, _atom.ATOM_TYPE)
+
+        if _atom.ATOM_TYPE == T_ATOM.HYDROGEN:
+            ## ! could/better to be optimized to Te-Ne-array
+            _CEij = Hydrogen.CE_rate_coe(_Line['ni'][:], _Line['nj'][:], _Te)
+        else:
+            assert False
 
     else:
         assert False
@@ -165,21 +155,25 @@ def CEij_rate_coe(_atom, _Te):
     return _CEij
 
 def CIik_rate_coe(_atom, _Te):
-    r"""
-    """
+    r""" """
 
-    if _atom.ATOM_DATA_TYPES.CE == T_DATA.INTERPOLATE:
+    if _atom.ATOM_DATA_TYPES.CI == T_DATA.INTERPOLATE:
 
         _Omega_table = _atom.CI.Omega_table[:,:]
         _Te_table    = _atom.CI.Te_table[:]
         _Coe         = _atom.CI.Coe
+        ## ! could/better to be optimized to Te-Ne-array
         _CIik = LibArray.CIik_rate_coe(_Omega_table, _Te_table, _Coe, _Te)
 
-    elif _atom.ATOM_DATA_TYPES.CE == T_DATA.CALCULATE:
+    elif _atom.ATOM_DATA_TYPES.CI == T_DATA.CALCULATE:
 
         _Cont  = _atom.Cont
-        _ni = _Cont['ni'][:]
-        _CIik = LibArray.CIik_rate_coe_calculate(_Te, _ni, _atom.ATOM_TYPE)
+
+        if _atom.ATOM_TYPE == T_ATOM.HYDROGEN:
+            ## ! could/better to be optimized to Te-Ne-array
+            _CIik = Hydrogen.CI_rate_coe(_Cont['ni'][:], _Te)
+        else:
+            assert False
 
     else:
         assert False
@@ -187,10 +181,11 @@ def CIik_rate_coe(_atom, _Te):
     return _CIik
 
 def get_Cij(_atom, _Te):
-    r"""
-    """
+    r""" """
+    ## ! could/better to be optimized to Te-Ne-array
     _CEij = CEij_rate_coe(_atom, _Te)
     if _atom.hasContinuum:
+        ## ! could/better to be optimized to Te-Ne-array
         _CIik = CIik_rate_coe(_atom, _Te)
         _Cij = np.append( _CEij[:], _CIik[:] )
     else:
@@ -210,6 +205,7 @@ def solve_SE(_atom, _Ne, _Cji, _Cij, _Bji_Jbar, _Bij_Jbar, _Rki_spon, _Rki_stim,
     _Rji_stim = np.append(_Bij_Jbar[:], _Rki_stim[:])
     _Rij = np.append(_Bij_Jbar[:], _Rik[:])
 
+    ## ! could/better to be optimized to Te-Ne-array
     _n_SE = LibArray.solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne)
 
     return _n_SE

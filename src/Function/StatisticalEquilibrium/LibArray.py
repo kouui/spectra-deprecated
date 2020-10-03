@@ -7,7 +7,7 @@ from ...RadiativeTransfer import Profile
 from ...Math import Integrate
 from ... import Constants as Cst
 
-from ...Structure.MyTypes import T_ATOM
+from ...Structure.MyTypes import T_ATOM#, T_ATOM_NBTYPE
 from ...Atomic import Hydrogen
 
 #from scipy.interpolate import interp1d
@@ -110,7 +110,8 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
     _Rki_spon = np.zeros(_nCont,dtype=np.double)
 
     for k in range(_nCont):
-
+        ## ! could not be optimized to Te-Ne-array
+        ## ! need to loop over Te-Ne-array
         _res = PhotoIonize.bound_free_radiative_transition_coefficient(
                             wave = _waveMesh[k,::-1],
                             J = _Jnu[k,::-1],
@@ -253,10 +254,12 @@ def B_Jbar_v0(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_
 
 def CEij_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
     r""" """
+    ## ! could/better to be optimized to Te-Ne-array
     _omega = Collision.interpolate_CE_fac(_table=_Omega_table[:,:],
                                         _Te=_Te,
                                         _Te_table=_Te_table[:],
                                         _f1=_Coe.f1[:], _f2=_Coe.f2[:])
+    ## ! could/better to be optimized to Te-Ne-array
     _CEij = Collision.get_CE_rate_coe(_CE_fac=_omega, _Te=_Te,
                                       _gi=_Coe.gi[:],_dEij=_Coe.dEij[:])
 
@@ -265,34 +268,40 @@ def CEij_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
 
 def CIik_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
     r""" """
+    ## ! could/better to be optimized to Te-Ne-array
     _omega = Collision.interpolate_CI_fac(_table=_Omega_table[:,:],
                                        _Te=_Te,
                                        _Te_table=_Te_table[:],
                                        _f2=_Coe.f2[:])
+    ## ! could/better to be optimized to Te-Ne-array
     _CIik = Collision.get_CI_rate_coe(_CI_fac=_omega[:], _Te=_Te,
                                   _dEik=_Coe.dEij[:])
 
     return _CIik
 
-@nb.njit
-def CEij_rate_coe_calculate(_Te, _ni, _nj, _ATOM_TYPE):
-    r""" """
-
-    if _ATOM_TYPE == T_ATOM.HYDROGEN:
-        _CEij = Hydrogen.CE_rate_coe(_ni, _nj, _Te)
-    else:
-        assert False
-    return _CEij
-
-@nb.njit
-def CIik_rate_coe_calculate(_Te, _ni, _ATOM_TYPE):
-    r""" """
-
-    if _ATOM_TYPE == T_ATOM.HYDROGEN:
-        _CIik = Hydrogen.CI_rate_coe(_ni, _Te)
-    else:
-        assert False
-    return _CIik
+###@nb.njit([ nb.float64[:](nb.float64,nb.uint8[:],nb.uint8[:],T_ATOM_NBTYPE) ])
+##@nb.njit
+##def CEij_rate_coe_calculate(_Te, _ni, _nj, _ATOM_TYPE):
+##    r""" """
+##
+##    #if _ATOM_TYPE == T_ATOM.HYDROGEN:
+##    #    _CEij = Hydrogen.CE_rate_coe(_ni, _nj, _Te)
+##    #else:
+##    #    assert False
+##    _CEij = Hydrogen.CE_rate_coe(_ni, _nj, _Te)
+##    return _CEij
+##
+###@nb.njit([nb.float64[:](nb.float64,nb.uint8[:],T_ATOM_NBTYPE)])
+##@nb.njit
+##def CIik_rate_coe_calculate(_Te, _ni, _ATOM_TYPE):
+##    r""" """
+##
+##    #if _ATOM_TYPE == T_ATOM.HYDROGEN:
+##    #    _CIik = Hydrogen.CI_rate_coe(_ni, _Te)
+##    #else:
+##    #    assert False
+##    _CIik = Hydrogen.CI_rate_coe(_ni, _Te)
+##    return _CIik
 
 
 def solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne):
