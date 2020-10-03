@@ -7,7 +7,11 @@ import numpy as np
 from ...Atomic import LTELib, BasicP
 from ...Atomic import PhotoIonize, Collision
 
+from ...Structure.MyTypes import T_ATOM, T_DATA
+from ...Atomic import Hydrogen
+
 from . import LibArray
+from ..Hydrogen import LevelN
 
 def atom_gamma_Gamma(_atom):
     r"""
@@ -69,7 +73,7 @@ def bf_R_rate(_atom, _Te, _nj_by_ni_LTE, _Tr=None):
     """
 
     if _Tr is None:
-        print("only computation with radiation temperature is available.")
+        assert False, "only computation with radiation temperature is available."
 
     else:
         _PI_I = []
@@ -77,7 +81,33 @@ def bf_R_rate(_atom, _Te, _nj_by_ni_LTE, _Tr=None):
             _PI_I.append( LTELib.Planck_cm(_atom.Mesh.Cont[k],_Tr) )
         _PI_I = np.array( _PI_I )
 
-    _PI_alpha = PhotoIonize.interpolate_PI_alpha(_atom.PI.alpha_table, _atom.Mesh.Cont)
+    ## use interpolation table
+    if _atom.ATOM_DATA_TYPES.PI == T_DATA.INTERPOLATE:
+        _PI_alpha = PhotoIonize.interpolate_PI_alpha(_atom.PI.alpha_table, _atom.Mesh.Cont)
+
+
+    ## calculate by functions
+    elif _atom.ATOM_DATA_TYPES.PI == T_DATA.CALCULATE:
+
+        ## hydrogen has function prepared
+        if _atom.ATOM_TYPE == T_ATOM.HYDROGEN:
+            if not _atom.hasContinuum:
+                assert False
+
+            ## compute quantum number n
+            _ns = LevelN.get_level_n(_atom.Level.g[:-1])
+            ## compute ratio of the transition energy to ionization energy
+            _Eratio = LevelN.ratio_Etran_to_Eionize(_ns[:], _atom.Mesh.Cont[::])
+
+            _PI_alpha = np.zeros(_Eratio.shape, dtype=np.double)
+            for k in range(_Eratio.shape[0]):
+                _PI_alpha[k,:] = Hydrogen.PI_cross_section(_ns[k], _Eratio[k,:], 1)
+
+        ## other element does not have function to calculate photoionizatoin cross section
+        else:
+            assert False
+    else:
+        assert False
 
 
     _Rik, _Rki_stim, _Rki_spon = LibArray.bf_R_rate(_waveMesh=_atom.Mesh.Cont,

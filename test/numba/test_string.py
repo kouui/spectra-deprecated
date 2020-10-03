@@ -45,5 +45,5 @@ if __name__ == "__main__":
     _ = test_func(_x, s='interpolate')
     _ = test_func(_x, s='calculate')
 
-    _ = test_func2(_x, s='interpolate')
+    _ = test_func2(_x)
     _ = test_func2(_x, s='calculate')

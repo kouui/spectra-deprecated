@@ -6,6 +6,37 @@ from ..Math import Special
 
 
 #-----------------------------------------------------------------------------
+# Utils
+#-----------------------------------------------------------------------------
+@nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
+def ratio_Etran_to_Eionize(ni, w):
+    r"""
+    compute the "ratio of transition energy to ionization energy"
+
+    Parameters
+    -----------
+    ni : int, [:math:`-`]
+        principal quantum number of lower level
+
+    w : float, [:math:`cm`]
+        wavelength
+
+    Returns
+    --------
+    ratio : float, [:math:`-`]
+        ratio of transition energy to ionization energy
+
+    """
+    # ionization energy
+    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    # transition energy
+    E_tran = Cst.h_ * Cst.c_ / w
+
+    ratio = E_tran / Eik
+    return ratio
+
+
+#-----------------------------------------------------------------------------
 # Gaunt factor
 #-----------------------------------------------------------------------------
 @nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
@@ -613,7 +644,7 @@ def PI_cross_section_cm(ni, w, Z):
     alpha = 2.815E29 * Z**4  / (v**3 * ni**5) * Gaunt_factor(ni, x)
     return alpha
 
-@nb.vectorize( [nb.float64(nb.int64, nb.float64, nb.int64)] , nopython=True)
+@nb.vectorize( ['float64(int64, float64, int64)', 'float64(uint8, float64, int64)'] , nopython=True)
 def PI_cross_section(ni, x, Z):
     r"""
     Photoionization cross-section for hydrogen from lower level ni at wavelength w.
@@ -698,7 +729,7 @@ def Rki_spon_rate_coe(ni, Te):
     #
     r = Eik / kT
 
-    summation  = Gaunt_factor_coe(0,ni) * Special.E1(1)
+    summation  = Gaunt_factor_coe(0,ni) * Special.E1(r)
     summation += Gaunt_factor_coe(1,ni) * Special.E2(r)
     summation += Gaunt_factor_coe(2,ni) * Special.E3(r)
 

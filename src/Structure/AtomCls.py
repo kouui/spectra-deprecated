@@ -5,7 +5,9 @@ from . import AtomIO
 from . import MeshCls
 from . import RadLineCls
 
-from collections import OrderedDict
+from .MyTypes import T_DATA, T_ATOM
+
+from collections import OrderedDict, namedtuple
 import os
 
 #from numba.typed import List
@@ -14,7 +16,8 @@ import os
 class Atom:
 
 
-    def __init__(self, _filepath, _file_Aji=None, _file_CEe=None, _file_CEp=None, _isPrint=False):
+    def __init__(self, _filepath, _file_Aji=None, _file_CEe=None, _file_CEp=None,
+                _file_CIe=None, _file_CIp=None, _file_PI=None, _isPrint=False):
         r"""
         initial method of class Atom.
 
@@ -47,11 +50,14 @@ class Atom:
         if self.hasContinuum:
             self.make_Cont()
 
-        # whether to read *.Aji file at __init__
-        self.read_Aji(_file_Aji)
+        self._ATOM_DATA_TYPE_dict = {}
 
-        # whether to read *.Electron and *.Proton files at __init__
+        self.read_Aji(_file_Aji)
         self.read_CE(_file_CEe, _file_CEp)
+        self.read_CI(_file_CIe, _file_CIp)
+        self.read_PI(_file_PI)
+
+        self.set_atomic_data_type()
 
     def read_Level(self):
         r"""
@@ -252,8 +258,9 @@ class Atom:
             with open(_path, 'r') as file:
                 fLines = file.readlines()
             AtomIO.read_line_info(_lns=fLines, _Aji=self.Line.AJI[:], _line_ctj_table=self.Line_ctj_table)
+            self._ATOM_DATA_TYPE_dict["AJI"] = T_DATA.INTERPOLATE
         else: # in case of we want to calculate Aji numerically
-            pass
+            self._ATOM_DATA_TYPE_dict["AJI"] = T_DATA.CALCULATE
 
         # calculate f0, w0, w0_AA
         for k in range(self.nLine):
@@ -285,8 +292,10 @@ class Atom:
         """
         if _path_electron is None:
             self.CE = None
+            self._ATOM_DATA_TYPE_dict["CE"] = T_DATA.CALCULATE
         else:
             self.CE = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CE", _isPrint=self.isPrint)
+            self._ATOM_DATA_TYPE_dict["CE"] = T_DATA.INTERPOLATE
 
     def read_CI(self, _path_electron, _path_proton=None):
         r"""
@@ -303,8 +312,10 @@ class Atom:
         """
         if _path_electron is None:
             self.CI = None
+            self._ATOM_DATA_TYPE_dict["CI"] = T_DATA.CALCULATE
         else:
             self.CI = Collisional_Transition(_parent=self, _path_electron=_path_electron, _type="CI", _isPrint=self.isPrint)
+            self._ATOM_DATA_TYPE_dict["CI"] = T_DATA.INTERPOLATE
 
     def read_PI(self, _path_alpha):
         r"""
@@ -324,8 +335,10 @@ class Atom:
         self.filepath_dict["Photoionization"] = _path_alpha
         if _path_alpha is None:
             self.PI = None
+            self._ATOM_DATA_TYPE_dict["PI"] = T_DATA.CALCULATE
         else:
             self.PI = Photoionization(_parent=self, _path_alpha=_path_alpha, _isPrint=self.isPrint)
+            self._ATOM_DATA_TYPE_dict["PI"] = T_DATA.INTERPOLATE
 
     def read_RadiativeLine_and_make_Line_Mesh(self, _path):
         r"""
@@ -362,13 +375,26 @@ class Atom:
         """
         self.I_Rad = RadLineCls.RadiativeLine(_parent=self, _folder=_folder)
 
-    def set_hydrogen(self, _isHydrogen=False):
-        self.isHydrogen = _isHydrogen
+    def set_atom_type(self, isHydrogen=False):
+        r""" """
+
+        if isHydrogen:
+            self.ATOM_TYPE = T_ATOM.HYDROGEN
+        else:
+            self.ATOM_TYPE = T_ATOM.NORMAL
 
 
+    def set_atomic_data_type(self):
+        r""" """
 
-
-
+        adt = self._ATOM_DATA_TYPE_dict
+        ATOM_DATA_TYPE = namedtuple('ATOM_DATA_TYPE', ['AJI', 'CE', 'CI', 'PI'])
+        self.ATOM_DATA_TYPES = ATOM_DATA_TYPE(
+                                         AJI = adt["AJI"],
+                                         CE  = adt["CE"],
+                                         CI  = adt["CI"],
+                                         PI  = adt["PI"],
+                                         )
 
     def ctj_to_level_idx(self, ctj):
         r"""
@@ -629,6 +655,7 @@ class Photoionization:
             # shift edge wavelength to the computed wavelength w0
             #self.PI_table[k,:self.PI_coe.nLambda[k],0] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table[k,0,0]
             self.alpha_table[k][0,:] += _parent.Cont.w0[k] - self.alpha_table[k][0,0]
+        self.alpha_table = np.array( self.alpha_table, dtype=np.double )
 
         if self.isPrint:
             print("Finished.")
@@ -669,17 +696,12 @@ def InitAtom(_conf_path, isHydrogen=False):
             assert _path_dict["folder"] is not None
             _path_dict[_words[0]] = os.path.join( _path_dict["folder"], _words[1] )
 
-    _atom = Atom(_path_dict["Level"], _file_Aji=_path_dict["Aji"], _file_CEe=_path_dict["CEe"])
-
-    _atom.read_CI(_path_electron=_path_dict["CIe"])
-
-    _atom.read_PI(_path_alpha=_path_dict["PI"])
+    _atom = Atom(_path_dict["Level"], _file_Aji=_path_dict["Aji"], _file_CEe=_path_dict["CEe"],
+                 _file_CIe=_path_dict["CIe"], _file_PI=_path_dict["PI"])
 
     _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
     _atom.make_Cont_Mesh()
-
-    _atom.set_hydrogen(isHydrogen)
+    _atom.set_atom_type(isHydrogen=isHydrogen)
 
     #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
-
     return _atom, _path_dict

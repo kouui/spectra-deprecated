@@ -52,7 +52,7 @@ saha_ = 2 * (2*pi_*me_*k_/h_/h_)**(1.5)
 """
 
 C0_ = 5.465366   * 1.E-11
-"""a constant factor in collisional excitation rate coefficient, :math:`\pi^a_{0}^{2}(8k/m\pi)^{1/2}`, [:math:`cm^{3}s^{-1}K^{-1/2}`]
+"""a constant factor in collisional excitation/ionization rate coefficient, :math:`\pi^a_{0}^{2}(8k/m\pi)^{1/2}`, [:math:`cm^{3}s^{-1}K^{-1/2}`]
 """
 
 ################################################################################

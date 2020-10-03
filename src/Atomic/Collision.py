@@ -1,7 +1,7 @@
 import numpy as np
 from .. import Constants as Cst
 
-from scipy.interpolate import splrep, splev
+#from scipy.interpolate import splrep, splev
 
 def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2):
     r"""
@@ -36,7 +36,9 @@ def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2):
 
     From [1]_.
 
-    .. math:: n_{e} C_{ij} = n_{e} \frac{8.63e-6 \times (\Omega_{ij} f1 / f2) }{g_{i} T_{e}^{1/2}}  \exp{\frac{-dE_{ji}}{kT_{e}} } \quad [s^{-1}]
+    .. math:: n_{e} C_{ij} = n_{e} \frac{8.63e-6 \times (\Omega_{ij} ) }{g_{i} T_{e}^{1/2}}  \exp{\frac{-dE_{ji}}{kT_{e}} } \quad [s^{-1}]
+
+    .. math:: \Omega_{ij} = \Omega_{ij} f1 / f2
 
     References
     ----------
@@ -49,9 +51,11 @@ def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2):
     _CE_fac = np.zeros(_nLine, dtype=np.double)
     for k in range(_nLine):
         #--- scipy B-spline interpolation
-        _Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
+        #_Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
         # ext=3 : return boundary value
-        _CE_fac[k] = splev(_Te, _Bsp_obj, ext=3) * _f1[k] / _f2[k]
+        #_CE_fac[k] = splev(_Te, _Bsp_obj, ext=3) * _f1[k] / _f2[k]
+
+        _CE_fac[k] = np.interp( _Te, _Te_table[:], _table[k,:] )  * _f1[k] / _f2[k]
 
     return _CE_fac
 
@@ -83,7 +87,9 @@ def interpolate_CI_fac(_table, _Te, _Te_table, _f2):
     Notes
     -----
 
-    .. math:: n_{e} C_{ik} = n_{e} * (\Omega_{ik} / f2) * \exp{\frac{-dE}{kT_{e}}} * \sqrt{T_{e}}, \quad [s^{-1}]
+    .. math:: n_{e} C_{ik} = n_{e} * (\Omega_{ik}) * \exp{\frac{-dE}{kT_{e}}} * \sqrt{T_{e}}, \quad [s^{-1}]
+
+    .. math:: \Omega_{ik} = \Omega_{ik} / f2
 
     References
     ----------
@@ -94,9 +100,11 @@ def interpolate_CI_fac(_table, _Te, _Te_table, _f2):
     _CI_fac = np.zeros(_nCont, dtype=np.double)
     for k in range(_nCont):
         #--- scipy B-spline interpolation
-        _Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
+        #_Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
         # ext=3 : return boundary value
-        _CI_fac[k] = splev(_Te, _Bsp_obj, ext=3) / _f2[k]
+        #_CI_fac[k] = splev(_Te, _Bsp_obj, ext=3) / _f2[k]
+
+        _CI_fac[k] = np.interp( _Te, _Te_table[:], _table[k,:] )  / _f2[k]
 
     return _CI_fac
 

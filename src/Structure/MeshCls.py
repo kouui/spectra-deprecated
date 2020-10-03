@@ -72,6 +72,7 @@ class WavelengthMesh:
                 mesh = Profile.makeContinuumMesh(41) # in limit wavelength unit
                 w0 = self._parent.Cont.w0[k]
                 self.Cont.append( mesh * w0 )
+            self.Cont = np.array( self.Cont, dtype=np.double )
 
             if self.isPrint:
                 print("continuum mesh prepared.")

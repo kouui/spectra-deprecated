@@ -106,9 +106,9 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
     for k in range(_nCont):
 
         _res = PhotoIonize.bound_free_radiative_transition_coefficient(
-                            wave = _waveMesh[k][::-1],
+                            wave = _waveMesh[k,::-1],
                             J = _Jnu[k][::-1],
-                            alpha = _alpha[k][::-1],
+                            alpha = _alpha[k,::-1],
                             Te = _Te,
                             nk_by_ni_LTE=_nj_by_ni_LTE[k])
         _Rik[k] = _res[0]
