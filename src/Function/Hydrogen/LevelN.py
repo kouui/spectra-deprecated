@@ -3,6 +3,20 @@ import numpy as np
 import numba as nb
 
 from ... import Constants as Cst
+from ...Atomic import Hydrogen
+
+def compute_PI_cross_section(_ni, _meshCont):
+    r""" """
+
+    ## compute ratio of the transition energy to ionization energy
+    _Eratio = ratio_Etran_to_Eionize(_ni[:], _meshCont[::])
+
+    _PI_alpha = np.zeros(_Eratio.shape, dtype=np.double)
+    for k in range(_Eratio.shape[0]):
+        _PI_alpha[k,:] = Hydrogen.PI_cross_section(_ni[k], _Eratio[k,:], 1)
+
+    return _PI_alpha
+
 
 @nb.vectorize(['uint8(uint8)', 'int64(int64)'], nopython=True)
 def get_level_n( g ):

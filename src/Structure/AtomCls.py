@@ -5,7 +5,7 @@ from . import AtomIO
 from . import MeshCls
 from . import RadLineCls
 
-from ..Atomic import LTELib, Hydrogen
+from ..Atomic import LTELib, Hydrogen, PhotoIonize
 
 from .MyTypes import T_DATA, T_ATOM
 
@@ -380,12 +380,28 @@ class Atom:
             print("Reading Photoionization cross section from : \n", _path_alpha)
 
         self.filepath_dict["Photoionization"] = _path_alpha
+
         if _path_alpha is None:
-            self.PI = None
+
+            self._PI = None
             self._ATOM_DATA_TYPE_dict["PI"] = T_DATA.CALCULATE
+
         else:
-            self.PI = Photoionization(_parent=self, _path_alpha=_path_alpha, _isPrint=self.isPrint)
+            self._PI = Photoionization(_parent=self, _path_alpha=_path_alpha, _isPrint=self.isPrint)
             self._ATOM_DATA_TYPE_dict["PI"] = T_DATA.INTERPOLATE
+
+    def prepare_PI_alpha(self):
+        r""" """
+        if self._ATOM_DATA_TYPE_dict["PI"] == T_DATA.CALCULATE:
+            ## hydrogen has function prepared
+            if self.hasContinuum and self.ATOM_TYPE == T_ATOM.HYDROGEN:
+                from ..Function.Hydrogen import LevelN
+                self.PI_alpha = LevelN.compute_PI_cross_section(self.Cont.ni[:], self.Mesh.Cont[:,:])
+            ## other element does not have function to calculate photoionizatoin cross section
+            else:
+                assert False
+        else:
+            self.PI_alpha = PhotoIonize.interpolate_PI_alpha(self._PI.alpha_table, self.Mesh.Cont[:,:])
 
     def read_RadiativeLine_and_make_Line_Mesh(self, _path):
         r"""
@@ -748,6 +764,7 @@ def InitAtom(_conf_path, isHydrogen=False):
 
     _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
     _atom.make_Cont_Mesh()
+    _atom.prepare_PI_alpha()
 
     #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
     return _atom, _path_dict
