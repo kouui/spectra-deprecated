@@ -5,6 +5,7 @@
 
 from .. import Constants as Cst
 
+import numba as nb
 
 ################################################################################
 # wavelength [cm] <--> frequency [hz]
@@ -284,3 +285,11 @@ def air_to_vacuum(w_, unit_):
 
     n_ = refractive_index_in_air(w_, unit_)
     return w_ * n_
+
+#-----------------------------------------------------------------------------
+#
+#-----------------------------------------------------------------------------
+
+if Cst.isJIT == True :
+    get_Doppler_width = nb.vectorize( ['float64(float64,float64,float64,float64)'] )( get_Doppler_width )
+    get_damping_a = nb.vectorize( ['float64(float64,float64)'] )( get_damping_a )

@@ -53,7 +53,7 @@ def read_general_info(_rs, _lns):
 
     return _re, _Title, _Z, _Element, _nLevel
 
-def read_level_info(_rs, _lns, _Level_info, _erg, _g, _stage):
+def read_level_info(_rs, _lns, _Level_info, _erg, _g, _stage, _n):
     r"""
     read level information to
         1. _Level_info
@@ -64,6 +64,7 @@ def read_level_info(_rs, _lns, _Level_info, _erg, _g, _stage):
         2. _erg
         3. _g
         4. _stage
+        5. _n
     """
 
     _idx = 0
@@ -96,6 +97,7 @@ def read_level_info(_rs, _lns, _Level_info, _erg, _g, _stage):
         _Level_info["J"].append( _words[2] )
         _Level_info["2S+1"].append( _words[5] )
 
+        _n[_idx] = int(_words[3]) if _words[3] != '-' else 0
         _erg[_idx] = float( _words[8] )
         _g[_idx] = int( _words[6] )
         _stage[_idx] = int( _words[7] )

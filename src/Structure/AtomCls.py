@@ -5,6 +5,8 @@ from . import AtomIO
 from . import MeshCls
 from . import RadLineCls
 
+from ..Atomic import LTELib, Hydrogen
+
 from .MyTypes import T_DATA, T_ATOM
 
 from collections import OrderedDict, namedtuple
@@ -17,7 +19,7 @@ class Atom:
 
 
     def __init__(self, _filepath, _file_Aji=None, _file_CEe=None, _file_CEp=None,
-                _file_CIe=None, _file_CIp=None, _file_PI=None, _isPrint=False):
+                _file_CIe=None, _file_CIp=None, _file_PI=None, _isHydrogen=False, _isPrint=False):
         r"""
         initial method of class Atom.
 
@@ -38,6 +40,7 @@ class Atom:
         """
 
         self.isPrint = _isPrint
+        self.set_atom_type(isHydrogen=_isHydrogen)
 
         self.filepath_dict = {
             "config" : _filepath,
@@ -81,11 +84,13 @@ class Atom:
                           ('stage',np.uint8),           #: ionization stage
                           ('gamma',np.double),          #: radiative damping constant of Level
                           ("isGround",np.bool),         #: whether a level is ground level
+                          ('n',np.uint8),               #: quantum number n
                           ])
         self.Level = np.recarray(self.nLevel, dtype=dtype)
         self._Level_info = {"configuration" : [], "term" : [], "J": [], "2S+1": []}
         rs = AtomIO.read_level_info(rs, _lns=fLines, _Level_info=self._Level_info,
-                            _erg=self.Level.erg[:], _g=self.Level.g[:], _stage=self.Level.stage[:])
+                                   _erg=self.Level.erg[:], _g=self.Level.g[:],
+                                   _stage=self.Level.stage[:], _n=self.Level.n[:])
         self.Level.erg[:] *= Cst.eV2erg_
 
         self.Level.isGround[:] = 1
@@ -208,6 +213,10 @@ class Atom:
                            ('f0',np.double),            #: central frequency
                            ('w0',np.double),            #: central wavelength in cm
                            ('w0_AA',np.double),         #: central wavelength in Angstrom
+                           ('gi',np.uint8),               #: statistical weight of lower level
+                           ('gj',np.uint8),               #: statistical weight of upper level
+                           ('ni',np.uint8),               #: quantum number n of lower level
+                           ('nj',np.uint8),               #: quantum number n of upper level
                            ])
         self.Cont = np.recarray(self.nCont, dtype=dtype)
 
@@ -218,6 +227,12 @@ class Atom:
             self.Cont.f0[k] = (self.Level.erg[j]-self.Level.erg[i]) / Cst.h_
         self.Cont.w0[:] = Cst.c_ / self.Cont.f0[:]
         self.Cont.w0_AA[:] = self.Cont.w0[:] * 1E+8
+
+        # read gi,gj,ni,nj
+        self.Cont.gi[:] = self.Level.g[ self.Cont.idxI[ : ] ]
+        self.Cont.gj[:] = self.Level.g[ self.Cont.idxJ[ : ] ]
+        self.Cont.ni[:] = self.Level.n[ self.Cont.idxI[ : ] ]
+        self.Cont.nj[:] = self.Level.n[ self.Cont.idxJ[ : ] ]
 
 
     def read_Aji(self, _path):
@@ -244,6 +259,12 @@ class Atom:
                            ('w0_AA',np.double),         #: central wavelength in Angstrom
                            #("isContinuum",np.uint8),    #: continuum tansition identifier, 0: same stage, 1: continuum transition, 2: others
                            ('Gamma',np.double),         #: radiative damping constant of Line
+                           ('gi',np.uint8),               #: statistical weight of lower level
+                           ('gj',np.uint8),               #: statistical weight of upper level
+                           ('ni',np.uint8),               #: quantum number n of lower level
+                           ('nj',np.uint8),               #: quantum number n of upper level
+                           ('BJI',np.double),           #: Einstein Bji coefficient
+                           ('BIJ',np.double),           #: Einstein BIJ coefficient
                            ])
         self.Line = np.recarray(self.nLine, dtype=dtype)
 
@@ -259,8 +280,11 @@ class Atom:
                 fLines = file.readlines()
             AtomIO.read_line_info(_lns=fLines, _Aji=self.Line.AJI[:], _line_ctj_table=self.Line_ctj_table)
             self._ATOM_DATA_TYPE_dict["AJI"] = T_DATA.INTERPOLATE
+
         else: # in case of we want to calculate Aji numerically
             self._ATOM_DATA_TYPE_dict["AJI"] = T_DATA.CALCULATE
+
+
 
         # calculate f0, w0, w0_AA
         for k in range(self.nLine):
@@ -271,6 +295,29 @@ class Atom:
         self.Line.w0_AA[:] = self.Line.w0[:] * 1E+8
 
         self.Line.Gamma[:] = 0
+
+        # read gi,gj,ni,nj
+        self.Line.gi[:] = self.Level.g[ self.Line.idxI[ : ] ]
+        self.Line.gj[:] = self.Level.g[ self.Line.idxJ[ : ] ]
+        self.Line.ni[:] = self.Level.n[ self.Line.idxI[ : ] ]
+        self.Line.nj[:] = self.Level.n[ self.Line.idxJ[ : ] ]
+
+        ## compute Aji
+        if self._ATOM_DATA_TYPE_dict["AJI"] == T_DATA.CALCULATE:
+            ## hydrogen has function prepared
+            if self.ATOM_TYPE == T_ATOM.HYDROGEN:
+
+                ## compute quantum number n for lower/upper levels
+                self.Line.AJI[:] = Hydrogen.Einstein_A_coefficient(self.Line['ni'][:], self.Line['nj'][:])
+
+            ## other element does not have function to Einstein Aji coefficient
+            else:
+                assert False
+
+        # compute Bji, Bij
+        self.Line.BJI[:], self.Line.BIJ[:] = LTELib.EinsteinA_to_EinsteinBs_cm(self.Line.AJI[:], self.Line.w0[:],
+                                                                             self.Line.gi[:], self.Line.gj[:])
+
 
         if self.isPrint:
             print("Finished.")
@@ -655,7 +702,7 @@ class Photoionization:
             # shift edge wavelength to the computed wavelength w0
             #self.PI_table[k,:self.PI_coe.nLambda[k],0] += self.Line.w0[self.PI_coe.lineIndex[k]] - self.PI_table[k,0,0]
             self.alpha_table[k][0,:] += _parent.Cont.w0[k] - self.alpha_table[k][0,0]
-        self.alpha_table = np.array( self.alpha_table, dtype=np.double )
+
 
         if self.isPrint:
             print("Finished.")
@@ -697,11 +744,10 @@ def InitAtom(_conf_path, isHydrogen=False):
             _path_dict[_words[0]] = os.path.join( _path_dict["folder"], _words[1] )
 
     _atom = Atom(_path_dict["Level"], _file_Aji=_path_dict["Aji"], _file_CEe=_path_dict["CEe"],
-                 _file_CIe=_path_dict["CIe"], _file_PI=_path_dict["PI"])
+                 _file_CIe=_path_dict["CIe"], _file_PI=_path_dict["PI"], _isHydrogen=isHydrogen)
 
     _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
     _atom.make_Cont_Mesh()
-    _atom.set_atom_type(isHydrogen=isHydrogen)
 
     #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
     return _atom, _path_dict

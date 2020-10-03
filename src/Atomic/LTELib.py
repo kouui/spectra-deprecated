@@ -53,7 +53,7 @@ def Boltzmann_distribution(_gi, _gj, _Eji, _Te):
     """
 
     _kT = Cst.k_ * _Te
-    _rt = float(_gj)/float(_gi) * np.exp(-_Eji/_kT)
+    _rt = _gj / _gi * np.exp(-_Eji/_kT)
 
     return _rt
 
@@ -108,7 +108,7 @@ def Saha_distribution(_gi, _gk, _chi, _ne, _Te):
     """
 
     _kT = Cst.k_ * _Te
-    _rt = Cst.saha_ * _Te**(1.5) * float(_gk)/float(_gi) * np.exp(-_chi/_kT) / _ne
+    _rt = Cst.saha_ * _Te**(1.5) * _gk / _gi * np.exp(-_chi/_kT) / _ne
 
     return _rt
 
@@ -335,7 +335,7 @@ def EinsteinA_to_EinsteinBs_cm(Aji, w0, gi, gj):
     """
     factor_ = 2*Cst.h_*Cst.c_**2/w0**5
     Bji = Aji / factor_
-    Bij = Bji * float(gj) / float(gi)
+    Bij = Bji * gj / gi
 
     return Bji, Bij
 
@@ -607,7 +607,10 @@ def Ufunc(elm, T):
 ################################################################################
 
 if Cst.isJIT == True :
-    Planck_cm = nb.vectorize( [nb.float64(nb.float64,nb.float64)])( Planck_cm )
-    Planck_hz = nb.vectorize( [nb.float64(nb.float64,nb.float64)])( Planck_hz )
+    Boltzmann_distribution = nb.vectorize( ['float64(uint8,uint8,float64,float64)'], nopython=True)( Boltzmann_distribution )
+    Saha_distribution = nb.vectorize( ['float64(uint8,uint8,float64,float64,float64)'], nopython=True)( Saha_distribution )
+    Planck_cm = nb.vectorize( [nb.float64(nb.float64,nb.float64)], nopython=True)( Planck_cm )
+    Planck_hz = nb.vectorize( [nb.float64(nb.float64,nb.float64)], nopython=True)( Planck_hz )
+    #EinsteinA_to_EinsteinBs_cm = nb.njit( ['Tuple((float64,float64))(float64,float64,uint8,uint8)'] )( EinsteinA_to_EinsteinBs_cm )
     #Ufunc = nb.jit(nb.float64(nb.types.unicode_type,nb.float64), nopython=True)( Ufunc )
     #Ufunc = nb.jit(nopython=True)( Ufunc )

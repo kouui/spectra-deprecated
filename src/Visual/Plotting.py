@@ -38,10 +38,6 @@ def set_imshow_ticks(axe, arr, axis, points=None, fmt='%1.3f', rot=0, fontsize=N
     -------
     None
 
-    Note
-    -----
-    None
-
     """
 
     assert axis in ('x', 'y')

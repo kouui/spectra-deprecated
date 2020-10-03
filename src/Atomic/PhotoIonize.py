@@ -1,4 +1,5 @@
 import numpy as np
+import numba as nb
 from .. import Constants as Cst
 
 from scipy.interpolate import splrep, splev, interp1d
@@ -38,7 +39,7 @@ def interpolate_PI_intensity(_backRad, _continuum_mesh_list):
 
     return _intensity_mesh_list
 
-def interpolate_PI_alpha(_PI_table_list, _continuum_mesh_list):
+def interpolate_PI_alpha(_PI_table_list, _continuum_mesh):
     r"""
     given continuum mesh, interpolate photoionization cross section
 
@@ -48,30 +49,32 @@ def interpolate_PI_alpha(_PI_table_list, _continuum_mesh_list):
     _PI_table_list : list of 2darray,
         list of table of photoionization cross section, wavelength_cm vs alpha_cm^2
 
-    _continuum_mesh_list : list of 1darray
-        list of continuum mesh
+    _continuum_mesh : 2darray
+        continuum mesh
 
     Returns
     -------
 
-    _alpha_mesh_list : list of 1darray
-        list of interpolated photoionization cross section.
+    _alpha_mesh : 2darray
+        interpolated photoionization cross section.
     """
 
-    _alpha_mesh_list = []
-    for _alpha_table, _cont_mesh in zip(_PI_table_list, _continuum_mesh_list):
-    #for k in range(len(_continuum_mesh_list)):
-    #    _alpha_table = _PI_table_dict[k]
-    #    _cont_mesh = _continuum_mesh_list[k]
-        #_fill_value = (_alpha_table[1,-1], 0)
-        _bsp_obj = interp1d(x=_alpha_table[0,:], y=_alpha_table[1,:], kind="cubic",
-                            bounds_error=False, fill_value="extrapolate")
-        _alpha_mesh = _bsp_obj(_cont_mesh[:])
-        _alpha_mesh_list.append( _alpha_mesh )
-
-    return _alpha_mesh_list
+    _alpha_mesh = np.zeros(_continuum_mesh.shape, dtype=np.double)
+    for k in range(_continuum_mesh.shape[0]):
+    #for _alpha_table, _cont_mesh in zip(_PI_table_list, _continuum_mesh_list):
+        _alpha_table = _PI_table_list[k]
+        #_cont_mesh = _continuum_mesh[k,:]
+        #_bsp_obj = interp1d(x=_alpha_table[0,:], y=_alpha_table[1,:], kind="cubic",
+        #                    bounds_error=False, fill_value="extrapolate")
+        #_alpha_mesh = _bsp_obj(_cont_mesh[:])
+        _alpha_mesh[k,:] = np.interp(_continuum_mesh[k,:], _alpha_table[0,:], _alpha_table[1,:])
 
 
+    return _alpha_mesh
+
+
+
+@nb.njit(['Tuple((float64,float64,float64))(float64[:],float64[:],float64[:],float64,float64)'])
 def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, nk_by_ni_LTE):
     r"""
     Given wavelength mesh, mean intensity (as function of wavelength),

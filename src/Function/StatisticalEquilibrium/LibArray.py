@@ -1,14 +1,18 @@
 
 import numpy as np
-
-
+import numba as nb
 from ...Atomic import Collision, PhotoIonize
 from ...Atomic import LTELib, SEsolver, BasicP, SEsolver
 from ...RadiativeTransfer import Profile
 from ...Math import Integrate
 from ... import Constants as Cst
 
-from scipy.interpolate import interp1d
+from ...Structure.MyTypes import T_ATOM
+from ...Atomic import Hydrogen
+
+#from scipy.interpolate import interp1d
+
+
 
 def convert_ni_to_nj_by_ni(_ni, _idxI, _idxJ):
     r"""
@@ -24,6 +28,7 @@ def convert_ni_to_nj_by_ni(_ni, _idxI, _idxJ):
 
     return _nj_by_ni
 
+@nb.njit
 def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
                       _nj_by_ni_C=None, _idxI_C=None, _idxJ_C=None):
     r"""
@@ -94,6 +99,7 @@ def ni_nj_LTE(_Level, _Line, _Cont, _Te, _Ne):
 
     return _n_LTE, _ni_LTE, _nj_LTE
 
+@nb.njit(['Tuple((float64[:],float64[:],float64[:]))(float64[:,:],float64[:,:],float64[:,:],float64,float64[:])'])
 def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
     r"""
     """
@@ -107,7 +113,7 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
 
         _res = PhotoIonize.bound_free_radiative_transition_coefficient(
                             wave = _waveMesh[k,::-1],
-                            J = _Jnu[k][::-1],
+                            J = _Jnu[k,::-1],
                             alpha = _alpha[k,::-1],
                             Te = _Te,
                             nk_by_ni_LTE=_nj_by_ni_LTE[k])
@@ -117,31 +123,35 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
 
     return _Rik, _Rki_stim, _Rki_spon
 
-def B_Jbar(_Level, _Line, _MeshCoe=None, _Te=None, _Vt=None,_Vd=None, _Mass=None, _Tr=None):
+#@nb.njit
+def B_Jbar(_Level, _Line, _MeshCoe, _Tr, _Te=1.E4, _Vt=5.E5, _Vd=1.E6, _Mass=1.):
     r"""
     """
 
-    _nLine = _Line.AJI.shape[0]
+    _nLine = _Line['AJI'].shape[0]
     _Bij_Jbar = np.zeros(_nLine, np.double)
     _Bji_Jbar = np.zeros(_nLine, np.double)
 
     for k in range(_nLine):
 
-        if _Line.AJI[ k ] < 1.E-3:
+        ## ignore lines with Aji < 1E-3
+        if _Line['AJI'][ k ] < 1.E-3:
             continue
 
-        _w0 = _Line.w0[ k ]
-        _gi = _Level.g[ _Line.idxI[ k ] ]
-        _gj = _Level.g[ _Line.idxJ[ k ] ]
-        _Aji = _Line.AJI[ k ]
+        _w0 = _Line['w0'][ k ]
+        _gi = _Line['gi'][ k ]
+        _gj = _Line['gj'][ k ]
+        _Aji = _Line['AJI'][ k ]
         _Bji, _Bij = LTELib.EinsteinA_to_EinsteinBs_cm(_Aji, _w0, _gi, _gj)
 
-        if _Tr is not None: # radiation temperature
-            _Jbar0 = LTELib.Planck_cm(_Line.w0[ k ], _Tr)
-
-        else:               # background radiation
-            _dopWidth_cm = BasicP.get_Doppler_width(p0=_w0, Te=_Te, Vt=_Vt, am=_Mass)
-            _a = BasicP.get_damping_a(_Gamma=_Line.Gamma[ k ], _dopWidth_hz=_dopWidth_cm*_f0/_w0 )
+        ## use radiation temperature to calculate mean intensity
+        if _Tr is not None:
+            _Jbar0 = LTELib.Planck_cm(_Line['w0'][ k ], _Tr)
+        ## use background radiation to calculate mean intensity
+        else:
+            _f0 = _Line.f0[ k ]
+            _dopWidth_cm = BasicP.get_Doppler_width(_w0, _Te, _Vt, _Mass)
+            _a = BasicP.get_damping_a(_Line['Gamma'][ k ], _dopWidth_cm*_f0/_w0 )
 
             # calculate mesh
             if k in _MeshCoe.lineIndex[:]:
@@ -159,14 +169,40 @@ def B_Jbar(_Level, _Line, _MeshCoe=None, _Te=None, _Vt=None,_Vd=None, _Mass=None
             _wave_mesh_cm = _wave_mesh_shifted[:] * _dopWidth_cm
             _absorb_mesh_cm = Profile.Voigt(_a, _wave_mesh[:]) / _dopWidth_cm
 
-            _I_cm_interp = MAKE_INTERPOLATION_HERE
-            _integrand = 0.5 * _I_cm_interp[:] * _absorb_mesh_cm
+            _I_cm_interp = _absorb_mesh_cm[:]#MAKE_INTERPOLATION_HERE
+            _integrand = 0.5 * _I_cm_interp[:] * _absorb_mesh_cm[:]
             _Jbar0 = Integrate.Trapze(integrand=_integrand, x=_wave_mesh_cm)
 
         _Bji_Jbar[k] = _Bji * _Jbar0
         _Bij_Jbar[k] = _Bij * _Jbar0
 
     return _Bij_Jbar, _Bji_Jbar
+
+@nb.njit
+def B_Jbar_Tr(_Aji, _Bji, _Bij, _w0, _Tr):
+
+    _nLine = _Aji.shape[0]
+    _Bij_Jbar = np.zeros(_nLine, np.double)
+    _Bji_Jbar = np.zeros(_nLine, np.double)
+
+    for k in range(_nLine):
+
+        ## ignore lines with Aji < 1E-3
+        if _Aji[k] < 1.E-3:
+            continue
+
+        #_Bji, _Bij = LTELib.EinsteinA_to_EinsteinBs_cm(_Aji[k], _w0[k], _gi[k], _gj[k])
+
+        ## use radiation temperature to calculate mean intensity
+        _Jbar0 = LTELib.Planck_cm(_w0[ k ], _Tr)
+
+        _Bji_Jbar[k] = _Bji[k] * _Jbar0
+        _Bij_Jbar[k] = _Bij[k] * _Jbar0
+
+    return _Bij_Jbar, _Bji_Jbar
+
+
+
 
 
 def B_Jbar_v0(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_Vd=None,
@@ -192,8 +228,9 @@ def B_Jbar_v0(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_
             _Jbar0 = _Jbar[k]
 
         else:
-            _dopWidth_cm = BasicP.get_Doppler_width(p0=_w0, Te=_Te, Vt=_Vt, am=_Mass)
-            _a = BasicP.get_damping_a(_Gamma=_Line.Gamma[_line_index], _dopWidth_hz=_dopWidth_cm*_f0/_w0 )
+            _dopWidth_cm = BasicP.get_Doppler_width(_w0, _Te, _Vt, _Mass)
+            BasicP.get_damping_a(_Gamma, _dopWidth_hz)
+            _a = BasicP.get_damping_a(_Line.Gamma[_line_index], _dopWidth_cm*_f0/_w0 )
 
             # shift wavelength mesh
             _wave_mesh = _MeshRadLine[k][:]
@@ -216,8 +253,7 @@ def B_Jbar_v0(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_
     return _Bij_Jbar, _Bji_Jbar
 
 def CEij_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
-    r"""
-    """
+    r""" """
     _omega = Collision.interpolate_CE_fac(_table=_Omega_table[:,:],
                                         _Te=_Te,
                                         _Te_table=_Te_table[:],
@@ -227,9 +263,9 @@ def CEij_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
 
     return _CEij
 
+
 def CIik_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
-    r"""
-    """
+    r""" """
     _omega = Collision.interpolate_CI_fac(_table=_Omega_table[:,:],
                                        _Te=_Te,
                                        _Te_table=_Te_table[:],
@@ -239,10 +275,29 @@ def CIik_rate_coe(_Omega_table, _Te_table, _Coe, _Te):
 
     return _CIik
 
-def solve_SE(_nLevel, _idxI, _idxJ,
-       _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne):
-    r"""
-    """
+@nb.njit
+def CEij_rate_coe_calculate(_Te, _ni, _nj, _ATOM_TYPE):
+    r""" """
+
+    if _ATOM_TYPE == T_ATOM.HYDROGEN:
+        _CEij = Hydrogen.CE_rate_coe(_ni, _nj, _Te)
+    else:
+        assert False
+    return _CEij
+
+@nb.njit
+def CIik_rate_coe_calculate(_Te, _ni, _ATOM_TYPE):
+    r""" """
+
+    if _ATOM_TYPE == T_ATOM.HYDROGEN:
+        _CIik = Hydrogen.CI_rate_coe(_ni, _Te)
+    else:
+        assert False
+    return _CIik
+
+
+def solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne):
+    r""" """
 
     _Cmat = np.zeros((_nLevel, _nLevel), dtype=np.double)
     SEsolver.setMatrixC(_Cmat=_Cmat[:,:],
