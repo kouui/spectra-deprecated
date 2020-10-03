@@ -229,7 +229,6 @@ def B_Jbar_v0(_Level, _Line, _lineIndex, _MeshRadLine=None, _Te=None, _Vt=None,_
 
         else:
             _dopWidth_cm = BasicP.get_Doppler_width(_w0, _Te, _Vt, _Mass)
-            BasicP.get_damping_a(_Gamma, _dopWidth_hz)
             _a = BasicP.get_damping_a(_Line.Gamma[_line_index], _dopWidth_cm*_f0/_w0 )
 
             # shift wavelength mesh

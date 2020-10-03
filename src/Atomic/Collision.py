@@ -51,11 +51,11 @@ def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2):
     _CE_fac = np.zeros(_nLine, dtype=np.double)
     for k in range(_nLine):
         #--- scipy B-spline interpolation
-        _Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
+        #_Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
         # ext=3 : return boundary value
-        _CE_fac[k] = splev(_Te, _Bsp_obj, ext=3) * _f1[k] / _f2[k]
+        #_CE_fac[k] = splev(_Te, _Bsp_obj, ext=3) * _f1[k] / _f2[k]
 
-        #_CE_fac[k] = np.interp( _Te, _Te_table[:], _table[k,:] )  * _f1[k] / _f2[k]
+        _CE_fac[k] = np.interp( _Te, _Te_table[:], _table[k,:] )  * _f1[k] / _f2[k]
 
     return _CE_fac
 
@@ -100,11 +100,11 @@ def interpolate_CI_fac(_table, _Te, _Te_table, _f2):
     _CI_fac = np.zeros(_nCont, dtype=np.double)
     for k in range(_nCont):
         #--- scipy B-spline interpolation
-        _Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
+        #_Bsp_obj = splrep(x=_Te_table[:], y=_table[k,:])
         # ext=3 : return boundary value
-        _CI_fac[k] = splev(_Te, _Bsp_obj, ext=3) / _f2[k]
+        #_CI_fac[k] = splev(_Te, _Bsp_obj, ext=3) / _f2[k]
 
-        #_CI_fac[k] = np.interp( _Te, _Te_table[:], _table[k,:] )  / _f2[k]
+        _CI_fac[k] = np.interp( _Te, _Te_table[:], _table[k,:] )  / _f2[k]
 
     return _CI_fac
 

@@ -66,7 +66,7 @@ def interpolate_PI_alpha(_PI_table_list, _continuum_mesh):
         #_cont_mesh = _continuum_mesh[k,:]
         #_bsp_obj = interp1d(x=_alpha_table[0,:], y=_alpha_table[1,:], kind="cubic",
         #                    bounds_error=False, fill_value="extrapolate")
-        #_alpha_mesh = _bsp_obj(_cont_mesh[:])
+        #_alpha_mesh[k,:] = _bsp_obj(_cont_mesh[:])
         _alpha_mesh[k,:] = np.interp(_continuum_mesh[k,:], _alpha_table[0,:], _alpha_table[1,:])
 
 
