@@ -3,7 +3,7 @@ import numba as nb
 
 from .. import Constants as Cst
 
-@nb.njit
+#@nb.njit
 def setMatrixC(_Cmat, _Cji, _Cij, _idxI, _idxJ, _Ne):
     r"""
     Compute the collisional rate matrix.
@@ -55,7 +55,7 @@ def setMatrixC(_Cmat, _Cji, _Cij, _idxI, _idxJ, _Ne):
         _Cmat[i,j] += _Ne * _Cji[k]
         _Cmat[j,i] += _Ne * _Cij[k]
 
-@nb.njit
+#@nb.njit
 def setMatrixR(_Rmat, _Rji_spon, _Rji_stim, _Rij, _idxI, _idxJ):
     r"""
     Compute the radiative rate matrix.
@@ -154,3 +154,5 @@ def solveSE(_Rmat, _Cmat):
 
 if Cst.isJIT == True :
     solveSE = nb.njit( ['float64[:](float64[:,:],float64[:,:])'] )( solveSE )
+    setMatrixC = nb.njit( setMatrixC )
+    setMatrixR = nb.njit( setMatrixR )

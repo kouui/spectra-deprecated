@@ -40,7 +40,7 @@ def get_level_n( g ):
 #get_level_n = np.frompyfunc( get_level_n, 1, 1 )
 
 
-@nb.njit( ['float64[:,:](uint8[:], float64[:,:])', 'float64[:,:](int64[:], float64[:,:])'] )
+#@nb.njit( ['float64[:,:](uint8[:], float64[:,:])', 'float64[:,:](int64[:], float64[:,:])'] )
 def ratio_Etran_to_Eionize( ni_arr, wave_arr ):
     r"""
 
@@ -57,3 +57,6 @@ def ratio_Etran_to_Eionize( ni_arr, wave_arr ):
         ratio[k,:] = E_tran[:] / E_ionize
 
     return ratio
+
+if Cst.isJIT:
+    ratio_Etran_to_Eionize = nb.njit( ['float64[:,:](uint8[:], float64[:,:])', 'float64[:,:](int64[:], float64[:,:])'] )(ratio_Etran_to_Eionize)

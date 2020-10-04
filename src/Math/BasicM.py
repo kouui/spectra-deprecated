@@ -3,7 +3,8 @@
 #     calculations related to basic/naive mathematical formula
 ################################################################################
 
-
+from .. import Constants as Cst
+import numba as nb
 
 
 ################################################################################
@@ -26,3 +27,7 @@ def is_odd(num):
          1 if input num is an odd number, otherwise 0.
     """
     return num & 0x1
+
+if Cst.isJIT:
+    pass
+    #is_odd = nb.njit( ['bool(int64)','bool(uint16)'] )( is_odd )

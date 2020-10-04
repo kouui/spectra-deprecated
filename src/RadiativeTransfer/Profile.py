@@ -155,7 +155,7 @@ def makeLineMesh_Half(nLambda, qcore, qwing, q):
     - change qwing, you change how far your Doppler width mesh reach
     - change qcore, you change how dense in line core.
     """
-    assert BasicM.is_odd(nLambda), "nLambda should be an odd number."
+    #assert BasicM.is_odd(nLambda), "nLambda should be an odd number."
     nLhalf = nLambda//2 + 1
 
     if qwing <= 2*qcore:
@@ -170,7 +170,7 @@ def makeLineMesh_Half(nLambda, qcore, qwing, q):
     for i in range(0, nLhalf):
         q[i] = a * (i + (np.exp(b*i)-1.))
 
-def makeLineMesh_Full(nLambda, qcore=2.5, qwing=10):
+def makeLineMesh_Full(nLambda, qcore=2.5, qwing=10.):
     r"""
     Construct Full line mesh.
     Calls inner function `makeLineMesh_Half` to construct half part
@@ -273,4 +273,5 @@ def half_to_full(_arr_half, _isMinus=False):
 # whether to compile them using numba's LLVM
 ################################################################################
 if Cst.isJIT == True:
-    pass
+    makeLineMesh_Half = nb.njit( ['(int64,float64,float64,float64[:])','(uint16,float64,float64,float64[:])'] )( makeLineMesh_Half )
+    makeLineMesh_Full = nb.njit( ['float64[:](int64,float64,float64)', 'float64[:](uint16,float64,float64)'] )( makeLineMesh_Full )

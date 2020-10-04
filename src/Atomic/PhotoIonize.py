@@ -74,7 +74,7 @@ def interpolate_PI_alpha(_PI_table_list, _continuum_mesh):
 
 
 
-@nb.njit(['Tuple((float64,float64,float64))(float64[:],float64[:],float64[:],float64,float64)'])
+#@nb.njit(['Tuple((float64,float64,float64))(float64[:],float64[:],float64[:],float64,float64)'])
 def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, nk_by_ni_LTE):
     r"""
     Given wavelength mesh, mean intensity (as function of wavelength),
@@ -158,3 +158,6 @@ def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, nk_by_ni_LTE
     Rki_spon = _factor * 4*Cst.pi_ * Integrate.Trapze(integrand_ki_spon, wave)
 
     return Rik, Rki_stim, Rki_spon
+
+if Cst.isJIT:
+    bound_free_radiative_transition_coefficient = nb.njit(['Tuple((float64,float64,float64))(float64[:],float64[:],float64[:],float64,float64)'])( bound_free_radiative_transition_coefficient )

@@ -28,7 +28,7 @@ def convert_ni_to_nj_by_ni(_ni, _idxI, _idxJ):
 
     return _nj_by_ni
 
-@nb.njit
+#@nb.njit
 def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
                       _nj_by_ni_C=None, _idxI_C=None, _idxJ_C=None):
     r"""
@@ -179,7 +179,7 @@ def B_Jbar(_Level, _Line, _MeshCoe, _Tr, _Te=1.E4, _Vt=5.E5, _Vd=1.E6, _Mass=1.)
 
     return _Bij_Jbar, _Bji_Jbar
 
-@nb.njit
+#@nb.njit
 def B_Jbar_Tr(_Aji, _Bji, _Bij, _w0, _Tr):
 
     _nLine = _Aji.shape[0]
@@ -323,3 +323,7 @@ def solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne)
     _n_SE = SEsolver.solveSE(_Rmat=_Rmat[:,:], _Cmat=_Cmat[:,:])
 
     return _n_SE
+
+if Cst.isJIT:
+    convert_nj_by_ni_to_ni = nb.njit(convert_nj_by_ni_to_ni)
+    B_Jbar_Tr = nb.njit(B_Jbar_Tr)

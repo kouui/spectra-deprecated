@@ -392,14 +392,19 @@ class Atom:
 
     def prepare_PI_alpha(self):
         r""" """
+        ## calculate cross section
         if self._ATOM_DATA_TYPE_dict["PI"] == T_DATA.CALCULATE:
+
             ## hydrogen has function prepared
             if self.hasContinuum and self.ATOM_TYPE == T_ATOM.HYDROGEN:
                 from ..Function.Hydrogen import LevelN
                 self.PI_alpha = LevelN.compute_PI_cross_section(self.Cont.ni[:], self.Mesh.Cont[:,:])
+
             ## other element does not have function to calculate photoionizatoin cross section
             else:
                 assert False
+
+        ## interpolate cross section
         else:
             self.PI_alpha = PhotoIonize.interpolate_PI_alpha(self._PI.alpha_table, self.Mesh.Cont[:,:])
 
