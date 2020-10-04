@@ -291,7 +291,7 @@ def _filter_term(_term):
 
 class Grotrian:
 
-    def __init__(self, _atom, _path, _conf_prefix=None, _scaleFunc=None, _scaleFunc_inv=None):
+    def __init__(self, _atom, _path=None, _conf_prefix=None, _scaleFunc=None, _scaleFunc_inv=None):
         r"""
 
         Parameters
@@ -303,12 +303,19 @@ class Grotrian:
         _path : str
             a path to the *.Grotrian configuration file
 
-        _conf_prefix : str
+        _conf_prefix : strfilepath_dict["Grotrian"]
             common configuration string of the inner shell
 
         """
+
+        self.set_atom( _atom, _path=_path,
+             _conf_prefix=_conf_prefix, _scaleFunc=_scaleFunc, _scaleFunc_inv=_scaleFunc_inv )
+
+    def set_atom(self, _atom, _path=None, _conf_prefix=None, _scaleFunc=None, _scaleFunc_inv=None):
+        r""" """
+
         self.atom = _atom
-        self._path = _path
+        self._path = _path if _path is not None else _atom.filepath_dict["Grotrian"]
         self._scaleFunc = _scaleFunc
         self._scaleFunc_inv = _scaleFunc_inv
 

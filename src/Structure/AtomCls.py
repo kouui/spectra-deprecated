@@ -43,7 +43,7 @@ class Atom:
         self.set_atom_type(isHydrogen=_isHydrogen)
 
         self.filepath_dict = {
-            "config" : _filepath,
+            "Level" : _filepath,
 
         }
         self.read_Level()
@@ -68,7 +68,7 @@ class Atom:
 
         """
 
-        with open(self.filepath_dict["config"], 'r') as file:
+        with open(self.filepath_dict["Level"], 'r') as file:
             fLines = file.readlines()
 
         #--- read general info
@@ -379,7 +379,7 @@ class Atom:
         if self.isPrint:
             print("Reading Photoionization cross section from : \n", _path_alpha)
 
-        self.filepath_dict["Photoionization"] = _path_alpha
+        self.filepath_dict["PI"] = _path_alpha
 
         if _path_alpha is None:
 
@@ -600,12 +600,12 @@ class Collisional_Transition:
         if _type == "CE":
             if self.isPrint:
                 print("Reading Electron impact Effective Collisional Strength from : \n", _path_electron)
-            _parent.filepath_dict["CE_electron"] = _path_electron
+            _parent.filepath_dict["CEe"] = _path_electron
             N = _parent.nLine
         elif _type == "CI":
             if self.isPrint:
                 print("Reading Electron impact Collisional Ionization coefficient from : \n", _path_electron)
-            _parent.filepath_dict["CI_electron"] = _path_electron
+            _parent.filepath_dict["CIp"] = _path_electron
             N = _parent.nCont
 
         with open(_path_electron, 'r') as file:
@@ -664,7 +664,7 @@ class Collisional_Transition:
             print("Finished.")
             print()
 
-            self.filepath_dict["CE_proton"] = _path_proton
+            self.filepath_dict["CEp"] = _path_proton
             with open(_path_proton, 'r') as file:
                 fLines = file.readlines()
 
@@ -770,6 +770,8 @@ def InitAtom(_conf_path, isHydrogen=False):
     _atom.read_RadiativeLine_and_make_Line_Mesh(_path=_path_dict["RadiativeLine"])
     _atom.make_Cont_Mesh()
     _atom.prepare_PI_alpha()
+
+    _atom.filepath_dict["Grotrian"] = _path_dict["Grotrian"]
 
     #_atom.read_RadLine_intensity(_folder="../../data/intensity/Ca_II/")
     return _atom, _path_dict
