@@ -8,7 +8,7 @@ import numpy as np
 
 from . import Plotting
 
-def _prepare_dict(_atom, _conf_prefix, _scaleFunc):
+def _prepare_dict(_atom, _conf_prefix, _scaleFunc, _exclude):
     r"""
     separate singlet and multiplet
 
@@ -50,7 +50,9 @@ def _prepare_dict(_atom, _conf_prefix, _scaleFunc):
     _singlet = {}
     _multiplet = {}
     _Lset = {"singlet" : set(), "multiplet" : set()}
+
     for k in range(_atom.nLevel):
+
 
         #---------------------------------------------------------------------
         # - remove inner shell electron configuration
@@ -61,6 +63,7 @@ def _prepare_dict(_atom, _conf_prefix, _scaleFunc):
         #---------------------------------------------------------------------
         _term = _atom._Level_info["term"][k]
         _J = _atom._Level_info["J"][k]
+
         try:
             _L = Cst.L_s2i[ _term[-1] ]
         except:
@@ -74,8 +77,6 @@ def _prepare_dict(_atom, _conf_prefix, _scaleFunc):
             _Lset["multiplet"].add(_L)
 
         _key = (_conf_clean ,_term)
-        if _key not in _d.keys():
-            _d[_key] = {}
 
         if _scaleFunc is not None:
             _y = _atom.Level.erg[k] / _atom.Level.erg[:].max()
@@ -83,9 +84,40 @@ def _prepare_dict(_atom, _conf_prefix, _scaleFunc):
         else:
             _y = _atom.Level.erg[k] / Cst.eV2erg_
 
-        _d[_key][_J] = ( _y, _L, _conf )
+        if _key not in _d.keys():
+            _d[_key] = {}
+
+        #---------------------------------------------------------------------
+        # assign y_ctj to each excluded ctj
+        #---------------------------------------------------------------------
+        _ctj = ( _conf, _term, _J )
+        if _ctj in _exclude.keys():
+            _exclude[_ctj].append( _y )
+        else:
+            ## add to normal plot level only when the ctj is not excluded
+            _d[_key][_J] = ( _y, _L, _conf )
+
     #-------------------------------------------------------------------------
-    return _singlet, _multiplet, _Lset
+    # exclude[ctj] = [text1, text2, x, y_ctj]
+    # -->group_dict[ (_text_list[0], _text_list[1]) ] = { "count":float,"y_group":float,"x":float,ctj_list=[...]}
+    #-------------------------------------------------------------------------
+
+    _group_dict = {}
+    for _ctj, _text_list in _exclude.items():
+        _group = ( _text_list[0], _text_list[1] )
+        try:
+            _group_dict[ _group ]['count'] += 1
+            _group_dict[ _group ]['y_group'] += _text_list[-1]
+            _group_dict[ _group ]['ctj_list'].append( _ctj )
+        except KeyError:
+            _group_dict[ _group ] = {}
+            _group_dict[ _group ]['count'] = 1
+            _group_dict[ _group ]['y_group'] = _text_list[-1]
+            _group_dict[ _group ]['x_group'] = _text_list[-2]
+            _group_dict[ _group ]['ctj_list'] = [_ctj,]
+    #-------------------------------------------------------------------------
+
+    return _singlet, _multiplet, _Lset, _group_dict
 
 def line_with_text(_ax, _lp, _rp, _text, _tsize, _r, _tangle=0, _lcolor="black",
                    _lwidth=0.7, _lstyle='-', _tcolor="black"):
@@ -217,11 +249,12 @@ def read_Grotrian(_lns):
     r"""
     read default line connection setup for Grotrian diagram
     """
-    _line_plot = None
-    _position = None
+    _line_plot  = None
+    _position   = {}
+    _exclude    = {}
     #_prefix = ''
-    _isPosition = False
-    _isLineplot = False
+    _isPosition, _isLineplot = False, False
+    _isGroup = False
     for _i, _ln in enumerate(_lns[:]):
 
         if AtomIO.skip_line(_ln):
@@ -236,18 +269,23 @@ def read_Grotrian(_lns):
             _prefix = _words[1] if _words[1] != '-' else ''
             continue
         elif _words[0] == 'position':
-            _isPosition = True
-            print("read position")
-            _position = {}
-            _isLineplot = False
+            #_position = {}
+            _isPosition, _isLineplot = True, False
+            _isGroup = False
             continue
         elif _words[0] == 'lineplot':
-            _isPosition = False
-            _isLineplot = True
             _line_plot = []
+            _isPosition, _isLineplot = False, True
+            _isGroup = False
+            continue
+        elif _words[0] == 'group':
+            _isPosition, _isLineplot = False, False
+            _isGroup = True
+            _group_str = _ln
+            #_group_text = [ _words[1], _words[2], float(_words[3]) ]
             continue
 
-        if _isPosition:
+        if _isPosition or _isGroup:
 
             if _words[0] == '-':
                 if _prefix == '':
@@ -259,7 +297,10 @@ def read_Grotrian(_lns):
             else:
                 _ctj = (_prefix+_words[0],_words[1],_words[2])
 
-            _position[_ctj] = float(_words[3])
+            if _isPosition:
+                _position[_ctj] = float(_words[3])
+            elif _isGroup:
+                _exclude[_ctj] = [_v.strip() for _v in _group_str.split()][1:]
 
 
         if _isLineplot:
@@ -283,7 +324,7 @@ def read_Grotrian(_lns):
 
             _line_plot.append(_params)
 
-    return _line_plot, _prefix, _position
+    return _line_plot, _prefix, _position, _exclude
 
 def _filter_term(_term):
 
@@ -317,26 +358,33 @@ class Grotrian:
         r""" """
 
         self.atom = _atom
-        self._path = _path if _path is not None else _atom.filepath_dict["Grotrian"]
+        _path = _path if _path is not None else _atom.filepath_dict["Grotrian"]
+        self._path = _path
         self._scaleFunc = _scaleFunc
         self._scaleFunc_inv = _scaleFunc_inv
 
         if _path is None:
             self.line_plot = None
             self.prefix = ''
-            self.position = None
+            self.position = {}
+            _exclude = {}
         else:
             with open(_path, 'r') as file:
                 _fLines = file.readlines()
-            self.line_plot, self.prefix, self.position  = read_Grotrian(_fLines)
+            self.line_plot, self.prefix, self.position, _exclude  = read_Grotrian(_fLines)
 
         if _conf_prefix is not None:
             self.prefix = _conf_prefix
 
+
+
         #---------------------------------------------------------------------
         # prepare structures for plotting
         #---------------------------------------------------------------------
-        singlet, multiplet, Lset = _prepare_dict(_atom=_atom, _conf_prefix=self.prefix, _scaleFunc=_scaleFunc)
+        singlet, multiplet, Lset, self.group_dict = _prepare_dict(_atom=_atom, _conf_prefix=self.prefix,
+                                                  _scaleFunc=_scaleFunc, _exclude=_exclude)
+
+
         self.singlet = singlet
         self.multiplet = multiplet
         self.Lset = Lset
@@ -350,7 +398,7 @@ class Grotrian:
 
         self.fig = None
 
-    def make_fig(self, _fig=None, _axe=None, _figsize=(6,8), _dpi=120, _f=200, _removeSpline=[]):
+    def make_fig(self, _fig=None, _axe=None, _figsize=(6,8), _dpi=120, _f=200, _removeSpline=[], _resetFig=True):
         r"""
 
         Parameters
@@ -390,7 +438,7 @@ class Grotrian:
             fig = _fig
             self.fig = fig
         else:
-            if self.fig is None:
+            if _resetFig or self.fig is None:
                 fig = plt.figure(figsize=_figsize, dpi=_dpi)
                 self.fig = fig
             else:
@@ -412,6 +460,27 @@ class Grotrian:
 
         #---------------------------------------------------------------------
 
+        #---------------------------------------------------------------------
+        # excluded levels
+        #---------------------------------------------------------------------
+        for _text_tuple, _val in self.group_dict.items():
+
+            _x_mid = float(_val['x_group'])
+            xs_level = _x_mid-_hw, _x_mid+_hw
+
+            ys_level = _val['y_group']/_val['count'], _val['y_group']/_val['count']
+
+            plt.plot(xs_level, ys_level, "-k", linewidth=1)
+
+            # store level posiiton, (conf_origin, term, J)
+            for _ctj in _val["ctj_list"]:
+                pos_level[ _ctj ] = {"xs" : xs_level,'ys' : ys_level}
+
+            # plot text
+            x_text = xs_level[1] + _st
+            y_text = ys_level[0]
+            plt.text(x_text, y_text, "{} {}".format(_text_tuple[0],_filter_term(_text_tuple[1])), fontsize=_textsize, color="k")
+
 
         #---------------------------------------------------------------------
         # singlet
@@ -420,8 +489,14 @@ class Grotrian:
             for k1, v1 in v0.items():
                 _ctj_ = (v1[2],k0[1],k1)
                 _idx = self.atom.Level_ctj_table.index(_ctj_)
-                #plot level
-                _x_mid = self.position[ _ctj_ ] if self.position is not None else v1[1]
+
+                #-------------------------------------------------------------
+                try:
+                    _x_mid = self.position[ _ctj_ ]
+                except KeyError:
+                    _x_mid = v1[1]
+                #-------------------------------------------------------------
+
                 if self.atom.Level.isGround[_idx]:
                     xs_level = _x_mid-_hw, _x_mid+_hw+2*len(Lset["singlet"])+len(Lset["multiplet"])
                 else:
@@ -459,7 +534,13 @@ class Grotrian:
                 # plot level
                 y_pos = y_mean + _f * (v1[0]-y_mean)            # enlarge space
                 ys_level = y_pos, y_pos
-                xs_level = v1[1]+1-_hw+_b, v1[1]+1+_hw+_b-_sf
+                #-------------------------------------------------------------
+                try:
+                    _x_mid = self.position[ _ctj_ ]
+                except KeyError:
+                    _x_mid = v1[1]
+                #-------------------------------------------------------------
+                xs_level = _x_mid+1-_hw+_b, _x_mid+1+_hw+_b-_sf
                 plt.plot(xs_level, ys_level, "-k", linewidth=1)
                 # store level posiiton, (conf_origin, term, J)
                 pos_level[ (v1[2], k0[1], k1) ] = {}
