@@ -6,6 +6,8 @@ from ..Structure import AtomIO
 from matplotlib.cm import ScalarMappable
 import numpy as np
 
+from . import Plotting
+
 def _prepare_dict(_atom, _conf_prefix, _scaleFunc):
     r"""
     separate singlet and multiplet
@@ -346,7 +348,9 @@ class Grotrian:
         self.pos_level = {}
         #---------------------------------------------------------------------
 
-    def make_fig(self, _figsize=(6,8), _dpi=120, _f=200, _forward=None, _inverse=None):
+        self.fig = None
+
+    def make_fig(self, _fig=None, _axe=None, _figsize=(6,8), _dpi=120, _f=200, _removeSpline=[]):
         r"""
 
         Parameters
@@ -378,8 +382,36 @@ class Grotrian:
         _st = 0.1                       # horizontal spacing between term and text
         #---------------------------------------------------------------------
 
-        fig = plt.figure(figsize=_figsize, dpi=_dpi)
-        self.fig = fig
+        #---------------------------------------------------------------------
+        # set figure and axe
+        #---------------------------------------------------------------------
+
+        if _fig is not None:
+            fig = _fig
+            self.fig = fig
+        else:
+            if self.fig is None:
+                fig = plt.figure(figsize=_figsize, dpi=_dpi)
+                self.fig = fig
+            else:
+                fig = self.fig
+
+        if _axe is not None:
+            plt.sca( _axe )
+
+        #---------------------------------------------------------------------
+
+        #---------------------------------------------------------------------
+        # remove splines
+        #---------------------------------------------------------------------
+        if _axe is not None:
+            Plotting.remove_spline(_axe, pos=_removeSpline)
+        else:
+            Plotting.remove_spline(*self.fig.get_axes(), pos=_removeSpline)
+
+
+        #---------------------------------------------------------------------
+
 
         #---------------------------------------------------------------------
         # singlet
@@ -627,7 +659,7 @@ class Grotrian:
 
         return _annotation_obj
 
-    def plot_transition_rate(self, _idxI, _idxJ, _rate, _direction, _cmap, _norm, _abserr=1E-5, _asize=5, _lwidth=2, _level_ctj_without_prefix=None):
+    def plot_transition_rate(self, _idxI, _idxJ, _rate, _direction, _cmap, _norm, _cax=None, _abserr=1E-5, _asize=5, _lwidth=2, _level_ctj_without_prefix=None):
         r"""
         """
 
@@ -666,7 +698,7 @@ class Grotrian:
         _temp_ax = self.fig.add_axes([0.875, 0.2, 0.001, 0.001])
         _img = _temp_ax.imshow(_temp, cmap=_cmap, norm=_norm)
         _temp_ax.set_visible(False)
-        _cax = self.fig.add_axes([0.84, 0.15, 0.02, 0.7])
+        _cax = self.fig.add_axes([0.84, 0.15, 0.02, 0.7]) if _cax is None else _cax
         self.fig.colorbar( _img, cax=_cax, orientation='vertical')
 
         self.show_fig()
