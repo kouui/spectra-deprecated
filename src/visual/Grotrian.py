@@ -249,7 +249,7 @@ def read_Grotrian(_lns):
     r"""
     read default line connection setup for Grotrian diagram
     """
-    _line_plot  = None
+    _line_plot  = {}
     _position   = {}
     _exclude    = {}
     #_prefix = ''
@@ -274,7 +274,6 @@ def read_Grotrian(_lns):
             _isGroup = False
             continue
         elif _words[0] == 'lineplot':
-            _line_plot = []
             _isPosition, _isLineplot = False, True
             _isGroup = False
             continue
@@ -322,7 +321,8 @@ def read_Grotrian(_lns):
             _params.append( float(_words[7]) )
             _params.append( float(_words[8]) )
 
-            _line_plot.append(_params)
+            #_line_plot.append(_params)
+            _line_plot[_ctj_ij] = _params[2:]
 
     return _line_plot, _prefix, _position, _exclude
 
@@ -364,14 +364,14 @@ class Grotrian:
         self._scaleFunc_inv = _scaleFunc_inv
 
         if _path is None:
-            self.line_plot = None
+            line_plot = {}
             self.prefix = ''
             self.position = {}
             _exclude = {}
         else:
             with open(_path, 'r') as file:
                 _fLines = file.readlines()
-            self.line_plot, self.prefix, self.position, _exclude  = read_Grotrian(_fLines)
+            line_plot, self.prefix, self.position, _exclude  = read_Grotrian(_fLines)
 
         if _conf_prefix is not None:
             self.prefix = _conf_prefix
@@ -395,6 +395,14 @@ class Grotrian:
         #---------------------------------------------------------------------
         self.pos_level = {}
         #---------------------------------------------------------------------
+
+        #---------------------------------------------------------------------
+        # initialize self.line_plot given line_plot
+        #---------------------------------------------------------------------
+        self.member_to_head = self._init_group_member2head()
+        self.line_plot = self.init_line_plot(line_plot)
+
+
 
         self.fig = None
 
@@ -622,13 +630,73 @@ class Grotrian:
 
         plt.show()
 
+    def _init_group_member2head(self):
+        r""" """
+        member_to_head = {}
+        for _text_tuple, _val in self.group_dict.items():
+
+            ## ignore group with only 1 level
+            if len(_val["ctj_list"]) < 2:
+                continue
+
+            _head = _val["ctj_list"][0]
+            for _ctj in _val["ctj_list"][1:]:
+                member_to_head[_ctj] = _head
+        return member_to_head
+
+
+    def init_line_plot(self, line_plot_defined):
+        r""" """
+
+        line_plot = {}
+        self.ctj_to_ctj_plot = {}
+
+        for _ctj_ij in self.atom.Line_ctj_table+self.atom.Cont_ctj_table:
+
+            ctj_i, ctj_j = _ctj_ij
+
+            if ctj_i in self.member_to_head.keys():
+
+                ## member -> member, ignore
+                if ctj_j in self.member_to_head.keys():
+                    continue
+                ## member -> other  : head -> other
+                else:
+                    ctj_ij = ( self.member_to_head[ctj_i], ctj_j )
+
+            ## other -> member : other -> head
+            elif ctj_j in self.member_to_head.keys():
+
+                ctj_ij = ( ctj_i, self.member_to_head[ctj_j] )
+
+            ## other -> other
+            else:
+                ctj_ij = _ctj_ij
+
+            ## a ctj map will be used in rate plot
+            self.ctj_to_ctj_plot[ _ctj_ij ] = ctj_ij
+
+            ## if defined in .Grotrian file, overwrite the parameters
+            try:
+                line_plot[ctj_ij] = line_plot_defined[ctj_ij]
+            except KeyError:
+                ## if not defined and already has parameter, ignore
+                if ctj_ij not in line_plot.keys():
+                    line_plot[ctj_ij] = ["None", 0.5, 0.5]
+
+        return line_plot
+
     def plot_transitions(self, _text_selection="wavelength", _hasText=True):
         r"""
         """
 
         _line_plot = self.line_plot
 
-        for _ctj1, _ctj2, wl, _r1, _r2 in _line_plot:
+
+        for _ctj_ij in _line_plot.keys():
+            _ctj1, _ctj2 = _ctj_ij
+            wl, _r1, _r2 = _line_plot[_ctj_ij]
+
 
             if _text_selection == "all":
                 if not _hasText:
@@ -646,10 +714,6 @@ class Grotrian:
                     if not _hasText:
                         wl = "None"
                     self.connect_line(_cfj1=_ctj1, _cfj2=_ctj2, _r1=_r1, _r2=_r2, _c="black", _text=wl, _tsize=7, _r=0.4)
-
-        for _ctj1, _ctj2, wl, _r1, _r2 in _line_plot:
-            if wl not in _text_selection:
-                continue
 
         self.show_fig()
 
@@ -748,30 +812,48 @@ class Grotrian:
 
         _line_plot = self.line_plot
 
-        _table = []
-        for _t in _line_plot:
-            _table.append((_t[0],_t[1]))
-
-
+        #---------------------------------------------------------------------
+        # preprocess
+        # (ctj_i,ctj_j) --> rate
+        #---------------------------------------------------------------------
+        ctj_rate_dict = {}
         for k in range(_idxI.shape[0]):
+            _ctj_i = self.atom.Level_ctj_table[ _idxI[k] ]
+            _ctj_j = self.atom.Level_ctj_table[ _idxJ[k] ]
+            _ctj_ij = ( _ctj_i, _ctj_j )
 
-            _cfj_i = self.atom.Level_ctj_table[ _idxI[k] ]
-            _cfj_j = self.atom.Level_ctj_table[ _idxJ[k] ]
+            try:
+                _ctj_ij_plot = self.ctj_to_ctj_plot[ _ctj_ij ]
+            ## member/head -> member/head are not in self.ctj_to_ctj_plot
+            except KeyError:
+                continue
 
+            try:
+                ctj_rate_dict[_ctj_ij_plot] += _rate[k]
+            except KeyError:
+                ctj_rate_dict[_ctj_ij_plot]  = _rate[k]
+
+        del _ctj_i, _ctj_j, _ctj_ij
+        #---------------------------------------------------------------------
+        # loop over ctj_rate_dict and plot arrow
+        #---------------------------------------------------------------------
+        #for key, value in _line_plot.items():
+        #    print(key, '  ', value)
+
+        for _ctj_ij_plot in ctj_rate_dict.keys():
+            #print(_ctj_ij_plot)
+
+            ## single level related
             if _level_ctj_without_prefix is not None:
                 _level_ctj = ( self.prefix+_level_ctj_without_prefix[0],_level_ctj_without_prefix[1],_level_ctj_without_prefix[2] )
-                if _level_ctj not in (_cfj_i, _cfj_j):
+                if _level_ctj not in _ctj_ij_plot:
                     continue
 
-            _idx = _table.index( (_cfj_i,_cfj_j) )
-            if _idx == -1:
-                continue
-            else:
-                _ri, _rj = _line_plot[_idx][3],_line_plot[_idx][4]
+            _, _ri, _rj = _line_plot[ _ctj_ij_plot ]
+            _v       = ctj_rate_dict[ _ctj_ij_plot ]
+            _ctj_i, _ctj_j = _ctj_ij_plot
 
-            _v = _rate[k]
-
-            _annotation_obj = self.connect_arrow(_cfj_i, _cfj_j, _ri, _rj, _direction,
+            _annotation_obj = self.connect_arrow(_ctj_i, _ctj_j, _ri, _rj, _direction,
                                         _cmap, _norm, _v, _abserr=_abserr, _asize=_asize, _lwidth=_lwidth)
 
         # colorbar ax
@@ -783,3 +865,41 @@ class Grotrian:
         self.fig.colorbar( _img, cax=_cax, orientation='vertical')
 
         self.show_fig()
+
+
+
+##        _table = []
+##        for _t in _line_plot:
+##            _table.append((_t[0],_t[1]))
+##
+##
+##        for k in range(_idxI.shape[0]):
+##
+##            _cfj_i = self.atom.Level_ctj_table[ _idxI[k] ]
+##            _cfj_j = self.atom.Level_ctj_table[ _idxJ[k] ]
+##
+##            if _level_ctj_without_prefix is not None:
+##                _level_ctj = ( self.prefix+_level_ctj_without_prefix[0],_level_ctj_without_prefix[1],_level_ctj_without_prefix[2] )
+##                if _level_ctj not in (_cfj_i, _cfj_j):
+##                    continue
+##
+##            _idx = _table.index( (_cfj_i,_cfj_j) )
+##            if _idx == -1:
+##                continue
+##            else:
+##                _ri, _rj = _line_plot[_idx][3],_line_plot[_idx][4]
+##
+##            _v = _rate[k]
+##
+##            _annotation_obj = self.connect_arrow(_cfj_i, _cfj_j, _ri, _rj, _direction,
+##                                        _cmap, _norm, _v, _abserr=_abserr, _asize=_asize, _lwidth=_lwidth)
+##
+##        # colorbar ax
+##        _temp = [[1,1]]
+##        _temp_ax = self.fig.add_axes([0.875, 0.2, 0.001, 0.001])
+##        _img = _temp_ax.imshow(_temp, cmap=_cmap, norm=_norm)
+##        _temp_ax.set_visible(False)
+##        _cax = self.fig.add_axes([0.84, 0.15, 0.02, 0.7]) if _cax is None else _cax
+##        self.fig.colorbar( _img, cax=_cax, orientation='vertical')
+##
+##        self.show_fig()
