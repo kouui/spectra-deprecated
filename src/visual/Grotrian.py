@@ -397,11 +397,9 @@ class Grotrian:
         #---------------------------------------------------------------------
 
         #---------------------------------------------------------------------
-        # initialize self.line_plot given line_plot
         #---------------------------------------------------------------------
         self.member_to_head = self._init_group_member2head()
-        self.line_plot = self.init_line_plot(line_plot)
-
+        self.line_plot_defined = line_plot
 
 
         self.fig = None
@@ -611,6 +609,11 @@ class Grotrian:
         # xlim_max - xlim_min
         self.xr = xlim[1] - xlim[0]
 
+        #---------------------------------------------------------------------
+        # init line plot after self.pos_level has been defined
+        #---------------------------------------------------------------------
+        self.line_plot = self.init_line_plot( self.line_plot_defined )
+
     def save_fig(self, _filename, _dpi=120):
         r"""
 
@@ -682,7 +685,15 @@ class Grotrian:
             except KeyError:
                 ## if not defined and already has parameter, ignore
                 if ctj_ij not in line_plot.keys():
-                    line_plot[ctj_ij] = ["None", 0.5, 0.5]
+                    #r1, r2 = 0.5, 0.5
+                    isGroud_lower = self.atom.Level.isGround[ self.atom.Level_ctj_table.index(ctj_i) ]
+                    isGroud_upper = self.atom.Level.isGround[ self.atom.Level_ctj_table.index(ctj_j) ]
+                    if isGroud_lower and isGroud_upper:
+                        r1, r2 =  0.9, 0.9
+                    else:
+                        r1, r2 = init_vertical_r1r2(self.pos_level[ctj_i]['xs'], self.pos_level[ctj_j]['xs'])
+                    #print(ctj_ij, '  ', r1, r2)
+                    line_plot[ctj_ij] = ["None", r1, r2]
 
         return line_plot
 
@@ -866,40 +877,48 @@ class Grotrian:
 
         self.show_fig()
 
+def init_vertical_r1r2(xs_lower, xs_upper):
+
+    #print(xs_lower, xs_upper)
+
+    l_upper = xs_upper[1] - xs_upper[0]
+    l_lower = xs_lower[1] - xs_lower[0]
+
+    # no overlapping
+    #         ----    or    ----
+    #  ----                       ----
+    #
+    if xs_lower[1] <= xs_upper[0] or xs_lower[0] >= xs_upper[1]:
+        return 0.5, 0.5
+
+    # containing
+    #     --------
+    #       ----
+    elif xs_lower[0] >= xs_upper[0] and xs_lower[1] <= xs_upper[1]:
+        k = 0.3
+        x = l_lower * k  + xs_lower[0]
+        return k, (x-xs_upper[0])/l_upper
+    # containing
+    #       ----
+    #      -------
+    elif xs_lower[0] <= xs_upper[0] and xs_lower[1] >= xs_upper[1]:
+        k = 0.7
+        x = l_upper * k  + xs_upper[0]
+        return (x-xs_lower[0])/l_lower,  k
+    # partially overlap
+    #       ------
+    #     ----
+    elif xs_lower[0] < xs_upper[0] < xs_lower[1]:
+        x = 0.5* (xs_lower[1] + xs_upper[0])
+        return (x-xs_lower[0])/l_lower, (x-xs_upper[0])/l_upper
+    # partially overlap
+    #       ------
+    #           ----
+    elif xs_lower[0] < xs_upper[1] < xs_lower[1]:
+        x = 0.5 * (xs_upper[1] + xs_lower[0])
+        return (x-xs_lower[0])/l_lower, (x-xs_upper[0])/l_upper
 
 
-##        _table = []
-##        for _t in _line_plot:
-##            _table.append((_t[0],_t[1]))
-##
-##
-##        for k in range(_idxI.shape[0]):
-##
-##            _cfj_i = self.atom.Level_ctj_table[ _idxI[k] ]
-##            _cfj_j = self.atom.Level_ctj_table[ _idxJ[k] ]
-##
-##            if _level_ctj_without_prefix is not None:
-##                _level_ctj = ( self.prefix+_level_ctj_without_prefix[0],_level_ctj_without_prefix[1],_level_ctj_without_prefix[2] )
-##                if _level_ctj not in (_cfj_i, _cfj_j):
-##                    continue
-##
-##            _idx = _table.index( (_cfj_i,_cfj_j) )
-##            if _idx == -1:
-##                continue
-##            else:
-##                _ri, _rj = _line_plot[_idx][3],_line_plot[_idx][4]
-##
-##            _v = _rate[k]
-##
-##            _annotation_obj = self.connect_arrow(_cfj_i, _cfj_j, _ri, _rj, _direction,
-##                                        _cmap, _norm, _v, _abserr=_abserr, _asize=_asize, _lwidth=_lwidth)
-##
-##        # colorbar ax
-##        _temp = [[1,1]]
-##        _temp_ax = self.fig.add_axes([0.875, 0.2, 0.001, 0.001])
-##        _img = _temp_ax.imshow(_temp, cmap=_cmap, norm=_norm)
-##        _temp_ax.set_visible(False)
-##        _cax = self.fig.add_axes([0.84, 0.15, 0.02, 0.7]) if _cax is None else _cax
-##        self.fig.colorbar( _img, cax=_cax, orientation='vertical')
-##
-##        self.show_fig()
+    else:
+        print("here")
+        return 0.5, 0.5
