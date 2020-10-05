@@ -16,16 +16,16 @@ from src.Atomic import LTELib
 def _nj_by_ni_Line_gu_nopy_par(gi, gj, w0, Te, nj_by_ni_L):
 
     nL = gi.shape[0]
-    for l in nb.prange(nL*10):
-        l = l // 10
+    for l in nb.prange(nL):
+
         nj_by_ni_L[l] = LTELib.Boltzmann_distribution(gi[l], gj[l], Cst.h_ * Cst.c_ / w0[l], Te[:])
 
 @nb.guvectorize([(nb.uint8[:], nb.uint8[:], nb.float64[:], nb.float64[:], nb.float64[:,:])], '(n),(n),(n),(m)->(n,m)', nopython=True)
 def _nj_by_ni_Line_gu_nopy(gi, gj, w0, Te, nj_by_ni_L):
 
     nL = gi.shape[0]
-    for l in range(nL*10):
-        l = l // 10
+    for l in range(nL):
+
         nj_by_ni_L[l] = LTELib.Boltzmann_distribution(gi[l], gj[l], Cst.h_ * Cst.c_ / w0[l], Te[:])
 
 
@@ -33,8 +33,8 @@ def _nj_by_ni_Line_gu_nopy(gi, gj, w0, Te, nj_by_ni_L):
 def _nj_by_ni_Line_gu(gi, gj, w0, Te, nj_by_ni_L):
 
     nL = gi.shape[0]
-    for l in range(nL*10):
-        l = l // 10
+    for l in range(nL):
+
         nj_by_ni_L[l] = LTELib.Boltzmann_distribution(gi[l], gj[l], Cst.h_ * Cst.c_ / w0[l], Te[:])
 
 @nb.njit( ['float64[:,:](uint8[:],uint8[:],float64[:],float64[:])'] )
@@ -42,9 +42,20 @@ def _nj_by_ni_Line_njit(gi, gj, w0, Te):
 
     nj_by_ni_L = np.empty(gi.shape+Te.shape, dtype=np.double)
     nL = gi.shape[0]
-    for l in range(nL*10):
-        l = l // 10
+    for l in range(nL):
+
         nj_by_ni_L[l,:] = LTELib.Boltzmann_distribution(gi[l], gj[l], Cst.h_ * Cst.c_ / w0[l], Te[:])
+
+    return nj_by_ni_L
+
+@nb.njit( ['float64[:,:](uint8[:],uint8[:],float64[:],float64[:])'] )
+def _nj_by_ni_Line_njit_loop(gi, gj, w0, Te):
+
+    nj_by_ni_L = np.empty(Te.shape+gi.shape, dtype=np.double)
+    nT = Te.shape[0]
+    for t in range(nT):
+
+        nj_by_ni_L[t,:] = LTELib.Boltzmann_distribution(gi[:], gj[:], Cst.h_ * Cst.c_ / w0[:], Te[t])
 
     return nj_by_ni_L
 
@@ -96,6 +107,18 @@ def ni_nj_LTE_njit(atom, Te, Ne):
     nj_by_ni_L = _nj_by_ni_Line_njit(Line['gi'][:], Line['gj'][:], Line['w0'][:], Te[:,])
     return nj_by_ni_L
 
+def ni_nj_LTE_njit_loop(atom, Te, Ne):
+    r""" """
+    Level = atom.Level
+    Line  = atom.Line
+    Cont  = atom.Cont
+
+    assert Te.shape == Ne.shape, "Te and Ne should have the same shape"
+
+    ## ! could be optimized to Te-Ne-array
+    nj_by_ni_L = _nj_by_ni_Line_njit_loop(Line['gi'][:], Line['gj'][:], Line['w0'][:], Te[:,])
+    return nj_by_ni_L
+
 def ni_nj_LTE(atom, Te, Ne):
     r""" """
     Level = atom.Level
@@ -145,12 +168,13 @@ if __name__ == "__main__":
         "guvec_nopy"  : ni_nj_LTE_gu_nopy,
         "guvec_nopy_par"  : ni_nj_LTE_gu_nopy_par,
         "njit"   : ni_nj_LTE_njit,
+        "njit_loop"   : ni_nj_LTE_njit_loop,
     })
     _result = collections.OrderedDict()
     for _key in _functions.keys():
         _result[_key] = []
 
-    _nLoop = 3
+    _nLoop = 10
 
     _atom, _ = AtomCls.InitAtom('../../data/conf/H.conf', isHydrogen=True)
 
