@@ -1,0 +1,10 @@
+Environment Change Log
+========================
+
+
+2020/10/05
+------------
+
+  $ pip uninstall numpy
+  $ conda uninstall scipy numba
+  $ conda install numpy scipy numba icc_rt
