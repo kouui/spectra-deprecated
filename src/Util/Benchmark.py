@@ -17,7 +17,11 @@ def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None):
     ax.set_xscale("log")
 
     ylim_upper =  max( [max( li ) for li in result.values()] )
-    ylim_upper = max( [ylim_upper, 1E-1] )
+    i = -6
+    while 10**(i) <= ylim_upper:
+        i += 1
+    ylim_upper = 10**(i)
+
     ax.set_ylim(1E-6, ylim_upper)
 
     if title is not None:
