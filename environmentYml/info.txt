@@ -1,6 +1,14 @@
 Environment Change Log
 ========================
 
+important packages
+------------------------------------------------------------------------------
+  start   |    end     |||  numba  |  icc_rt  |  numpy  |  scipy  ||  pandas |
+------------------------------------------------------------------------------
+    -     | 2020/10/05 |||  0.49.1 |    x     |  1.19.2 |  1.2.1  ||  1.1.2  |
+2020/10/05|    now     |||  0.49.1 |  2020.2  |  1.19.1 |  1.5.2  ||   -     |
+------------------------------------------------------------------------------
+
 
 2020/10/05
 ------------
@@ -8,3 +16,11 @@ Environment Change Log
   $ pip uninstall numpy
   $ conda uninstall scipy numba
   $ conda install numpy scipy numba icc_rt
+
+  due to issue
+      OMP: Info #270: omp_set_nested routine deprecated, please use omp_set_max_active_levels instead.
+      https://github.com/numba/numba/issues/5275#issue-567065439
+  we downgrade numba from 0.51.2 to 0.49.1
+  $ conda uninstall numba icc_rt
+  $ conda install numba==0.49.1
+  $ conda install -c numba icc_rt
