@@ -1,0 +1,16 @@
+------------------------------------------------------------------------------------------------
+unit [1E-6 sec] |    normal     |     guvec     |  guvec_nopy   | guvec_nopy_par |     njit
+------------------------------------------------------------------------------------------------
+n=10            |     205.6     |     114.5     |      92.2     |     187.0     |      93.2
+n=100           |     206.4     |     427.0     |     448.9     |     519.7     |     401.1
+n=1000          |     666.8     |    3612.9     |    5593.1     |    4397.2     |    3438.3
+n=10000         |    4617.1     |   33439.7     |   33833.9     |   33674.0     |   33028.1
+n=100000        |   49031.7     |  357444.3     |  351637.4     |  353775.1     |  344370.0
+n=1000000       |  610150.5     | 4235097.4     | 4185609.3     | 4172894.2     | 4072642.7
+------------------------------------------------------------------------------------------------
+
+
+Conclusion:
+  1. parallel in guvectorize does not help
+  2. guvectorize and njit does not help to naive loop computation, since the function call inside the loop is already optimized by vectorize
+  3. guvectorize has its flexibility on broadcasting, which take advantages on njit
