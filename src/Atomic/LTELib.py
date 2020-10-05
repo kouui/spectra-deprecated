@@ -339,6 +339,20 @@ def EinsteinA_to_EinsteinBs_cm(Aji, w0, gi, gj):
 
     return Bji, Bij
 
+def Aji_to_Bji_cm(Aji, w0):
+    r""" """
+
+    factor- = 2*Cst.h_*Cst.c_**2/w0**5
+    Bji = Aji / factor_
+
+    return Bji
+
+def Bji_to_Bij(Bji, gi, gj):
+    r""" """
+
+    Bij = Bji * gj / gi
+
+    return Bij
 
 def Planck_hz(F,T):
     r"""
@@ -611,6 +625,7 @@ if Cst.isJIT == True :
     Saha_distribution = nb.vectorize( ['float64(uint8,uint8,float64,float64,float64)'], nopython=True)( Saha_distribution )
     Planck_cm = nb.vectorize( [nb.float64(nb.float64,nb.float64)], nopython=True)( Planck_cm )
     Planck_hz = nb.vectorize( [nb.float64(nb.float64,nb.float64)], nopython=True)( Planck_hz )
-    #EinsteinA_to_EinsteinBs_cm = nb.njit( ['Tuple((float64,float64))(float64,float64,uint8,uint8)'] )( EinsteinA_to_EinsteinBs_cm )
+    Aji_to_Bji_cm = nb.vectorize( ['float64(float64,float64)'], nopython=True)( Aji_to_Bji_cm )
+    Bji_to_Bij = nb.vectorize( ['float64(float64,uint8,uint8)','float64(float64,int64,int64)'], nopython=True)( Bji_to_Bij )
     #Ufunc = nb.jit(nb.float64(nb.types.unicode_type,nb.float64), nopython=True)( Ufunc )
     #Ufunc = nb.jit(nopython=True)( Ufunc )

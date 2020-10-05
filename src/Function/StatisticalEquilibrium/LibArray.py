@@ -28,8 +28,24 @@ def convert_ni_to_nj_by_ni(_ni, _idxI, _idxJ):
 
     return _nj_by_ni
 
-#@nb.njit
-def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
+@nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] )
+def nj_by_ni_To_ni(_nj_by_ni, _idxI, _idxJ, _isGround):
+    r""" """
+
+    _nLevel = _isGround.shape[0]
+    _nLine  = _idxI.shape[0]
+    _ni = np.ones(_nLevel, dtype=np.double)
+
+    for k in range( _nLine ):
+        i = _idxI[k]
+        j = _idxJ[k]
+        if _isGround[ i ]:
+            _ni[ j ] = _nj_by_ni[ k ] * _ni[ i ]
+
+    return _ni
+
+
+def convert_nj_by_ni_to_ni_v0(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
                       _nj_by_ni_C=None, _idxI_C=None, _idxJ_C=None):
     r"""
     """
@@ -39,23 +55,25 @@ def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=
         _nCont  = _nj_by_ni_C.shape[0]
 
 
-    _stage_list = []
-    for k in range(_nLevel):
-        if _stage[k] not in _stage_list:
-            _stage_list.append( _stage[k] )
-
+    #_stage_list = []
+    #for k in range(_nLevel):
+    #    if _stage[k] not in _stage_list:
+    #        _stage_list.append( _stage[k] )
+    _stage_unique = np.unique(_stage)
 
     _ni = np.ones(_nLevel, dtype=np.double)
     _refIdx = 0
-    for _s in _stage_list:
+    #for _s in _stage_list:
+    for _s in _stage_unique:
         # process line transition
         for k in range(_nLine):
+
+            if _idxI_L[k] != _refIdx:
+                continue
 
             _si = _stage[_idxI_L[k]]
             _sj = _stage[_idxJ_L[k]]
 
-            if _idxI_L[k] != _refIdx:
-                continue
 
             if _si==_s and _sj==_s:
                 _ni[ _idxJ_L[k] ] = _ni[ _refIdx ] * _nj_by_ni_L[k]
@@ -66,11 +84,12 @@ def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=
 
         for k in range(_nCont):
 
+            if _idxI_C[k] != _refIdx:
+                continue
+
             _si = _stage[_idxI_C[k]]
             _sj = _stage[_idxJ_C[k]]
 
-            if _idxI_C[k] != _refIdx:
-                continue
 
             if _si==_s and _sj==_s+1:
                 _ni[ _idxJ_C[k] ] = _ni[ _refIdx ] * _nj_by_ni_C[k]
@@ -179,8 +198,31 @@ def B_Jbar(_Level, _Line, _MeshCoe, _Tr, _Te=1.E4, _Vt=5.E5, _Vd=1.E6, _Mass=1.)
 
     return _Bij_Jbar, _Bji_Jbar
 
-#@nb.njit
-def B_Jbar_Tr(_Aji, _Bji, _Bij, _w0, _Tr):
+
+def B_Jbar_Tr_v0(_Aji, _Bji, _Bij, _w0, _Tr):
+
+    _nLine = _Aji.shape[0]
+    _Bij_Jbar = np.zeros(_nLine, np.double)
+    _Bji_Jbar = np.zeros(_nLine, np.double)
+
+    for k in range(_nLine):
+
+        ## ignore lines with Aji < 1E-3
+        if _Aji[k] < 1.E-3:
+            continue
+
+        #_Bji, _Bij = LTELib.EinsteinA_to_EinsteinBs_cm(_Aji[k], _w0[k], _gi[k], _gj[k])
+
+        ## use radiation temperature to calculate mean intensity
+        _Jbar0 = LTELib.Planck_cm(_w0[ k ], _Tr)
+
+        _Bji_Jbar[k] = _Bji[k] * _Jbar0
+        _Bij_Jbar[k] = _Bij[k] * _Jbar0
+
+    return _Bij_Jbar, _Bji_Jbar
+
+
+def B_Jbar_Tr(_Aji, _Bji, _Bij, _w0, _Jbar):
 
     _nLine = _Aji.shape[0]
     _Bij_Jbar = np.zeros(_nLine, np.double)
@@ -326,4 +368,5 @@ def solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne)
 
 if Cst.isJIT:
     convert_nj_by_ni_to_ni = nb.njit(convert_nj_by_ni_to_ni)
+    nj_by_ni_To_ni = nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] )(nj_by_ni_To_ni)
     B_Jbar_Tr = nb.njit(B_Jbar_Tr)
