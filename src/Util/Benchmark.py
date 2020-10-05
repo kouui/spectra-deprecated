@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 
 
-def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None):
+def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None, _xlabel=None):
 
     if _ax is None:
         fig, ax = plt.subplots(1,1,figsize=(6,4), dpi=100)
@@ -23,6 +23,9 @@ def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None):
     ylim_upper = 10**(i)
 
     ax.set_ylim(1E-6, ylim_upper)
+
+    if _xlabel is not None:
+        ax.set_xlabel(_xlabel)
 
     if title is not None:
         ax.set_title( title )
@@ -53,5 +56,5 @@ def print_table(x : list, result : dict, outFile=None):
     print(s)
 
     if outFile is not None:
-        with open(outFile, 'w') as f:
+        with open(outFile, 'a') as f:
             f.write( s )
