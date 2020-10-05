@@ -7,11 +7,11 @@ class T_DATA(Enum):
     INTERPOLATE = 1
     CALCULATE   = 2
 
-#T_DATA_NBTYPE = nb.typeof(T_DATA.INTERPOLATE)
+T_DATA_MEMTYPE = nb.typeof( T_DATA.CALCULATE )
 
 class T_ATOM(Enum):
     HYDROGEN      = 1
     HYDROGEN_LIKE = 2
     NORMAL        = 3
 
-#T_ATOM_NBTYPE = nb.typeof(T_ATOM.HYDROGEN)
+T_ATOM_MEMTYPE = nb.typeof( T_ATOM.HYDROGEN )
