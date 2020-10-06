@@ -10,11 +10,13 @@ def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None, 
         ax = _ax
 
     for key in result.keys():
-        ax.plot(x, result[key], "--o", markersize=3, label=key)
+        ax.plot(x, result[key], "--o", markersize=5, label=key)
 
     ax.legend(loc="upper left")
     ax.set_yscale("log")
     ax.set_xscale("log")
+    ax.grid(True)
+
 
     ylim_upper =  max( [max( li ) for li in result.values()] )
     i = -6
@@ -22,7 +24,14 @@ def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None, 
         i += 1
     ylim_upper = 10**(i)
 
-    ax.set_ylim(1E-6, ylim_upper)
+    ylim_lower =  min( [min( li ) for li in result.values()] )
+    i = -6
+    while 10**(i) >= ylim_lower:
+        i -= 1
+    ylim_lower = 10**(i)
+
+    ax.set_ylim(ylim_lower, ylim_upper)
+
 
     if _xlabel is not None:
         ax.set_xlabel(_xlabel)
