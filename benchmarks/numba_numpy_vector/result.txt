@@ -39,8 +39,11 @@ nxn=1000000     | 3018151.5     | 3296411.9     | 3480706.2     | 3537324.8
 Conclusion:
   1. np.linalg.solve will automatically make the use of all your computational threads (cores)
   2. for vector functions, pure numpy version is faster when n > 100x100, so we could use njit if necessary
+    - for sum : np.sum+njit is fine
+    - for dot : loop+njit is better
   3. for linear algebra, pure numpy version is the fastest, could use loop+njit if necessary
-  4. for matrix multiplication, use pure @ or @+njit, don't use loop
+  4. Time(solve) linearly scales with the "array size" and "extra size"
+  5. for matrix multiplication, use pure @ or @+njit, don't use loop
 
 matrix multiplication :
 --------------------------------------------------------------------------------

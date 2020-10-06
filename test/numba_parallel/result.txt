@@ -1,0 +1,6 @@
+Conclusion :
+  vectorize :
+    1. target='cpu'       --> single thread, sequentially calculating each element in input array
+    2. target='parallel'  --> multi thread, parallelly (unorderd) calculating each element in input array
+  njit:
+    1. parallel=True      --> multi thread, need nb.prange to explicitly specity which loop is paralell (unordered)
