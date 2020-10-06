@@ -1,0 +1,34 @@
+
+------------------------------------------------------------------------------------------------
+unit [1E-6 sec] |      np       |    np+njit    |   math+njit   |    np+vec     |   math+vec
+------------------------------------------------------------------------------------------------
+n=10            |     727.3     |      79.1     |      40.7     |       3.4     |       3.1
+n=100           |     988.3     |     401.2     |     324.2     |       2.9     |       2.5
+n=1000          |    4832.3     |    6057.9     |    3310.4     |      23.6     |      20.3
+n=10000         |   32466.0     |   34669.9     |   28504.9     |     110.2     |     108.2
+n=100000        |  344807.9     |  357159.6     |  290577.4     |    1289.3     |    1080.4
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+unit [1E-6 sec] |      np       |    np+njit    |   math+njit   |    np+vec     |   math+vec
+------------------------------------------------------------------------------------------------
+n=10            |      75.0     |      10.1     |       9.8     |       5.7     |       2.7
+n=100           |     110.8     |      39.0     |      33.2     |       2.5     |       2.3
+n=1000          |     501.0     |     354.0     |     307.3     |      12.7     |      12.2
+n=10000         |    3308.4     |    3646.2     |    2967.2     |     109.0     |     109.0
+n=100000        |   36222.1     |   37192.9     |   29912.3     |    1072.2     |    1071.8
+------------------------------------------------------------------------------------------------
+
+
+Conclusion :
+  1. almost no difference between using math.* oand numpy.* in numba
+  2. when size of array is small, overhead : type checking ... in the for loop
+  3. when size of array is large, most time is spend on numeric operation, then numpy vectorized operation is comparable to numba.njit
+  4. math.* in numba is stable. we can use the following notation to switch functions
+     ```
+     import numpy as np
+     if Cst.isJit:
+         from math import exp, sin, cos
+     else:
+         from numpy import exp, sin, cos
+     ```
+     beautiful!
