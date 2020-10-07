@@ -205,7 +205,7 @@ def solve_SE(_atom, _Ne, _Cji, _Cij, _Bji_Jbar, _Bij_Jbar, _Rki_spon, _Rki_stim,
     _idxJ = np.append(_atom.Line.idxJ[:], _atom.Cont.idxJ[:])
 
     _Rji_spon = np.append(_atom.Line.AJI[:], _Rki_spon[:])
-    _Rji_stim = np.append(_Bij_Jbar[:], _Rki_stim[:])
+    _Rji_stim = np.append(_Bji_Jbar[:], _Rki_stim[:])
     _Rij = np.append(_Bij_Jbar[:], _Rik[:])
 
     ## ! could/better to be optimized to Te-Ne-array

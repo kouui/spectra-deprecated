@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 
 
-def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None, _xlabel=None):
+def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None, _xlabel=None, _plotLinear=False):
 
     if _ax is None:
         fig, ax = plt.subplots(1,1,figsize=(6,4), dpi=100)
@@ -11,6 +11,7 @@ def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None, 
 
     for key in result.keys():
         ax.plot(x, result[key], "--o", markersize=5, label=key)
+
 
     ax.legend(loc="upper left")
     ax.set_yscale("log")
@@ -31,6 +32,9 @@ def make_figure(x : list, result : dict, save_path : str, title=None, _ax=None, 
     ylim_lower = 10**(i)
 
     ax.set_ylim(ylim_lower, ylim_upper)
+
+    if _plotLinear:
+        ax.plot(x, [10**(k) for k in range(i,i+len(x))], "--", linewidth=0.6)
 
 
     if _xlabel is not None:
