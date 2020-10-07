@@ -151,7 +151,6 @@ def solveSE(_Rmat, _Cmat):
 #-----------------------------------------------------------------------------
 #
 #-----------------------------------------------------------------------------
-setMatrixR(_Rmat, _Rji_spon, _Rji_stim, _Rij, _idxI, _idxJ)
 if isJIT_ == True :
     solveSE = nb.njit( ['float64[:](float64[:,:],float64[:,:])'] )( solveSE )
     setMatrixC = nb.njit( ['void(float64[:,:],float64[:],float64[:],uint16[:],uint16[:],float64)'] )( setMatrixC )

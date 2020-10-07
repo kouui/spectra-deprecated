@@ -23,55 +23,90 @@ from ...Structure.MyTypes import T_ATOM, T_DATA
 
 def ni_nj_LTE(_atom, _Te, _Ne):
     r""" """
+
+    ## convert _Te, _Ne into numpy array
+    _Te = numpy.atleast_1d( _Te )
+    _Ne = numpy.atleast_1d( _Ne )
+
+
+    ## grab arrays
     _Level = _atom.Level
     _Line  = _atom.Line
-    _Cont  = _atom.Cont
+    _nLevel = _atom.nLevel
+    _nLine = _atom.nLine
+    if _atom.hasContinuum:
+        _Cont  = _atom.Cont
+        _nCont = _atom.nCont
+        _nTran = _nLine + _nCont
+    else:
+        _nTran = _nLine
 
-    ## ! could be optimized to Te-Ne-array
-    
-    _nj_by_ni_L = LTELib.Boltzmann_distribution(_Line['gi'][:], _Line['gj'][:], Cst.h_ * Cst.c_ / _Line['w0'][:], _Te)
+    ## initilize _nj_by_ni
+    _nj_by_ni = numpy.empty( (_nTran,)+_Te.shape, dtype=dtDOUBLE_ )
+
+    ## for line transitions
+    _gi = _Line['gi'][:]
+    _gj = _Line['gj'][:]
+    _Eji = Cst.h_ * _Line['f0'][:]
+
+    for k in range(0, _nLine):
+        _nj_by_ni[k,:] = LTELib.Boltzmann_distribution(_gi[k], _gj[k], _Eji[k], _Te[:])
+
     _idxI_L = _atom.Line['idxI'][:]
     _idxJ_L = _atom.Line['idxJ'][:]
 
-    _stage = _atom.Level['stage'][:]
+    #_stage = _atom.Level['stage'][:]
 
+    ## if there is continuum transition
     if _atom.hasContinuum:
-        ## ! could be optimized to Te-Ne-array
-        _nj_by_ni_C = LTELib.Saha_distribution(_Cont['gi'][:], _Cont['gj'][:], Cst.h_ * Cst.c_ / _Cont['w0'][:], _Ne, _Te)
-        _idxI_C = _Cont['idxI'][:]
-        _idxJ_C = _Cont['idxJ'][:]
+
+        _gi = _Cont['gi'][:]
+        _gj = _Cont['gj'][:]
+        _chi = Cst.h_ * _Cont['f0'][:]
+
+        for k in range(_nCont):
+            _nj_by_ni[k+_nLine,:] = LTELib.Saha_distribution(_gi[k], _gj[k], _chi[k], _Ne[:], _Te[:])
+
+        _idxI = numpy.append( _Line['idxI'][:],_Cont['idxI'][:] )
+        _idxJ = numpy.append( _Line['idxJ'][:],_Cont['idxJ'][:] )
     else:
-        _nj_by_ni_C = None
-        _idxI_C = None
-        _idxJ_C = None
+        _idxI = _Line['idxI'][:]
+        _idxJ = _Line['idxJ'][:]
 
-    ## ! could be optimized to Te-Ne-array
-    _ni = LibArray.convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage,
-                          _hasContinuum=_atom.hasContinuum,
-                          _nj_by_ni_C=_nj_by_ni_C, _idxI_C=_idxI_C, _idxJ_C=_idxJ_C)
+    _isGround = _Level['isGround'][:]
+    ## compute _ni
+    _ni = nj_by_ni_To_ni(_nj_by_ni[:,], _idxI[:], _idxJ[:], _isGround[:], _nLine)
 
-    return _ni, _nj_by_ni_L, _nj_by_ni_C
+    return _ni, _nj_by_ni[:_nLine,:], _nj_by_ni[_nLine:,:]
 
 #-----------------------------------------------------------------------------
 # Array level functions which could be optimized by numba
 #-----------------------------------------------------------------------------
-def nj_by_ni_To_ni(_nj_by_ni, _idxI, _idxJ, _isGround):
+def nj_by_ni_To_ni(_nj_by_ni, _idxI, _idxJ, _isGround, _nLine):
     r""" """
 
     _nLevel = _isGround.shape[0]
-    _nLine  = _idxI.shape[0]
-    _ni = np.ones(_nLevel, dtype=np.double)
+    _nTran  = _idxI.shape[0]
 
-    for k in range( _nLine ):
+    _ni = numpy.empty((_nLevel,)+_nj_by_ni.shape[1:], dtype=dtDOUBLE_)
+    _ni[0,:] = 1.
+
+    for k in range(_nLine, _nTran):
         i = _idxI[k]
         j = _idxJ[k]
         if _isGround[ i ]:
             _ni[ j ] = _nj_by_ni[ k ] * _ni[ i ]
 
-    return _ni
+    for k in range(0, _nLine):
+        i = _idxI[k]
+        j = _idxJ[k]
+        if _isGround[ i ]:
+            _ni[ j ] = _nj_by_ni[ k ] * _ni[ i ]
+
+    return _ni[:,:] / _ni[:,:].sum(axis=0)
 
 #-----------------------------------------------------------------------------
 # numba optimization
 #-----------------------------------------------------------------------------
 if isJIT_:
-    nj_by_ni_To_ni = nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] ) (nj_by_ni_To_ni)
+    nj_by_ni_To_ni = numba.njit( nj_by_ni_To_ni )

@@ -31,23 +31,23 @@ def convert_ni_to_nj_by_ni(_ni, _idxI, _idxJ):
     return _nj_by_ni
 
 
-def nj_by_ni_To_ni(_nj_by_ni, _idxI, _idxJ, _isGround):
-    r""" """
+##def nj_by_ni_To_ni(_nj_by_ni, _idxI, _idxJ, _isGround):
+##    r""" """
+##
+##    _nLevel = _isGround.shape[0]
+##    _nLine  = _idxI.shape[0]
+##    _ni = np.ones(_nLevel, dtype=np.double)
+##
+##    for k in range( _nLine ):
+##        i = _idxI[k]
+##        j = _idxJ[k]
+##        if _isGround[ i ]:
+##            _ni[ j ] = _nj_by_ni[ k ] * _ni[ i ]
+##
+##    return _ni
 
-    _nLevel = _isGround.shape[0]
-    _nLine  = _idxI.shape[0]
-    _ni = np.ones(_nLevel, dtype=np.double)
 
-    for k in range( _nLine ):
-        i = _idxI[k]
-        j = _idxJ[k]
-        if _isGround[ i ]:
-            _ni[ j ] = _nj_by_ni[ k ] * _ni[ i ]
-
-    return _ni
-
-
-def convert_nj_by_ni_to_ni_v0(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
+def convert_nj_by_ni_to_ni(_nj_by_ni_L, _idxI_L, _idxJ_L, _stage, _hasContinuum=False,
                       _nj_by_ni_C=None, _idxI_C=None, _idxJ_C=None):
     r"""
     """
@@ -120,7 +120,7 @@ def ni_nj_LTE(_Level, _Line, _Cont, _Te, _Ne):
 
     return _n_LTE, _ni_LTE, _nj_LTE
 
-@nb.njit(['Tuple((float64[:],float64[:],float64[:]))(float64[:,:],float64[:,:],float64[:,:],float64,float64[:])'])
+#@nb.njit(['Tuple((float64[:],float64[:],float64[:]))(float64[:,:],float64[:,:],float64[:,:],float64,float64[:])'])
 def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
     r"""
     """
@@ -369,7 +369,7 @@ def solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne)
     return _n_SE
 
 if isJIT_:
-    convert_nj_by_ni_to_ni = nb.njit(convert_nj_by_ni_to_ni)
-    nj_by_ni_To_ni = nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] )(nj_by_ni_To_ni)
+    #convert_nj_by_ni_to_ni = nb.njit(convert_nj_by_ni_to_ni)
+#    nj_by_ni_To_ni = nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] )(nj_by_ni_To_ni)
     B_Jbar_Tr = nb.njit(B_Jbar_Tr)
     bf_R_rate = nb.njit(['Tuple((float64[:],float64[:],float64[:]))(float64[:,:],float64[:,:],float64[:,:],float64,float64[:])'])(bf_R_rate)

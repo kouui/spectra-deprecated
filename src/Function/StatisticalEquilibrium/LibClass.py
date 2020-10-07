@@ -123,9 +123,8 @@ def B_Jbar(_atom, _Tr=None):
         ## ! could be optimized to Te-Ne-array
         _Jbar = LTELib.Planck_cm(_Line["w0"][:], _Tr)
 
-        _Bji_Jbar = _Line["BJI"][:] * 
-        _Bij_Jbar =
-         = LibArray.B_Jbar_Tr(_Line["AJI"][:], _Line["BJI"][:], _Line["BIJ"][:], _Line["w0"][:], _Tr)
+        _Bji_Jbar = _Line["BJI"][:] * _Jbar[:]
+        _Bij_Jbar = _Line["BIJ"][:] * _Jbar[:]
 
     return _Bij_Jbar, _Bji_Jbar
 

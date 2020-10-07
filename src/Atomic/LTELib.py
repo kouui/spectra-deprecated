@@ -345,8 +345,8 @@ def EinsteinA_to_EinsteinBs_cm(Aji, w0, gi, gj):
 def Aji_to_Bji_cm(Aji, w0):
     r""" """
 
-    factor- = 2*Cst.h_*Cst.c_**2/w0**5
-    Bji = Aji / factor_
+    factor = 2*Cst.h_*Cst.c_**2/w0**5
+    Bji = Aji / factor
 
     return Bji
 
