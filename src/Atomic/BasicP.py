@@ -4,6 +4,7 @@
 ################################################################################
 
 from .. import Constants as Cst
+from .. import Config
 
 import numba as nb
 
@@ -290,7 +291,7 @@ def air_to_vacuum(w_, unit_):
 #
 #-----------------------------------------------------------------------------
 
-if Cst.isJIT == True :
+if Config.isJIT == True :
     get_Doppler_width = nb.vectorize( ['float64(float64,float64,float64,float64)'] )( get_Doppler_width )
     get_damping_a = nb.vectorize( ['float64(float64,float64)'] )( get_damping_a )
     get_Level_gamma = nb.njit( ['(uint8[:],uint8[:],float64[:])'] )( get_Level_gamma )

@@ -6,6 +6,7 @@ from ...Atomic import LTELib, SEsolver, BasicP, SEsolver
 from ...RadiativeTransfer import Profile
 from ...Math import Integrate
 from ... import Constants as Cst
+from .. import Config
 
 from ...Structure.MyTypes import T_ATOM#, T_ATOM_NBTYPE
 from ...Atomic import Hydrogen
@@ -366,7 +367,7 @@ def solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne)
 
     return _n_SE
 
-if Cst.isJIT:
+if Config.isJIT:
     convert_nj_by_ni_to_ni = nb.njit(convert_nj_by_ni_to_ni)
     nj_by_ni_To_ni = nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] )(nj_by_ni_To_ni)
     B_Jbar_Tr = nb.njit(B_Jbar_Tr)

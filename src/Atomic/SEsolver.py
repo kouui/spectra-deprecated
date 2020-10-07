@@ -2,6 +2,7 @@ import numpy as np
 import numba as nb
 
 from .. import Constants as Cst
+from .. import Config
 
 #@nb.njit
 def setMatrixC(_Cmat, _Cji, _Cij, _idxI, _idxJ, _Ne):
@@ -152,7 +153,7 @@ def solveSE(_Rmat, _Cmat):
 #
 #-----------------------------------------------------------------------------
 
-if Cst.isJIT == True :
+if Config.isJIT == True :
     solveSE = nb.njit( ['float64[:](float64[:,:],float64[:,:])'] )( solveSE )
     setMatrixC = nb.njit( setMatrixC )
     setMatrixR = nb.njit( setMatrixR )

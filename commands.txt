@@ -75,6 +75,7 @@ numba
 
   $ conda install -c numba icc_rt
   $ conda update numba
+  $ conda install tbb
 
 others
 ------

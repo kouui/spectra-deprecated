@@ -3,6 +3,8 @@ import numpy as np
 import numba as nb
 
 from ... import Constants as Cst
+from .. import Config
+
 from ...Atomic import Hydrogen
 
 def compute_PI_cross_section(_ni, _meshCont):
@@ -58,5 +60,5 @@ def ratio_Etran_to_Eionize( ni_arr, wave_arr ):
 
     return ratio
 
-if Cst.isJIT:
+if Config.isJIT:
     ratio_Etran_to_Eionize = nb.njit( ['float64[:,:](uint8[:], float64[:,:])', 'float64[:,:](int64[:], float64[:,:])'] )(ratio_Etran_to_Eionize)

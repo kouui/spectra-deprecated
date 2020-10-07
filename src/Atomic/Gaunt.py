@@ -12,6 +12,7 @@
 
 import numba as nb
 from .. import Constants as Cst
+from .. import Config
 
 
 def g0(_n):
@@ -98,7 +99,7 @@ def g2(_n):
 # whether to compile them using numba's LLVM
 ################################################################################
 
-if Cst.isJIT == True :
+if Config.isJIT == True :
     g0 = nb.vectorize( [nb.float64(nb.int64),nb.float64(nb.uint8)],nopython=True)( g0 )
     g1 = nb.vectorize( [nb.float64(nb.int64),nb.float64(nb.uint8)],nopython=True)( g1 )
     g2 = nb.vectorize( [nb.float64(nb.int64),nb.float64(nb.uint8)],nopython=True)( g2 )

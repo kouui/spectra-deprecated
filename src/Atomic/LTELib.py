@@ -8,6 +8,7 @@
 import numpy as np
 import numba as nb
 from .. import Constants as Cst
+from .. import Config
 
 def Boltzmann_distribution(_gi, _gj, _Eji, _Te):
     r"""
@@ -620,7 +621,7 @@ def Ufunc(elm, T):
 # whether to compile them using numba's LLVM
 ################################################################################
 
-if Cst.isJIT == True :
+if Config.isJIT == True :
     Boltzmann_distribution = nb.vectorize( ['float64(uint8,uint8,float64,float64)'], nopython=True)( Boltzmann_distribution )
     Saha_distribution = nb.vectorize( ['float64(uint8,uint8,float64,float64,float64)'], nopython=True)( Saha_distribution )
     Planck_cm = nb.vectorize( [nb.float64(nb.float64,nb.float64)], nopython=True)( Planck_cm )

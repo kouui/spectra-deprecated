@@ -69,7 +69,7 @@ L_i2s = { 0 : "S", 1 : "P", 2 : "D", 3 : "F", 4 : "G", 5 : "H", 6 : "I" }
 ################################################################################
 # constants for code configuration
 ################################################################################
-isJIT = True
+#isJIT = True
 """whether to turn on the JIT compilation in all *.py files,
 since sphinx does no understand numba thus can not generate documentation for numba jitted functions.
 

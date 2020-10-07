@@ -1,8 +1,12 @@
 ------------------------------------------------
-unit [1E-6 sec] |      np       |    np+njit    
+unit [1E-6 sec] |      np       |    np+njit
 ------------------------------------------------
-n=11            |      48.6     |       1.6     
-n=51            |      78.0     |       1.7     
-n=101           |     151.3     |       1.9     
-n=1001          |    1357.6     |      11.1     
+n=11            |      48.6     |       1.6
+n=51            |      78.0     |       1.7
+n=101           |     151.3     |       1.9
+n=1001          |    1357.6     |      11.1
 ------------------------------------------------
+
+Conclusion :
+  1. with n~51, 2 dimemsional z-axis, x-axis, iteration-axis ~ 100x100x100 --> 1.9 [sec], which is accecptable
+  2. 3 dimensional is unacceptable, since 1 iteration for 100x100x100 (xyz) costs 1.9 [sec]. in this case better pre-calculate it

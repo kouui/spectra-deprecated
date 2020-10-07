@@ -7,6 +7,7 @@ import numba as nb
 import numpy as np
 
 from .. import Constants as Cst
+from .. import Config
 
 ################################################################################
 # Exponential integral E1(x) and E2(x)
@@ -108,7 +109,7 @@ def E3(x):
 # whether to compile them using numba's LLVM
 ################################################################################
 
-if Cst.isJIT == True :
+if Config.isJIT == True :
     E0 = nb.jit( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E0 )
     E1 = nb.vectorize( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E1 )
     E2 = nb.vectorize( [nb.float64(nb.float64), nb.float64(nb.int_)], nopython=True)( E2 )

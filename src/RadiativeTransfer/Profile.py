@@ -8,6 +8,8 @@ import numpy as np
 import numba as nb
 
 from .. import Constants as Cst
+from .. import Config
+
 from ..Math import BasicM
 
 
@@ -272,6 +274,6 @@ def half_to_full(_arr_half, _isMinus=False):
 ################################################################################
 # whether to compile them using numba's LLVM
 ################################################################################
-if Cst.isJIT == True:
+if Config.isJIT == True:
     makeLineMesh_Half = nb.njit( ['(int64,float64,float64,float64[:])','(uint16,float64,float64,float64[:])'] )( makeLineMesh_Half )
     makeLineMesh_Full = nb.njit( ['float64[:](int64,float64,float64)', 'float64[:](uint16,float64,float64)'] )( makeLineMesh_Full )

@@ -1,9 +1,12 @@
 import numpy as np
 import numba as nb
 from .. import Constants as Cst
+from .. import Config
 
 from scipy.interpolate import splrep, splev, interp1d
 from ..Math import Integrate
+
+
 
 
 def interpolate_PI_intensity(_backRad, _continuum_mesh_list):
@@ -159,5 +162,5 @@ def bound_free_radiative_transition_coefficient(wave, J, alpha, Te, nk_by_ni_LTE
 
     return Rik, Rki_stim, Rki_spon
 
-if Cst.isJIT:
+if Config.isJIT:
     bound_free_radiative_transition_coefficient = nb.njit(['Tuple((float64,float64,float64))(float64[:],float64[:],float64[:],float64,float64)'])( bound_free_radiative_transition_coefficient )
