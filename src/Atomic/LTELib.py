@@ -7,8 +7,10 @@
 
 import numpy as np
 import numba as nb
+
 from .. import Constants as Cst
-from .. import Config
+from ..Config import isJIT_
+
 
 def Boltzmann_distribution(_gi, _gj, _Eji, _Te):
     r"""
@@ -621,11 +623,11 @@ def Ufunc(elm, T):
 # whether to compile them using numba's LLVM
 ################################################################################
 
-if Config.isJIT == True :
+if isJIT_ == True :
     Boltzmann_distribution = nb.vectorize( ['float64(uint8,uint8,float64,float64)'], nopython=True)( Boltzmann_distribution )
     Saha_distribution = nb.vectorize( ['float64(uint8,uint8,float64,float64,float64)'], nopython=True)( Saha_distribution )
-    Planck_cm = nb.vectorize( [nb.float64(nb.float64,nb.float64)], nopython=True)( Planck_cm )
-    Planck_hz = nb.vectorize( [nb.float64(nb.float64,nb.float64)], nopython=True)( Planck_hz )
+    Planck_cm = nb.vectorize( ['float64(float64,float64)'], nopython=True)( Planck_cm )
+    Planck_hz = nb.vectorize( ['float64(float64,float64)'], nopython=True)( Planck_hz )
     Aji_to_Bji_cm = nb.vectorize( ['float64(float64,float64)'], nopython=True)( Aji_to_Bji_cm )
     Bji_to_Bij = nb.vectorize( ['float64(float64,uint8,uint8)','float64(float64,int64,int64)'], nopython=True)( Bji_to_Bij )
     #Ufunc = nb.jit(nb.float64(nb.types.unicode_type,nb.float64), nopython=True)( Ufunc )

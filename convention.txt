@@ -1,0 +1,32 @@
+
+
+Names
+-------
+
+-----------------------------------------------------------------
+      Variable         |   Function   |    Class   |   Module   |
+-----------------------------------------------------------------
+  local   |   global   |              |            |            |
+-----------------------------------------------------------------
+  _abc*   |   abc*_    |   abc_def    |    AbcDef  |   AbcDef   |
+-----------------------------------------------------------------
+
+
+import namespace
+-----------------
+
+1. for functions, class
+
+```
+from [...] import ModuleName
+
+ModuleName.functoin_name()
+ModuelName.ClassName()
+```
+
+2. for global variables
+
+```
+from [...]Constants import c_
+from [...]Config import isJIT_, dtFLOAT
+```

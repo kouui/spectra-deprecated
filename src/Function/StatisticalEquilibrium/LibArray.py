@@ -5,13 +5,14 @@ from ...Atomic import Collision, PhotoIonize
 from ...Atomic import LTELib, SEsolver, BasicP, SEsolver
 from ...RadiativeTransfer import Profile
 from ...Math import Integrate
+
 from ... import Constants as Cst
-from .. import Config
+from ...Config import isJIT_
+
 
 from ...Structure.MyTypes import T_ATOM#, T_ATOM_NBTYPE
 from ...Atomic import Hydrogen
 
-#from scipy.interpolate import interp1d
 
 
 
@@ -29,7 +30,7 @@ def convert_ni_to_nj_by_ni(_ni, _idxI, _idxJ):
 
     return _nj_by_ni
 
-@nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] )
+
 def nj_by_ni_To_ni(_nj_by_ni, _idxI, _idxJ, _isGround):
     r""" """
 
@@ -144,7 +145,7 @@ def bf_R_rate(_waveMesh, _Jnu, _alpha, _Te, _nj_by_ni_LTE):
 
     return _Rik, _Rki_stim, _Rki_spon
 
-#@nb.njit
+
 def B_Jbar(_Level, _Line, _MeshCoe, _Tr, _Te=1.E4, _Vt=5.E5, _Vd=1.E6, _Mass=1.):
     r"""
     """
@@ -367,7 +368,8 @@ def solve_SE(_nLevel, _idxI, _idxJ, _Cji, _Cij, _Rji_spon, _Rji_stim, _Rij, _Ne)
 
     return _n_SE
 
-if Config.isJIT:
+if isJIT_:
     convert_nj_by_ni_to_ni = nb.njit(convert_nj_by_ni_to_ni)
     nj_by_ni_To_ni = nb.njit( ['float64[:](float64[:], uint16[:], uint16[:], bool[:])'] )(nj_by_ni_To_ni)
     B_Jbar_Tr = nb.njit(B_Jbar_Tr)
+    bf_R_rate = nb.njit(['Tuple((float64[:],float64[:],float64[:]))(float64[:,:],float64[:,:],float64[:,:],float64,float64[:])'])(bf_R_rate)

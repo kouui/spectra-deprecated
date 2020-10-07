@@ -4,7 +4,8 @@
 ################################################################################
 
 from .. import Constants as Cst
-from .. import Config
+from ..Config import isJIT_
+
 import numba as nb
 
 
@@ -29,6 +30,6 @@ def is_odd(num):
     """
     return num & 0x1
 
-if Config.isJIT:
+if isJIT_:
     pass
     #is_odd = nb.njit( ['bool(int64)','bool(uint16)'] )( is_odd )

@@ -3,7 +3,8 @@ import numpy as np
 import numba as nb
 
 from ... import Constants as Cst
-from .. import Config
+from ...Config import isJIT_
+
 
 from ...Atomic import Hydrogen
 
@@ -60,5 +61,5 @@ def ratio_Etran_to_Eionize( ni_arr, wave_arr ):
 
     return ratio
 
-if Config.isJIT:
+if isJIT_:
     ratio_Etran_to_Eionize = nb.njit( ['float64[:,:](uint8[:], float64[:,:])', 'float64[:,:](int64[:], float64[:,:])'] )(ratio_Etran_to_Eionize)

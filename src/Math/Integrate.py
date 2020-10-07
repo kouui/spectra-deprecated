@@ -7,7 +7,8 @@ import numpy as np
 import numba as nb
 
 from .. import Constants as Cst
-from .. import Config
+from ..Config import isJIT_
+
 
 
 ################################################################################
@@ -57,5 +58,5 @@ def Trapze(integrand, x):
 # whether to compile them using numba's LLVM
 ################################################################################
 
-if Config.isJIT == True:
+if isJIT_ == True:
     Trapze = nb.jit([nb.float64(nb.float64[:],nb.float64[:]),nb.int_(nb.int_[:],nb.int_[:])],nopython=True)( Trapze )
