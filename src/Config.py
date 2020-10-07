@@ -1,6 +1,5 @@
 
-import numba as nb
-import numpy as np
+import numba
 #-----------------------------------------------------------------------------
 # for numba configuratoin
 #-----------------------------------------------------------------------------
@@ -15,19 +14,22 @@ set to
     False : before generating documentation using sphinx
 """
 
+def set_numba_thread(threading_layer='threadsafe', n_thread=2):
+    r""" """
+
+    nb.config.THREADING_LAYER = threading_layer
+    """ set to thread safe library : tbb, omp, workqueue, default : workqueue. tbb if possible """
+
+    nb.set_num_threads(n_thread)
+    """ limiting the number of threads """
 
 
-nb.config.THREADING_LAYER = 'threadsafe'
-""" set to thread safe library : tbb, omp, workqueue, default : workqueue. tbb if possible """
-
-nb.set_num_threads(2)
-""" limiting the number of threads """
 
 #-----------------------------------------------------------------------------
 # global datatype definition
 #-----------------------------------------------------------------------------
 
-dtFLOAT_   = np.float32
-dtDOUBLE_  = np.float64
-dtUINT_    = np.uint16
-dtINT_     = np.int64
+dtFLOAT_   = 'float32'
+dtDOUBLE_  = 'float64'
+dtUINT_    = 'uint16'
+dtINT_     = 'int64'
