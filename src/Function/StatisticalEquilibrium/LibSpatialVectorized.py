@@ -1,5 +1,5 @@
-import numpy as np
-import numba as nb
+import numpy
+import numba
 
 from numpy import exp
 #from math import exp
@@ -7,7 +7,7 @@ from numpy import exp
 # module namespace
 #-----------------------------------------------------------------------------
 from ... import Constants as Cst
-from ...Config import isJIT_
+from ...Config import isJIT_, dtDOUBLE_
 
 
 from ...Atomic import Collision, PhotoIonize, LTELib, SEsolver, BasicP, SEsolver
@@ -28,6 +28,7 @@ def ni_nj_LTE(_atom, _Te, _Ne):
     _Cont  = _atom.Cont
 
     ## ! could be optimized to Te-Ne-array
+    
     _nj_by_ni_L = LTELib.Boltzmann_distribution(_Line['gi'][:], _Line['gj'][:], Cst.h_ * Cst.c_ / _Line['w0'][:], _Te)
     _idxI_L = _atom.Line['idxI'][:]
     _idxJ_L = _atom.Line['idxJ'][:]
