@@ -2,6 +2,13 @@ import numpy as np
 from .. import Constants as Cst
 
 from scipy.interpolate import splrep, splev
+import numba
+
+@numba.njit(['float64[:](float64[:],float64[:],float64[:],float64,float64)'])
+def interp_Omega(_table, _Te, _Te_table, _f1, _f2):
+    r""" """
+    _Omega = np.interp( _Te, _Te_table[:], _table[:] )  * _f1 / _f2
+    return _Omega
 
 def interpolate_CE_fac(_table, _Te, _Te_table, _f1, _f2):
     r"""
@@ -108,6 +115,7 @@ def interpolate_CI_fac(_table, _Te, _Te_table, _f2):
 
     return _CI_fac
 
+@numba.vectorize(['float64(float64,float64)'], nopython=True)
 def Cij_to_Cji(_Cij,  _nj_by_ni_LTE):
     r"""
     calculate Cji from Cij
@@ -137,6 +145,7 @@ def Cij_to_Cji(_Cij,  _nj_by_ni_LTE):
 
     return _Cji
 
+@numba.vectorize(['float64(float64,float64,uint8,float64)'], nopython=True)
 def get_CE_rate_coe(_CE_fac, _Te, _gi, _dEij):
     r"""
     compute the CE rate coefficient.
@@ -183,6 +192,7 @@ def get_CE_rate_coe(_CE_fac, _Te, _gi, _dEij):
 
     return _CEij
 
+@numba.vectorize(['float64(float64,float64,float64)'], nopython=True)
 def get_CI_rate_coe(_CI_fac, _Te, _dEik):
     r"""
     compute the CI rate coefficient.

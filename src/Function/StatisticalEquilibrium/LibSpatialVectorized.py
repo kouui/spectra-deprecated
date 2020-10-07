@@ -165,8 +165,21 @@ def get_Cij(_atom, _Te):
     # for line transition
     #------
     if _atom.ATOM_DATA_TYPES.CE == T_DATA.INTERPOLATE:
-        pass
-        # interpolate CE
+
+        _Omega_table = _atom.CE.Omega_table[:,:]
+        _Te_table    = _atom.CE.Te_table[:]
+        _f1        = _atom.CE.Coe['f1'][:]
+        _f2        = _atom.CE.Coe['f2'][:]
+        _gi        = _atom.CE.Coe['gi'][:]
+        _dEij      = _atom.CE.Coe['dEij'][:]
+
+        for k in range(_nLine):
+            _omega = Collision.interp_Omega(_Omega_table[k,:], _Te_1D[:],
+                                           _Te_table[:], _f1[k], _f2[k])
+
+            _Cij[k,:] = Collision.get_CE_rate_coe(_omega[:], _Te_1D[:], _gi[k],_dEij[k] )
+
+
 
     elif _atom.ATOM_DATA_TYPES.CE == T_DATA.CALCULATE:
 
@@ -179,6 +192,9 @@ def get_Cij(_atom, _Te):
             for k in range(_nLine):
                 _Cij[k,:] = Hydrogen.CE_rate_coe(_ni[k], _nj[k], _Te_1D[:])
 
+        else:
+            assert False
+
     else:
         assert False
 
@@ -189,8 +205,18 @@ def get_Cij(_atom, _Te):
         #------
 
         if _atom.ATOM_DATA_TYPES.CI == T_DATA.INTERPOLATE:
-            pass
-            # interpolate CI
+
+            _Omega_table = _atom.CI.Omega_table[:,:]
+            _Te_table    = _atom.CI.Te_table[:]
+            _f2        = _atom.CI.Coe['f2'][:]
+            _dEij      = _atom.CI.Coe['dEij'][:]
+
+            for k in range(_nCont):
+                _omega = Collision.interp_Omega(_Omega_table[k,:], _Te_1D[:],
+                                               _Te_table[:], 1., _f2[k])
+
+                _Cij[k+_nLine,:] = Collision.get_CI_rate_coe(_omega[:], _Te_1D[:], _dEij[k] )
+
 
         elif _atom.ATOM_DATA_TYPES.CI == T_DATA.CALCULATE:
 
@@ -200,6 +226,10 @@ def get_Cij(_atom, _Te):
                 _ni = _Cont['ni'][:]
                 for k in range(_nCont):
                     _Cij[k+_nLine,:]= Hydrogen.CI_rate_coe(_ni[k], _Te_1D[:])
+
+            else:
+                assert False
+
         else:
             assert False
 
