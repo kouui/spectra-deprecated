@@ -1,5 +1,6 @@
 
 import numba
+import numpy
 #-----------------------------------------------------------------------------
 # for numba configuratoin
 #-----------------------------------------------------------------------------
@@ -29,7 +30,14 @@ def set_numba_thread(threading_layer='threadsafe', n_thread=2):
 # global datatype definition
 #-----------------------------------------------------------------------------
 
-dtFLOAT_   = 'float32'
-dtDOUBLE_  = 'float64'
-dtUINT_    = 'uint16'
-dtINT_     = 'int64'
+dtFLOAT_   = numpy.float32
+dtFLOAT_S_ = 'float32'
+
+dtDOUBLE_  = numpy.float64
+dtDOUBLE_S_= 'float64'
+
+dtUINT_    = numpy.uint16
+dtUINT_S_  = 'uint16'
+
+dtINT_     = numpy.int64
+dtINT_S_   = 'int64'

@@ -27,6 +27,6 @@ ModuelName.ClassName()
 2. for global variables
 
 ```
-from [...]Constants import c_
+from [...] import Constants as Cst
 from [...]Config import isJIT_, dtFLOAT
 ```

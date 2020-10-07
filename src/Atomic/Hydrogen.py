@@ -1,14 +1,18 @@
-import numpy as np
-import numba as nb
+import numpy
+from numpy import sqrt, exp, log
+import numba
 
-from .. import Constants as Cst
+#from .. import Constants as Cst
+from ..Constants import E_Rydberg_, h_, c_, k_, sqrt3_, pi_, C0_, K2eV_
+from ..Config import dtUINT_, dtDOUBLE_
+
 from ..Math import Special
 
 
 #-----------------------------------------------------------------------------
 # Utils
 #-----------------------------------------------------------------------------
-@nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64)'] , nopython=True)
 def ratio_Etran_to_Eionize(ni, w):
     r"""
     compute the "ratio of transition energy to ionization energy"
@@ -28,9 +32,9 @@ def ratio_Etran_to_Eionize(ni, w):
 
     """
     # ionization energy
-    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    Eik = E_Rydberg_ * (1./ni**2)
     # transition energy
-    E_tran = Cst.h_ * Cst.c_ / w
+    E_tran = h_ * c_ / w
 
     ratio = E_tran / Eik
     return ratio
@@ -39,7 +43,7 @@ def ratio_Etran_to_Eionize(ni, w):
 #-----------------------------------------------------------------------------
 # Gaunt factor
 #-----------------------------------------------------------------------------
-@nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64)'] , nopython=True)
 def Gaunt_factor_Gingerich_cm(ni, w):
     r"""
     Gaunt factor
@@ -83,7 +87,7 @@ def Gaunt_factor_Gingerich_cm(ni, w):
     return g
 
 
-@nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64)'] , nopython=True)
 def Gaunt_factor_Gingerich(ni, x):
     r"""
     Gaunt factor
@@ -116,17 +120,17 @@ def Gaunt_factor_Gingerich(ni, x):
     .. [1] Gingerich, March 1964
     """
     # ionization energy
-    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    Eik = E_Rydberg_ * (1./ni**2)
     # transition energy
     E_tran = x * Eik
     # wavelength
-    w = Cst.h_ * Cst.c_ / E_tran
+    w = h_ * c_ / E_tran
 
     g = Gaunt_factor_Gingerich_cm(ni, w)
     return g
 
 
-@nb.vectorize([nb.float64(nb.int64, nb.int64)], nopython=True)
+@numba.vectorize(['float64(int64,int64)'], nopython=True)
 def Gaunt_factor_coe(i, ni):
     r"""
     coefficients to calculate Gaunt factor
@@ -170,7 +174,7 @@ def Gaunt_factor_coe(i, ni):
     return gi
 
 
-@nb.vectorize( [nb.float64(nb.int64,nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64)'] , nopython=True)
 def Gaunt_factor(ni, x):
     r"""
     Gaunt factor
@@ -236,7 +240,7 @@ def Gaunt_factor(ni, x):
 # Einstein Aji coefficient
 #-----------------------------------------------------------------------------
 
-@nb.vectorize( [nb.float64(nb.int64,nb.int64)] , nopython=True)
+@numba.vectorize( ['float64(int64,int64)'] , nopython=True)
 def absorption_oscillator_strength(ni, nj):
     r"""
     absorption oscillator strength given by (Bethe and Salpeter 1957)
@@ -267,7 +271,7 @@ def absorption_oscillator_strength(ni, nj):
            Astrophysical Journal, vol. 174, p.227, May 1972.
            1972ApJ...174..227J
     """
-    coef = 32. / (3. * Cst.sqrt3_ * Cst.pi_ )
+    coef = 32. / (3. * sqrt3_ * pi_ )
     x = 1. - (ni / nj)**2
 
     fij = coef * ni / ( x * nj )**3
@@ -275,7 +279,7 @@ def absorption_oscillator_strength(ni, nj):
     return fij
 
 
-@nb.vectorize( [nb.float64(nb.int64,nb.int64)] , nopython=True)
+@numba.vectorize( ['float64(int64,int64)'] , nopython=True)
 def Einstein_A_coefficient(ni, nj):
     r"""
     Einstein coefficient for spontaneous emission in the hydrogen atom
@@ -321,10 +325,10 @@ def Einstein_A_coefficient(ni, nj):
     fij = absorption_oscillator_strength(ni, nj) * g
 
     # excitation energy
-    Eij = Cst.E_Rydberg_ * (1./ni**2 - 1./nj**2)
+    Eij = E_Rydberg_ * (1./ni**2 - 1./nj**2)
 
     # wavelength
-    w = Cst.h_ * Cst.c_ / Eij
+    w = h_ * c_ / Eij
 
     # constant factor
     C1 = 0.667025 # 8 * Cst.pi_**2 * Cst.e_**2 / Cst.me_ / Cst.c_
@@ -337,7 +341,7 @@ def Einstein_A_coefficient(ni, nj):
 # Collisional Excitation rate coefficient
 #-----------------------------------------------------------------------------
 
-@nb.vectorize( [nb.float64(nb.int64,nb.int64, nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,int64,float64)'] , nopython=True)
 def CE_rate_coe(ni, nj, Te):
     r"""
     Collisional Excitation rate coefficient qij for the hydrogen atom
@@ -383,7 +387,7 @@ def CE_rate_coe(ni, nj, Te):
 
     """
 
-    kT = Cst.k_ * Te
+    kT = k_ * Te
 
     # Gaunt factor
     x = 1. - (ni / nj)**2
@@ -409,7 +413,7 @@ def CE_rate_coe(ni, nj, Te):
     Bij = 4. * ni * (ni/nj)**3 * x_m**2 * ( 1. + x_m * ( 4/3 + x_m * bi ) )
 
     # excitation energy
-    Eij = Cst.E_Rydberg_ * (1./ni**2 - 1./nj**2)
+    Eij = E_Rydberg_ * (1./ni**2 - 1./nj**2)
 
     # Eq(37)
     y = Eij / kT
@@ -419,10 +423,10 @@ def CE_rate_coe(ni, nj, Te):
     z = rij + y
 
     term1 = Aij * ( ( 1./y + 0.5 ) * Special.E1(y) - ( 1./z + 0.5 ) * Special.E1(z) )
-    term2 = ( Bij - Aij *  np.log( 2. * ni * ni * x_m ) ) * ( Special.E2(y) / y - Special.E2(z) / z )
+    term2 = ( Bij - Aij *  log( 2. * ni * ni * x_m ) ) * ( Special.E2(y) / y - Special.E2(z) / z )
 
     # Eq(36)
-    Sij = Cst.C0_ * Te**(0.5) * 2 * ni * ni * x_m * y * y * (term1 + term2)
+    Sij = C0_ * Te**(0.5) * 2 * ni * ni * x_m * y * y * (term1 + term2)
     qij = Sij
 
     return qij
@@ -431,7 +435,7 @@ def CE_rate_coe(ni, nj, Te):
 # Collisional Ionization rate coefficient
 #-----------------------------------------------------------------------------
 
-@nb.vectorize( [nb.float64(nb.int64, nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64)'] , nopython=True)
 def CI_rate_coe(ni, Te):
     r"""
     Collisional ionization rate coefficient qik for the hydrogen atom
@@ -474,12 +478,12 @@ def CI_rate_coe(ni, Te):
 
     """
 
-    kT = Cst.k_ * Te
+    kT = k_ * Te
 
     # Eq(20)
-    i_arr = np.array([0,1,2],dtype=np.int64)
+    i_arr = numpy.array([0,1,2],dtype=dtUINT_)
     gi_arr = Gaunt_factor_coe(i_arr, ni)
-    Ai = 32./(3.*Cst.sqrt3_*Cst.pi_) * ni * ( gi_arr[:] / (i_arr[:]+3) ).sum()
+    Ai = 32./(3.*sqrt3_*pi_) * ni * ( gi_arr[:] / (i_arr[:]+3) ).sum()
 
     # Eq(25, 26, 31, 32)
     if ni >= 2:
@@ -494,7 +498,7 @@ def CI_rate_coe(ni, Te):
     Bi = 2./3. * ni*ni * (5. + bi)
 
     # ionization energy
-    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    Eik = E_Rydberg_ * (1./ni**2)
 
     # Eq(40)
     y = Eik / kT
@@ -511,14 +515,14 @@ def CI_rate_coe(ni, Te):
     xi_z = Special.E0(z) - 2.*E1_z + E2_z
 
     term1 = Ai * ( 1./y * E1_y - 1./z * E1_z )
-    term2 = ( Bi - Ai*np.log(2*ni*ni) ) * ( xi_y - xi_z )
+    term2 = ( Bi - Ai*log(2*ni*ni) ) * ( xi_y - xi_z )
     # Eq(39)
-    Sik = Cst.C0_ * Te**(0.5) * 2 * ni * ni * y * y * (term1 + term2)
+    Sik = C0_ * Te**(0.5) * 2 * ni * ni * y * y * (term1 + term2)
     qik = Sik
 
     return qik
 
-@nb.vectorize( [nb.float64(nb.int64, nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64)'] , nopython=True)
 def CI_rate_coe_Clark(ni, Te):
     r"""
     Collisional ionization rate coefficient qik for the hydrogen atom
@@ -561,7 +565,7 @@ def CI_rate_coe_Clark(ni, Te):
 
     """
 
-    kT = Cst.k_ * Te
+    kT = k_ * Te
 
     C1 =  1.53690
     C2 =  0.99656
@@ -576,13 +580,13 @@ def CI_rate_coe_Clark(ni, Te):
     G = ( ni - 1 ) * ( 4 * ni + 1 ) / ( 6 * ni )
 
     # ionization energy
-    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    Eik = E_Rydberg_ * (1./ni**2)
 
     y = Eik / kT
-    TeV = Te * Cst.K2eV_
-    F = 5.89E-9 * np.sqrt( TeV ) * y * ni**4# / Eik**2 # mistake in the paper?
+    TeV = Te * K2eV_
+    F = 5.89E-9 * sqrt( TeV ) * y * ni**4# / Eik**2 # mistake in the paper?
 
-    E_y  = np.exp(-y)
+    E_y  = exp(-y)
     E1_y = Special.E1(y)
     E2_y = Special.E2(y)
 
@@ -598,7 +602,7 @@ def CI_rate_coe_Clark(ni, Te):
 #-----------------------------------------------------------------------------
 # Photoionization cross section
 #-----------------------------------------------------------------------------
-@nb.vectorize( [nb.float64(nb.int64, nb.float64, nb.int64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64,int64)'] , nopython=True)
 def PI_cross_section_cm(ni, w, Z):
     r"""
     Photoionization cross-section for hydrogen from lower level ni at wavelength w.
@@ -633,18 +637,18 @@ def PI_cross_section_cm(ni, w, Z):
         Princeton University Press, 2015.
     """
     # ionization energy
-    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    Eik = E_Rydberg_ * (1./ni**2)
 
     # frequency
-    v = Cst.c_ / w
+    v = c_ / w
     # ratio of transition energy to ionization energy
-    x = Cst.h_ * v / Eik
+    x = h_ * v / Eik
 
 
     alpha = 2.815E29 * Z**4  / (v**3 * ni**5) * Gaunt_factor(ni, x)
     return alpha
 
-@nb.vectorize( ['float64(int64, float64, int64)', 'float64(uint8, float64, int64)'] , nopython=True)
+@numba.vectorize( ['float64(int64, float64, int64)', 'float64(uint8, float64, int64)'] , nopython=True)
 def PI_cross_section(ni, x, Z):
     r"""
     Photoionization cross-section for hydrogen from lower level ni at wavelength w.
@@ -679,10 +683,10 @@ def PI_cross_section(ni, x, Z):
         Princeton University Press, 2015.
     """
     # ionization energy
-    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    Eik = E_Rydberg_ * (1./ni**2)
 
     # frequency
-    v = x * Eik / Cst.h_
+    v = x * Eik / h_
 
     # frequency
 
@@ -692,7 +696,7 @@ def PI_cross_section(ni, x, Z):
 #-----------------------------------------------------------------------------
 # spontaneous radiative recombination
 #-----------------------------------------------------------------------------
-@nb.vectorize( [nb.float64(nb.int64, nb.float64)] , nopython=True)
+@numba.vectorize( ['float64(int64,float64)'] , nopython=True)
 def Rki_spon_rate_coe(ni, Te):
     r"""
     Parameters
@@ -723,9 +727,9 @@ def Rki_spon_rate_coe(ni, Te):
            Astrophysical Journal, vol. 174, p.227, May 1972.
            1972ApJ...174..227J
     """
-    kT = Cst.k_ * Te
+    kT = k_ * Te
     # ionization energy
-    Eik = Cst.E_Rydberg_ * (1./ni**2)
+    Eik = E_Rydberg_ * (1./ni**2)
     #
     r = Eik / kT
 
@@ -733,7 +737,117 @@ def Rki_spon_rate_coe(ni, Te):
     summation += Gaunt_factor_coe(1,ni) * Special.E2(r)
     summation += Gaunt_factor_coe(2,ni) * Special.E3(r)
 
-    Ski = 5.197E-14 * r**(1.5) * np.exp(r) * summation
+    Ski = 5.197E-14 * r**(1.5) * exp(r) * summation
 
     RCki = Ski
     return RCki
+
+#-----------------------------------------------------------------------------
+# collisional line broadening
+# for hydrogen, they are
+#   1. Resonance broadening
+#   2. Van der Waals broadening
+#   3. Linear Stark broadening
+#-----------------------------------------------------------------------------
+@numba.vectorize([ 'float64(uint8,uint8,float64,float64)' ], nopython=True)
+def collisional_broadening_Res_and_Van( _ni, _nj, _nH_I_ground, _Te):
+    r"""
+
+    collisional broadening caused by
+      1. Resonance broadening
+      2. Van der Waals broadening
+
+    Parameters
+    ------------
+    _ni : int,  [:math:`-`]
+        principal quantum number of lower level
+
+    _nj : int,  [:math:`-`]
+        principal quantum number of lower level
+
+    _nH_I_ground : float,  [:math:`cm^{-3}`]
+        population of neutral hydrogem ground level
+
+    _Te : float,  [:math:`K`]
+        electron temperature
+
+    Returns
+    ---------
+    _gamma : float, [:math:`s^{-1}`]
+        half life time of the damping (line width of the Lorentz profile)
+
+    Notes
+    ------
+    refer to [1]_
+
+    References
+    -----------
+    .. [1] M. C. Lortet & E. Roueff, "Broadening of Hydrogen Lines
+           in a Neutral Medium", A&A, 3, 462-467, 1969
+           1969A&A......3...462L
+    """
+
+    _psr = numpy.array([ 0.0, 4.94E-8, 7.93E-9, 2.75E-9, 1.29E-9, 7.14E-10 ], dtype=dtDOUBLE_)
+
+    if _ni == 1:
+        _n = _nj
+    else:
+        _n = _ni
+
+    _cvdw = 1.61E-33 * ( _nj**4 - _ni**4 )
+
+    _V_HH = 20596. * sqrt( _Te )
+    _psi_w = 17. * _cvdw**0.4 * _V_HH**0.6
+
+    if _n <= 6 :
+        _psi_r = _psr[ _n-1 ]
+        _psi = ( _psi_r**2.65 + _psi_w**2.65 ) ** (1./2.65)
+    else:
+        _psi = _psi_w
+
+    _gamma = _nH_I_ground * _psi / ( 4.0 * pi_ )
+
+    return _gamma
+
+
+@numba.vectorize([ 'float64(uint8,uint8,float64)' ], nopython=True)
+def collisional_broadening_LinearStark( _ni, _nj, _Ne):
+    r"""
+
+    collisional broadening caused by
+      1. Linear Stark broadening
+
+    Parameters
+    ------------
+    _ni : int,  [:math:`-`]
+        principal quantum number of lower level
+
+    _nj : int,  [:math:`-`]
+        principal quantum number of lower level
+
+    _Ne : float,  [:math:`cm^{-3}`]
+        electron density
+
+    Returns
+    ---------
+    _gamma : float, [:math:`s^{-1}`]
+        half life time of the damping (line width of the Lorentz profile)
+
+    Notes
+    ------
+    refer to [1]_
+
+    References
+    -----------
+    .. [1] K. Sutton, "Approximate line shapes for hydrogen",
+           J. Quant. Spectrosc. Radiat. Transfer,
+           Vol. 20, pp. 333-343, 1978JQSRT...20...33
+    """
+
+    if _nj - _ni == 1:
+        _a1 = 0.642
+    else:
+        _a1 = 1.
+
+    _gamma = 0.255 * _a1 * (_nj*_nj - _ni*_ni) * _Ne**(2./3.)
+    return _gamma
