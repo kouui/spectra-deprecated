@@ -123,8 +123,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# documentation building folder
-#sphinx/
+
 
 # mac
 .DS_Store
@@ -132,5 +131,23 @@ dmypy.json
 # third-party modules
 external/modules
 
+# documentation building folder
+sphinx/
+
 # temp
-notebooks/StatisticalEquilibrium/SE_Plots-Copy1.ipynb
+#notebooks/StatisticalEquilibrium/SE_Plots-Copy1.ipynb
+
+# large files
+*.npy
+
+# notebooks
+notebooks
+
+# pdf
+ref
+
+# temp
+temp
+
+# useless
+useless
