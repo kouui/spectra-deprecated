@@ -103,6 +103,7 @@ def bf_R_rate(_atom, _Te, _nj_by_ni_Cont, _Tr=None):
     # we compute/interpolate photoionizatoin cross section only once
     # and assume that while suffering Doppler shift
     #    - continuum wavelength mesh might shift
+    #        (but for the sake of simplicity, we assume they do not shift)
     #    - photoionizatoin cross section keep constant
     #-------------------------------------------------------------------------
 

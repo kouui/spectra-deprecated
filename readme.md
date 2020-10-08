@@ -204,13 +204,3 @@ for proton impact collision excitation
 - [Copeland et al. 1997](./ref/ECS/Copeland_et_al_1997.pdf) listed a table of references for **Be-like to Cl-like ions for elements from C to Ni**. Also **fine_structure excitation only**.
 
 ---
-
-## TODO
-
-- [X] debug newly added functions in commit [3607eef](https://github.com/kouui/spectra/commit/3607eeff005caae0c659a94344c873fde254e9e5) || finished in commit [852ef87](https://github.com/kouui/spectra/commit/852ef87b443dfcbffbdcd60cd9f2b6be1b3c7618)
-- [X] convert the (I,J) indexing of AJI and CE to Level indexing : (conf_term_J(lower), conf_term_J(upper)) (combine **spectra** and **AtomicQuery**) || finished in commit [5bca5a8](https://github.com/kouui/spectra/commit/5bca5a82ce6ee42260a10a69fcd13fc9630a99d9)
-- [ ] calculate the fitting parameters for collisional excitation/ionization. Because computation using fitting formula is always faster than interpolation, and it is also easier to optmize, e.x. `numba` and so on
-- [ ] try to examine the proposed line pair in Solar-C_EUVST with our code
-- [ ] add functions for calculating collisional ionization/recombination rate coeffcients.
-- [ ] complete the radiative transition rates in calculating SE.
-- [ ] bound-free, free-free opacity, and so on ...
