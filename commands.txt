@@ -10,7 +10,7 @@ git
 
   $ git checkout <branch-name>
 
-3. to untrack a file
+3. to untrack a file (file already deleted)
 
   $ git rm <file>
 
@@ -57,6 +57,17 @@ git
 11. to update local branch to a remote branch
 
   $ git pull origin <branch-name>
+
+12. show ignored files/folders
+
+  $ git status --ignored -s
+
+13. to untrack a file/folder (keep file/folder exist in local disk, but delete their remote)
+
+    $# add the file/folder into your .gitignore
+    $ git rm -r --cached <file/folder>
+    $# push to your remote repositorys
+
 
 
 sphinx
